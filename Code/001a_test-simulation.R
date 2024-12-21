@@ -42,7 +42,8 @@ pacman::p_load(
     doParallel, 
     foreach,
     parallel, 
-    
+    purrr, # for map()
+    glue, # for glue()
     dplyr, 
     readr, 
     ggplot2
@@ -108,13 +109,12 @@ for (func in function_names) {
 # Test mediator generation 
 # generate_mediator()
 
-
 # # generate_data()
 # J = 100                        # Number of clusters
 # njrange = c(50, 100)            # Range for cluster sizes
 # Mfamily = "gaussian"
 # Yfamily = "binomial"            # Family for outcome ('gaussian' or 'binomial')
-# if.null = FALSE 
+# if.null = FALSE
 # num_x = 3                       # Number of individual-level confounders
 # x_z = 0                         # Correlation between 'X' and 'Z'
 # m_on_a = 0.2                    # Effect of 'A' on 'M'
@@ -185,13 +185,14 @@ for (func in function_names) {
 #     m_on_az = m_on_az,
 #     m_on_anj = m_on_anj,
 #     quadratic.M = quadratic.M,
-#     int.XZ = int.XZ, 
+#     int.XZ = int.XZ,
 #     Mfamily = Mfamily
 # )
 # 
 # data_list$Mfamily
 # data_list$data
 # 
+# generate_outcome(data_list = data_list)
 # # [1] "gaussian"
 # # > data_list$data
 # # # A tibble: 7,185 × 7
@@ -256,10 +257,12 @@ conditions <- data.frame(rbind(
 conditions
 
 
+
+# Testing 1 dataset -------------------------------------------------------
+
+# Condition 
 test_condition <- conditions |> 
     filter(J == 40, Nj_low == 50, quadratic == FALSE, binary.med == TRUE, binary.out == TRUE)
-
-
 
 # Generate Data 
 set.seed(8675309)
@@ -284,9 +287,60 @@ data <- generate_data(
     int.XZ = FALSE
 )
 
+# Effects
+data.frame(
+    individual = unlist(data$effects$individual),
+    cluster = unlist(data$effects$cluster),
+    row.names = names(data$effects$individual)
+)
+# individual    cluster
+# pnde 0.13254019 0.13413533
+# tnie 0.02008776 0.02064484
+# tnde 0.00000000 0.00000000 # A's direct effect only manifests in the absence of mediator change
+# pnie 0.15262795 0.15478017 
 
-data$effects
 
+# Try different parameters 
+set.seed(8675309)
+data <- generate_data(
+    J = test_condition[["J"]], 
+    njrange = c(test_condition[["Nj_low"]], test_condition[["Nj_high"]]), 
+    Mfamily = "binomial",
+    Yfamily = "binomial",
+    # Mfamily = "gaussian",
+    # Yfamily = "gaussian",
+    seed = 8769,
+    num_x = 3,
+    
+    m_on_a = 3.5,
+    m_on_anj = 0.2,
+    m_on_az = 0.2,
+    
+    y_on_a = 2,
+    y_on_m = 5,
+    y_on_am = 2,
+    y_on_az = 0.2,
+    y_on_mz = 0.2,
+    y_on_anj = 0.2,
+    int.XZ = FALSE
+)
+
+# Effects
+data.frame(
+    individual = unlist(data$effects$individual),
+    cluster = unlist(data$effects$cluster),
+    row.names = names(data$effects$individual)
+) |> 
+    format(scientific = FALSE)
+# individual     cluster
+# pnde 0.107344744 0.108667581
+# tnie 0.009257772 0.009533959
+# tnde 0.003682356 0.003771970
+# pnie 0.112920161 0.114429569
+
+# PNDE + TNIE = TNDE + PNIE
+(data$effects$individual$pnde + data$effects$individual$tnie) == (data$effects$individual$tnde + data$effects$individual$pnie)
+ 
 
 
 # Analyze data 
@@ -303,7 +357,33 @@ results <- analyze_clustered_mediation(PS_model_type = "FE",
                                        data = data$data)
 
 results
-data$effects$individual
+# data$effects$individual
+
+# Load Dr Liu ML estimation package
+devtools::load_all("Application/Functions/MediatorCL")
+
+
+# Analyze data with ML approach 
+learners_a <- learners_m <- learners_y <- c("SL.glm","SL.nnet") 
+
+# data$CLUSTER2 <- as.factor(data$CLUSTER2)
+# Sname <- "school" # have to specify this outside of MediatorCL function to work
+
+results_ml <- MediatorCL::MediatorCL(
+    data = data$data,
+    Sname = "school",
+    Wnames = "W_nj",
+    Xnames = paste0("X", 1:3),
+    Aname = "A",
+    Mnames = "M",
+    Yname = "Y",
+    learners_a = learners_a,
+    learners_m = learners_m,
+    learners_y = learners_y,
+    cluster_opt = "cwc",
+    num_folds = 5
+    
+)
 
 
 

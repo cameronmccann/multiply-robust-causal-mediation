@@ -29,7 +29,7 @@ generate_clusters <- function(J = 100, njrange = c(50, 100), seed) {
                        school = unlist(map(1:J, ~ rep(.x, each = nj_sizes[.x])))) |> 
         group_by(school) |> 
         # Create a standardized cluster size variable 'W_nj'
-        mutate(W_nj = (n() - njrange[1]) / (njrange[2] - njrange[1])) |> 
+        mutate(W_nj = (n() - njrange[1]) / (njrange[2] - njrange[1])) |> # NOTE: maybe reconsider 
         ungroup()
     
     return(list(

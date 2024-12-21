@@ -35,7 +35,7 @@ trueVals <- function(data_list) {
     m_on_anj <- data_list$m_on_anj
     quadratic_M <- data_list$quadratic.M 
     Mfamily = data_list$Mfamily 
-    # m_given = data_list$m_given
+    m_given = data_list$m_given
     
     iccy = data_list$iccy 
     yintercept = data_list$yintercept 
@@ -49,7 +49,7 @@ trueVals <- function(data_list) {
     y_on_z = data_list$y_on_z
     quadratic.Y = data_list$quadratic.Y 
     Yfamily = data_list$Yfamily 
-    # y_given = data_list$y_given
+    y_given = data_list$y_given
     
     # Define 'gen_m' if not provided
     if (is.null(data_list$gen_m)) {

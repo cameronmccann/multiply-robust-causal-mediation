@@ -12,20 +12,18 @@
 # Script Description: this is used to fix, test, and properly build the trueVals funciton 
 #
 #
-# Last Updated: 12/13/2024
+# Last Updated: 12/18/2024
 #
 #
 # Notes:
-#   To-Do: figure out why trueVals (specifically, pm1() & my() are returning integer(0))
-#               # So far i have been going through the function (qoeking on loop.. section) & commenting out & adding code for one interation of the loops 
+#   To-Do: 
+#       + probably examine more thoroughly (& check with Dr Liu) about the proper computation of true values with continuous med &/or out
 #
 #   Done: 
+#       figure out why trueVals (specifically, pm1() & my() are returning integer(0))
+#               # So far i have been going through the function (qoeking on loop.. section) & commenting out & adding code for one interation of the loops 
 #
 ################################################################################
-
-
-
-
 
 
 # Set Up (Load packages, functions, &/or data) ----------------------------
@@ -37,15 +35,16 @@ pacman::p_load(
     # doParallel, 
     # foreach,
     # parallel, 
-    
+    purrr, # for map()
+    glue, # for glue()
     dplyr, 
     readr 
     # ggplot2
 )
 
-#----------------------
-# Load Functions
-#----------------------
+# ═══════════════════
+#     Load Functions
+# ═══════════════════
 
 # Load Data gen functions 
 # Define the vector of function names
@@ -71,7 +70,6 @@ for (func in function_names) {
 
 # generate data & set initial values within function  ---------------------
 
-
 # Generate Data 
 set.seed(8675309)
 data_list <- generate_data(
@@ -80,25 +78,35 @@ data_list <- generate_data(
     Mfamily = "binomial",
     Yfamily = "binomial", 
     seed = 8769,
+    
+    # num_x = 3,
+    # m_on_a = 15,
+    # m_on_anj = 0.5,
+    # m_on_az = 0.2,
+    # y_on_a = 2,
+    # y_on_m = 15,
+    # y_on_am = 5,
+    # y_on_az = 0.2,
+    # y_on_mz = 0.2,
+    # y_on_anj = 5,
+    # int.XZ = FALSE
+    
     num_x = 3,
-    
-    m_on_a = 15,
-    m_on_anj = 0.5,
+    m_on_a = 3.5,
+    m_on_anj = 0.2,
     m_on_az = 0.2,
-    
     y_on_a = 2,
-    y_on_m = 15,
-    y_on_am = 5,
+    y_on_m = 5,
+    y_on_am = 2,
     y_on_az = 0.2,
     y_on_mz = 0.2,
-    y_on_anj = 5,
+    y_on_anj = 0.2,
     int.XZ = FALSE
 )
 
-
-# ===========================
-# set up of initial part of trueVals 
-# ===========================
+# ══════════════════════════════
+#     set up of initial part of trueVals    
+# ══════════════════════════════
 
 # Extract necessary components from data_list
 data <- data_list$data
@@ -188,72 +196,73 @@ truevals_cluster <- list()
 # working on loop section of function (meat of func) ----------------------
 
 
+# NOTE: I STOPPED WORKING ON COMMENTED OUT CODE BECAUSE I SOLVED ISSUE
 
 
 
 
 
 
-# Loop over each combination of treatment values
-# for (j in 1:nrow(a_vals)) {
-
-    j = 1
-
-    a0_val <- a_vals$a0[j]
-    a1_val <- a_vals$a1[j]
-    
-    # Define a label for the current treatment combination
-    label <- glue("Y(a0={a0_val}, gm(a1={a1_val}))")
-    
-    # All possible values of the mediator (binary: 0 and 1)
-    mediator_vals <- expand.grid(m = c(0, 1))
-    
-    # Compute the expected outcome by integrating over mediator distribution
-    # intm <- sapply(1:nrow(mediator_vals), function(i) {
-        i = 1
-        m <- mediator_vals$m[i]
-        
-        # Compute the probability of mediator being m
-        p_m <- pm1(
-            m = m,
-            a = a1_val,
-            z = data$Z,
-            nj = data$nj, #nj = data_list$nj_sizes, # 
-            given = data_list$m_given,
-            gen_m = gen_m
-        )
-        
-        # Compute the expected outcome given mediator and treatment
-        expected_y <- my(
-            m = m,
-            a = a0_val,
-            z = data$Z,
-            nj = data$nj, #nj = data_list$nj_sizes, # nj = data$nj,
-            given = data_list$y_given,
-            gen_y = gen_y,
-            binary = (Yfamily == "binomial")
-        )
-        
-        # Return the product of mediator probability and expected outcome
-        return(p_m * expected_y)
-    # })
-    
-    # Sum over all mediator values to get the expected outcome for each observation
-    # Resulting in a vector of expected outcomes per observation
-    int_m_sum <- rowSums(intm)
-    
-    # Compute the average expected outcome across all observations (individual-level)
-    truevals_individual[[label]] <- mean(int_m_sum, na.rm = TRUE)
-    
-    # Compute the cluster-level average expected outcome
-    # Aggregating by 'school' and then taking the mean across clusters
-    cluster_means <- data  |> 
-        mutate(int_m_sum = int_m_sum) |> 
-        group_by(school) |> 
-        summarize(cluster_avg = mean(int_m_sum, na.rm = TRUE))
-    
-    truevals_cluster[[label]] <- mean(cluster_means$cluster_avg, na.rm = TRUE)
-}
+# # Loop over each combination of treatment values
+# # for (j in 1:nrow(a_vals)) {
+# 
+#     j = 1
+# 
+#     a0_val <- a_vals$a0[j]
+#     a1_val <- a_vals$a1[j]
+# 
+#     # Define a label for the current treatment combination
+#     label <- glue("Y(a0={a0_val}, gm(a1={a1_val}))")
+# 
+#     # All possible values of the mediator (binary: 0 and 1)
+#     mediator_vals <- expand.grid(m = c(0, 1))
+# 
+#     # Compute the expected outcome by integrating over mediator distribution
+#     # intm <- sapply(1:nrow(mediator_vals), function(i) {
+#         i = 1
+#         m <- mediator_vals$m[i]
+# 
+#         # Compute the probability of mediator being m
+#         p_m <- pm1(
+#             m = m,
+#             a = a1_val,
+#             z = data$Z,
+#             nj = data$nj, #nj = data_list$nj_sizes, #
+#             given = data_list$parameters$m_given, #data_list$m_given,
+#             gen_m = gen_m
+#         )
+# 
+#         # Compute the expected outcome given mediator and treatment
+#         expected_y <- my(
+#             m = m,
+#             a = a0_val,
+#             z = data$Z,
+#             nj = data$nj, #nj = data_list$nj_sizes, # nj = data$nj,
+#             given = data_list$parameters$y_given,
+#             gen_y = gen_y,
+#             binary = (Yfamily == "binomial")
+#         )
+# 
+#         # Return the product of mediator probability and expected outcome
+#         return(p_m * expected_y)
+#     # })
+# 
+#     # Sum over all mediator values to get the expected outcome for each observation
+#     # Resulting in a vector of expected outcomes per observation
+#     int_m_sum <- rowSums(intm)
+# 
+#     # Compute the average expected outcome across all observations (individual-level)
+#     truevals_individual[[label]] <- mean(int_m_sum, na.rm = TRUE)
+# 
+#     # Compute the cluster-level average expected outcome
+#     # Aggregating by 'school' and then taking the mean across clusters
+#     cluster_means <- data  |>
+#         mutate(int_m_sum = int_m_sum) |>
+#         group_by(school) |>
+#         summarize(cluster_avg = mean(int_m_sum, na.rm = TRUE))
+# 
+#     truevals_cluster[[label]] <- mean(cluster_means$cluster_avg, na.rm = TRUE)
+# }
 
 
 
@@ -409,3 +418,113 @@ trueVals <- function(data_list) {
         )
     )
 }
+
+
+
+# pm1 <- function(m, a, z, nj, given, gen_m) {
+#     
+#     latent <- gen_m[["m_on_a"]] * a + 
+#         gen_m[["m_on_az"]] * a * z + 
+#         gen_m[["m_on_anj"]] * a * nj + 
+#         given
+#     prob1 <- pnorm(latent, mean = 0, sd = sqrt(1 - gen_m[["iccm"]]))
+#     # m * prob1 + (1 - m) * (1 - prob1)
+#     return(m * prob1 + (1 - m) * (1 - prob1))
+# }
+# 
+# my <- function(m, a, z, nj, given, gen_y, binary = TRUE) {
+#     latent <- gen_y[["y_on_m"]] * m + 
+#         gen_y[["y_on_a"]] * a + 
+#         gen_y[["y_on_am"]] * a * m + 
+#         gen_y[["y_on_az"]] * a * z + 
+#         gen_y[["y_on_mz"]] * m * z + 
+#         gen_y[["y_on_anj"]] * a * nj + 
+#         given
+#     
+#     if (binary) {
+#         # For binary outcomes, use logistic function
+#         # cond_mean <- plogis(latent)  # Equivalent to 1 / (1 + exp(-latent))
+#         cond_mean <- pnorm(latent, mean = 0, sd = sqrt(1 - gen_y[["iccy"]]))
+#     }
+#     if (!binary) {
+#         cond_mean <- latent
+#     }
+#     
+#     return(cond_mean)
+# }
+
+
+
+
+
+# Running 2.0 data gen & true values --------------------------------------
+
+# Load updated functions 
+source(file.path("Functions/trueVals2.0.R"))
+source(file.path("Functions/generate_data2.0.R"))
+
+# Generate Data 
+set.seed(8675309)
+data_list <- generate_data2.0(
+    # J = test_condition[["J"]], 
+    # njrange = c(test_condition[["Nj_low"]], test_condition[["Nj_high"]]), 
+    Mfamily = "gaussian", # "binomial", 
+    Yfamily = "gaussian", # "binomial", 
+    seed = 8769,
+    
+    num_x = 3,
+    m_on_a = 3.5,
+    m_on_anj = 0.2,
+    m_on_az = 0.2,
+    y_on_a = 2,
+    y_on_m = 5,
+    y_on_am = 2,
+    y_on_az = 0.2,
+    y_on_mz = 0.2,
+    y_on_anj = 0.2,
+    int.XZ = TRUE
+)
+
+
+# 
+summary(data_list$data)  # Y has large variability (hist(data_list$data$Y)) <- LOOK INTO 
+data_list$data
+
+data_list$truevals
+data_list$effects
+data_list$parameters
+
+
+# ══════════════════════════════
+#    quick look at overlap  
+# ══════════════════════════════
+
+data_list$data
+
+# Create the density plot
+ggplot(data_list$data, aes(x = ps_true, fill = factor(A))) +
+    geom_density(alpha = 0.5) +  # Use transparency for overlapping areas
+    labs(
+        title = "Density Plot of ps_true by Treatment Group (A)",
+        x = "True Propensity Score (ps_true)",
+        y = "Density",
+        fill = "Treatment (A)"
+    ) +
+    theme_minimal() +
+    theme(
+        legend.position = "top",
+        plot.title = element_text(hjust = 0.5, face = "bold")
+    )
+
+    
+
+# Look at overlap 
+
+
+
+
+data_list$data
+
+
+
+

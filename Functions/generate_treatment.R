@@ -16,12 +16,13 @@
 #' print(example_result)
 #'
 #' @export
-generate_treatment <- function(data_list, nj_sizes, icca, quadratic.A = FALSE, num_x = 3) {
+generate_treatment <- function(data_list, nj_sizes, icca, quadratic.A = FALSE, num_x = 3 #, # a_x = 0.15, # a_z = sqrt(0.4 / 1)
+                               ) {
     
     gen_a <- list(
-        icca = icca,                                # Intra-class correlation for 'A'
-        a_x = sqrt(0.15 * 1 / num_x),               # Effect of 'X' on 'A'
-        a_z = sqrt(0.4 / 1)                         # Effect of 'Z' on 'A'
+        icca = icca,                                       # Intra-class correlation for 'A'
+        a_x = sqrt(0.15 * 1 / num_x), #sqrt(a_x * 1 / num_x),               # Effect of 'X' on 'A'
+        a_z = sqrt(0.4 / 1) # a_z                          # Effect of 'Z' on 'A'
     )
     
     J <- length(unique(data_list$data$school))
@@ -40,9 +41,18 @@ generate_treatment <- function(data_list, nj_sizes, icca, quadratic.A = FALSE, n
         a_given <- ab + gen_a[["a_x"]] * rowSums(Xquad) + gen_a[["a_z"]] * data_list$data$Z
     }
     
-    # Generate binary treatment 'A' using the probability function 'pa'
-    prob1 <- pnorm(a_given, mean = 0, sd = sqrt(1 - gen_a$icca))
-    data_list$data$A <- rbinom(N, 1, prob1) #(a * prob1 + (1 - a) * (1 - prob1)))
+    # Compute the true propensity score 
+    ps_true <- pnorm(a_given, mean = 0, sd = sqrt(1 - gen_a$icca))
+    
+    # Note: check overlap assumption 
+    
+    # Generate binary treatment 'A' using the true propensity score 
+    data_list$data$A <- rbinom(N, 1, ps_true)
+    # prob1 <- pnorm(a_given, mean = 0, sd = sqrt(1 - gen_a$icca))
+    # data_list$data$A <- rbinom(N, 1, prob1) #(a * prob1 + (1 - a) * (1 - prob1)))
+    
+    # Add true propensity score to data 
+    data_list$data$ps_true <- ps_true
     
     return(modifyList(data_list, list(
         a_x = gen_a[["a_x"]], 
@@ -51,4 +61,7 @@ generate_treatment <- function(data_list, nj_sizes, icca, quadratic.A = FALSE, n
         quadratic.A = quadratic.A
     )))
 }
+
+
+
 

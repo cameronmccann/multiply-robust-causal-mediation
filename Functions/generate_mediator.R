@@ -35,7 +35,9 @@
 #' @export
 
 generate_mediator <- function(data_list, nj_sizes, iccm = 0.2, num_x = 3, m_on_a = 0.2,
-                              m_on_az = 0.2, m_on_anj = 0.2, quadratic.M = FALSE, int.XZ = FALSE, Mfamily = "binomial") {
+                              m_on_az = 0.2, m_on_anj = 0.2, 
+                              # m_on_x = sqrt(0.15 / num_x), m_on_z = sqrt(0.4), 
+                              quadratic.M = FALSE, int.XZ = TRUE, Mfamily = "binomial") {
 
     # Input validation for Mfamily
     if (!Mfamily %in% c("binomial", "gaussian")) {
@@ -45,8 +47,8 @@ generate_mediator <- function(data_list, nj_sizes, iccm = 0.2, num_x = 3, m_on_a
     gen_m <- list(
         iccm = iccm,         # Intra-class correlation for 'M'
         m_on_a = m_on_a,        # Effect of 'A' on 'M'
-        m_on_x = sqrt(0.15 / num_x), # Effect of 'X' on 'M'
-        m_on_z = sqrt(0.4),  # Effect of 'Z' on 'M'
+        m_on_x = sqrt(0.15 / num_x), # m_on_x, # Effect of 'X' on 'M'
+        m_on_z = sqrt(0.4), # m_on_z,  # Effect of 'Z' on 'M'
         m_on_az = m_on_az,       # Interaction effect of 'A' and 'Z' on 'M'
         m_on_anj = m_on_anj      # Interaction effect of 'A' and cluster size on 'M'
     )
@@ -57,7 +59,7 @@ generate_mediator <- function(data_list, nj_sizes, iccm = 0.2, num_x = 3, m_on_a
     # skipping this part
     # # If interaction between 'A' and cluster size is not included
     if (int.XZ == FALSE) {
-        gen_m[c("m_on_anj")] <- 0
+        gen_m[c("m_on_anj")] <- 0 # NOTE: delete 
     }
 
     # Generate cluster-level random effects for mediators

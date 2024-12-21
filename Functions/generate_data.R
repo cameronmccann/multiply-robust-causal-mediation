@@ -90,23 +90,23 @@ generate_data <- function(J = 100,                        # Number of clusters
                           iccy = 0.2                       # Intra-class correlation for 'Y'
                           ) {               # Generate data under null hypothesis if TRUE
     
-    # ---------------------------
-    # Step 0: Set Seed for Reproducibility
-    # ---------------------------
+    # ══════════════════════════════
+    #     Step 0: Set Seed for Reproducibility
+    # ══════════════════════════════
     set.seed(seed)
     
-    # ---------------------------
-    # Step 1: Generate Clusters
-    # ---------------------------
+    # ══════════════════════════════
+    #     Step 1: Generate Clusters   
+    # ══════════════════════════════
     data_list <- generate_clusters(J = J, njrange = njrange, seed = seed)
     # data_list contains:
     # - data: Data frame with 'id', 'school', and 'W_nj'
     # - nj_sizes: Vector of cluster sizes
     # - njrange: Range of cluster sizes
     
-    # ---------------------------
-    # Step 2: Generate Confounders
-    # ---------------------------
+    # ══════════════════════════════
+    #     Step 2: Generate Confounders
+    # ══════════════════════════════
     data_list <- generate_confounders(
         data_list = data_list,
         nj_sizes = data_list$nj_sizes,
@@ -118,9 +118,9 @@ generate_data <- function(J = 100,                        # Number of clusters
     # - Z: Cluster-level unobserved confounder
     # - X: Matrix of individual-level confounders
     
-    # ---------------------------
-    # Step 3: Generate Treatment
-    # ---------------------------
+    # ══════════════════════════════
+    #     Step 3: Generate Treatment   
+    # ══════════════════════════════
     data_list <- generate_treatment(
         data_list = data_list,
         nj_sizes = data_list$nj_sizes,
@@ -130,9 +130,9 @@ generate_data <- function(J = 100,                        # Number of clusters
     )
     # Treatment 'A' added to data_list$data
     
-    # ---------------------------
-    # Step 4: Generate Mediator
-    # ---------------------------
+    # ══════════════════════════════
+    #     Step 4: Generate Mediator
+    # ══════════════════════════════
     data_list <- generate_mediator(
         data_list = data_list,
         nj_sizes = data_list$nj_sizes,
@@ -147,9 +147,9 @@ generate_data <- function(J = 100,                        # Number of clusters
     )
     # Mediator 'M' added to data_list$data
     
-    # ---------------------------
-    # Step 5: Generate Outcome
-    # ---------------------------
+    # ══════════════════════════════
+    #     Step 5: Generate Outcome
+    # ══════════════════════════════
     data_list <- generate_outcome(
         data_list = data_list,
         iccy = iccy,
@@ -168,42 +168,87 @@ generate_data <- function(J = 100,                        # Number of clusters
     )
     # Outcome 'Y' added to data_list$data
     
-    # ---------------------------
-    # Step 6: Compute True Values
-    # ---------------------------
-    true_vals <- trueVals(data_list = data_list)
-    # true_vals contains true values for individual and cluster levels
+    # ══════════════════════════════
+    #     Step 6: Compute True Values
+    # ══════════════════════════════
+    if (Mfamily == "binomial" & Yfamily == "binomial") {
+        true_vals <- trueVals(data_list = data_list)
+        # true_vals contains true values for individual and cluster levels
+    } else {
+        true_vals <- NULL
+        pnde_ind <- NULL
+        pnie_ind <- NULL
+        tnde_ind <- NULL
+        tnie_ind <- NULL
+        pnde_cluster <- NULL
+        pnie_cluster <- NULL
+        tnde_cluster <- NULL
+        tnie_cluster <- NULL
+    }
+    # true_vals <- trueVals(data_list = data_list)
+    # # true_vals contains true values for individual and cluster levels
+
+    # ══════════════════════════════
+    #     Step 7: Add Effects Calculation
+    # ══════════════════════════════
+    if (Mfamily == "binomial" & Yfamily == "binomial") {
+        # Individual-level true values
+        y_a0_m0 <- true_vals$truevals_individual$`Y(a0=0, gm(a1=0))`
+        y_a1_m0 <- true_vals$truevals_individual$`Y(a0=1, gm(a1=0))`
+        y_a0_m1 <- true_vals$truevals_individual$`Y(a0=0, gm(a1=1))`
+        y_a1_m1 <- true_vals$truevals_individual$`Y(a0=1, gm(a1=1)`
+        
+        # Compute effects for individual-level outcomes
+        pnde_ind <- y_a1_m0 - y_a0_m0  # Pure Natural Direct Effect
+        pnie_ind <- y_a0_m1 - y_a0_m0  # Pure Natural Indirect Effect
+        tnde_ind <- y_a1_m1 - y_a0_m1  # Total Natural Direct Effect
+        tnie_ind <- y_a1_m1 - y_a1_m0  # Total Natural Indirect Effect
+        
+        # Cluster-level true values (averages)
+        y_cl_a0_m0 <- true_vals$truevals_cluster$`Y(a0=0, gm(a1=0))`
+        y_cl_a1_m0 <- true_vals$truevals_cluster$`Y(a0=1, gm(a1=0))`
+        y_cl_a0_m1 <- true_vals$truevals_cluster$`Y(a0=0, gm(a1=1))`
+        y_cl_a1_m1 <- true_vals$truevals_cluster$`Y(a0=1, gm(a1=1))`
+        
+        # Compute effects for cluster-level outcomes
+        pnde_cluster <- y_cl_a1_m0 - y_cl_a0_m0  # Pure Natural Direct Effect
+        pnie_cluster <- y_cl_a0_m1 - y_cl_a0_m0  # Pure Natural Indirect Effect
+        tnde_cluster <- y_cl_a1_m1 - y_cl_a0_m1  # Total Natural Direct Effect
+        tnie_cluster <- y_cl_a1_m1 - y_cl_a1_m0  # Total Natural Indirect Effect
+    }
     
-    # ---------------------------
-    # Step 7: Add Effects Calculation
-    # ---------------------------
-    # Individual-level true values
-    y_a0_m0 <- true_vals$truevals_individual$`Y(a0=0, gm1(a1=0))`
-    y_a1_m0 <- true_vals$truevals_individual$`Y(a0=1, gm1(a1=0))`
-    y_a0_m1 <- true_vals$truevals_individual$`Y(a0=0, gm1(a1=1))`
-    y_a1_m1 <- true_vals$truevals_individual$`Y(a0=1, gm1(a1=1)`
+    if (Mfamily == "gaussian" | Yfamily == "gaussian") {
+        print("Function does not support computing true values for gaussian distributions yet")
+    }
+    # # Individual-level true values
+    # y_a0_m0 <- true_vals$truevals_individual$`Y(a0=0, gm(a1=0))`
+    # y_a1_m0 <- true_vals$truevals_individual$`Y(a0=1, gm(a1=0))`
+    # y_a0_m1 <- true_vals$truevals_individual$`Y(a0=0, gm(a1=1))`
+    # y_a1_m1 <- true_vals$truevals_individual$`Y(a0=1, gm(a1=1)`
+    # 
+    # # Compute effects for individual-level outcomes
+    # pnde_ind <- y_a1_m0 - y_a0_m0  # Pure Natural Direct Effect
+    # pnie_ind <- y_a0_m1 - y_a0_m0  # Pure Natural Indirect Effect
+    # tnde_ind <- y_a1_m1 - y_a0_m1  # Total Natural Direct Effect
+    # tnie_ind <- y_a1_m1 - y_a1_m0  # Total Natural Indirect Effect
+    # 
+    # # Cluster-level true values (averages)
+    # y_cl_a0_m0 <- true_vals$truevals_cluster$`Y(a0=0, gm(a1=0))`
+    # y_cl_a1_m0 <- true_vals$truevals_cluster$`Y(a0=1, gm(a1=0))`
+    # y_cl_a0_m1 <- true_vals$truevals_cluster$`Y(a0=0, gm(a1=1))`
+    # y_cl_a1_m1 <- true_vals$truevals_cluster$`Y(a0=1, gm(a1=1))`
+    # 
+    # # Compute effects for cluster-level outcomes
+    # pnde_cluster <- y_cl_a1_m0 - y_cl_a0_m0  # Pure Natural Direct Effect
+    # pnie_cluster <- y_cl_a0_m1 - y_cl_a0_m0  # Pure Natural Indirect Effect
+    # tnde_cluster <- y_cl_a1_m1 - y_cl_a0_m1  # Total Natural Direct Effect
+    # tnie_cluster <- y_cl_a1_m1 - y_cl_a1_m0  # Total Natural Indirect Effect
     
-    # Compute effects for individual-level outcomes
-    pnde_ind <- y_a1_m0 - y_a0_m0  # Pure Natural Direct Effect
-    pnie_ind <- y_a0_m1 - y_a0_m0  # Pure Natural Indirect Effect
-    tnde_ind <- y_a1_m1 - y_a0_m1  # Total Natural Direct Effect
-    tnie_ind <- y_a1_m1 - y_a1_m0  # Total Natural Indirect Effect
+    # Mfamily = "binomial"
     
-    # Cluster-level true values (averages)
-    y_cl_a0_m0 <- true_vals$truevals_cluster$`Y(a0=0, gm1(a1=0))`
-    y_cl_a1_m0 <- true_vals$truevals_cluster$`Y(a0=1, gm1(a1=0))`
-    y_cl_a0_m1 <- true_vals$truevals_cluster$`Y(a0=0, gm1(a1=1))`
-    y_cl_a1_m1 <- true_vals$truevals_cluster$`Y(a0=1, gm1(a1=1))`
-    
-    # Compute effects for cluster-level outcomes
-    pnde_cluster <- y_cl_a1_m0 - y_cl_a0_m0  # Pure Natural Direct Effect
-    pnie_cluster <- y_cl_a0_m1 - y_cl_a0_m0  # Pure Natural Indirect Effect
-    tnde_cluster <- y_cl_a1_m1 - y_cl_a0_m1  # Total Natural Direct Effect
-    tnie_cluster <- y_cl_a1_m1 - y_cl_a1_m0  # Total Natural Indirect Effect
-    
-    # ---------------------------
-    # Step 8: Update Data with Observed Data
-    # ---------------------------
+    # ══════════════════════════════
+    #     Step 8: Update Data with Observed Data
+    # ══════════════════════════════
     datobs <- data_list$data
     # Split 'X' matrix into separate columns if 'X' is a matrix
     if (is.matrix(datobs$X)) {
@@ -219,19 +264,26 @@ generate_data <- function(J = 100,                        # Number of clusters
     # Remove temporary variable
     rm(datobs)
     
-    # ---------------------------
-    # Step 9: Compile Final Output
-    # ---------------------------
+    # ══════════════════════════════
+    #     Step 9: Compile Final Output
+    # ══════════════════════════════
     result_data <- list(
         data = data_list$data,   # Complete dataset with all variables
         truevals = true_vals,    # True values for potential outcomes
         effects = list(
-            individual = list(pnde = pnde_ind, pnie = pnie_ind, tnde = tnde_ind, tnie = tnie_ind),
-            cluster = list(pnde = pnde_cluster, pnie = pnie_cluster, tnde = tnde_cluster, tnie = tnie_cluster)
+            individual = list(pnde = pnde_ind, tnie = tnie_ind, tnde = tnde_ind, pnie = pnie_ind),
+            cluster = list(pnde = pnde_cluster, tnie = tnie_cluster, tnde = tnde_cluster, pnie = pnie_cluster)
         ),
         parameters = list(
-            J = J, njrange = njrange, nj_sizes = data_list$nj_sizes, seed = seed, num_x = num_x, iccx = iccx, x_z = x_z, icca = icca,
-            quadratic.A = quadratic.A, iccm = iccm, m_on_a = m_on_a, m_on_az = m_on_az, m_on_anj = m_on_anj,
+            J = J, 
+            njrange = njrange, 
+            nj_sizes = data_list$nj_sizes, 
+            y_given = data_list$y_given,
+            m_given = data_list$m_given,
+            seed = seed, 
+            num_x = num_x, 
+            iccx = iccx, x_z = x_z, 
+            icca = icca, quadratic.A = quadratic.A, iccm = iccm, m_on_a = m_on_a, m_on_az = m_on_az, m_on_anj = m_on_anj,
             quadratic.M = quadratic.M, int.XZ = int.XZ, iccy = iccy, yintercept = yintercept,
             y_on_a = y_on_a, y_on_m = y_on_m, y_on_am = y_on_am, y_on_az = y_on_az, y_on_mz = y_on_mz,
             y_on_anj = y_on_anj, quadratic.Y = quadratic.Y, Yfamily = Yfamily, if.null = if.null

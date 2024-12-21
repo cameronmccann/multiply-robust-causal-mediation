@@ -25,10 +25,10 @@ generate_outcome <- function(data_list, iccy = 0.2, yintercept = 1,
                              y_on_mz = 0.2, 
                              y_on_anj = 0.2,
                              num_x = 3,
-                             # y_on_x = sqrt(0.15 / num_x), 
-                             # y_on_z = sqrt(0.4), 
+                             # y_on_x = sqrt(0.15 / num_x),
+                             # y_on_z = sqrt(0.4),
                              quadratic.Y = FALSE, 
-                             int.XZ = FALSE, 
+                             int.XZ = TRUE, 
                              Yfamily = "gaussian", if.null = FALSE) {
     
     # Define parameters for the outcome model
@@ -41,8 +41,8 @@ generate_outcome <- function(data_list, iccy = 0.2, yintercept = 1,
         y_on_az = y_on_az,           # Interaction effect of 'A' and 'Z' on 'Y'
         y_on_mz = y_on_mz,          # Interaction effect of 'M' and 'Z' on 'Y'
         y_on_anj = y_on_anj,          # Interaction effect of 'A' and cluster size on 'Y'
-        y_on_x = sqrt(0.15 / num_x), # Effect of 'X' on 'Y'
-        y_on_z = sqrt(0.4)       # Effect of 'Z' on 'Y'
+        y_on_x = sqrt(0.15 / num_x), # y_on_x,  # Effect of 'X' on 'Y'
+        y_on_z = sqrt(0.4) # y_on_z        # Effect of 'Z' on 'Y'
     )
     
     J <- length(unique(data_list$data$school))
@@ -50,7 +50,7 @@ generate_outcome <- function(data_list, iccy = 0.2, yintercept = 1,
     
     
     # Set interaction effects to zero if specified
-    y_on_amint <- 0  # Not directly used in this code
+    # y_on_amint <- 0  # Not directly used in this code
     
     # Generate cluster-level random effects for 'Y'
     yb <- rnorm(J, sd = sqrt(gen_y[["iccy"]]))[data_list$data$school]
@@ -66,15 +66,15 @@ generate_outcome <- function(data_list, iccy = 0.2, yintercept = 1,
             y_on_az = 0,
             y_on_mz = 0,
             y_on_anj = 0,
-            y_on_x = sqrt(0.15 / num_x),
-            y_on_z = sqrt(0.4)
+            y_on_x = y_on_x, # sqrt(0.15 / num_x),
+            y_on_z = y_on_z  # sqrt(0.4)
         )
     }
     
     # Skipping this part
     # If interaction between 'A' and cluster size is not included
     if (int.XZ == FALSE) {
-        gen_y[c("y_on_anj")] <- 0
+        gen_y[c("y_on_anj")] <- 0 # NOTE : derlete
     }
     
     # Compute the linear predictor for 'Y'
