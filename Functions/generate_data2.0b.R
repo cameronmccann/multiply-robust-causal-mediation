@@ -1,4 +1,4 @@
-#' NOTE: THIS IS MODIFIED TO WORK ON ORIGINAL generate_data2.0 function 
+#' NOTE: THIS IS MODIFIED TO WORK ON ORIGINAL generate_data2.0 function (note: ps overlap plot was added to this function)
 #' @title generate_data2.0b
 #' 
 #' @description This function generates clustered data with an individual-level treatment (A), mediator (M), and outcome (Y), 
@@ -122,6 +122,81 @@ generate_data2.0b <- function(J = 100,                        # Number of cluste
         # a_z = a_z, 
     )
     
+    # Create Overlap Plot
+    overlap_plot <- ggplot(data_list$data, aes(x = ps_true, color = factor(A), fill = factor(A))) +
+        geom_density(alpha = 0.5) +
+        labs(
+            title = "Density Plot of ps_true by Treatment Group (A)",
+            x = "True Propensity Score (ps_true)",
+            y = "Density",
+            fill = "Treatment (A)"
+        ) +
+        theme_minimal() +
+        theme(
+            legend.position = "top",
+            plot.title = element_text(hjust = 0.5, face = "bold")
+        )
+    # Create Overlap Plot with Logit PS
+    overlap_plot_logit <- ggplot(data_list$data, aes(x = qlogis(ps_true), fill = factor(A))) +
+        geom_density(alpha = 0.5) +
+        labs(
+            title = "Density Plot of Logit(ps_true) by Treatment Group (A)",
+            x = "Logit of the True Propensity Score",
+            y = "Density",
+            fill = "Treatment (A)"
+        ) +
+        theme_minimal()
+    
+    # Summarize extreme PS values
+    n_ps_below_001 <- sum(data_list$data$ps_true < 0.01, na.rm = TRUE)
+    n_ps_above_099 <- sum(data_list$data$ps_true > 0.99, na.rm = TRUE)
+    
+    # Calculate percentages
+    pct_ps_below_001 <- 100 * n_ps_below_001 / nrow(data_list$data)
+    pct_ps_above_099 <- 100 * n_ps_above_099 / nrow(data_list$data)
+    
+    # Combine into a message string
+    ps_msg <- paste0(
+        "Number of PSs < 0.01: ", n_ps_below_001, " (", 
+        round(pct_ps_below_001, 2), "%); ",
+        "Number of PSs > 0.99: ", n_ps_above_099, " (",
+        round(pct_ps_above_099, 2), "%)"
+    )
+    # Print to console
+    message(ps_msg)
+    
+    # Create an IPTW variable
+    data_list$data <- data_list$data %>%
+        mutate(
+            iptw_true = ifelse(A == 1, 1 / ps_true, 1 / (1 - ps_true))
+        )
+    
+    # Identify 1st and 99th percentiles
+    first_percentile <- quantile(data_list$data$iptw_true, probs = 0.01, na.rm = TRUE)
+    ninety_ninth_percentile <- quantile(data_list$data$iptw_true, probs = 0.99, na.rm = TRUE)
+    
+    # Count outliers below 1st percentile & above 99th percentile
+    n_iptw_below_1p <- sum(data_list$data$iptw_true < first_percentile, na.rm = TRUE)
+    n_iptw_above_99p <- sum(data_list$data$iptw_true > ninety_ninth_percentile, na.rm = TRUE)
+    
+    # Calculate percentages for IPTW outliers
+    pct_iptw_below_1p <- 100 * n_iptw_below_1p / nrow(data_list$data)
+    pct_iptw_above_99p <- 100 * n_iptw_above_99p / nrow(data_list$data)
+    
+    # Combine into a message string
+    iptw_msg <- paste0(
+        "Number of cases < 1st percentile of IPTW (", 
+        round(first_percentile, 4), "): ", n_iptw_below_1p, " (",
+        round(pct_iptw_below_1p, 2), "%); ",
+        "Number of cases > 99th percentile of IPTW (", 
+        round(ninety_ninth_percentile, 4), "): ", n_iptw_above_99p, " (",
+        round(pct_iptw_above_99p, 2), "%)"
+    )
+    # Print to console
+    message(iptw_msg)
+    
+    
+    
     # Generate Mediator
     data_list <- generate_mediator(
         data_list = data_list,
@@ -242,6 +317,10 @@ generate_data2.0b <- function(J = 100,                        # Number of cluste
             individual = list(pnde = pnde_ind, tnie = tnie_ind, tnde = tnde_ind, pnie = pnie_ind),
             cluster = list(pnde = pnde_cluster, tnie = tnie_cluster, tnde = tnde_cluster, pnie = pnie_cluster)
         ),
+        overlap = list(overlap_plot = overlap_plot, 
+                       overlap_plot_logit = overlap_plot_logit, 
+                       ps_summary    = ps_msg,
+                       iptw_summary  = iptw_msg), 
         parameters = list(
             J = J, 
             njrange = njrange, 

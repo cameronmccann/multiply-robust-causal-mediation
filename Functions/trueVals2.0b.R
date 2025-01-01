@@ -226,26 +226,26 @@ trueVals2.0b <- function(data_list) {
     truevals_individual <- list()
     truevals_cluster <- list()
     
-    # for (j in 1:nrow(a_vals)) {
-    #     a0_val <- a_vals$a0[j]
-    #     a1_val <- a_vals$a1[j]
-    #     label <- glue("Y(a0={a0_val}, gm(a1={a1_val}))")
-    #     
-    #     E_y_each <- compute_expected_y(a0_val, a1_val, data)
-    # 
-    #     truevals_individual[[label]] <- mean(E_y_each, na.rm=TRUE)
-    # 
-    #     cluster_means <- data  |>
-    #         mutate(E_y = E_y_each) |>
-    #         group_by(school) |>
-    #         summarize(cluster_avg = mean(E_y, na.rm=TRUE))
-    #     truevals_cluster[[label]] <- mean(cluster_means$cluster_avg, na.rm=TRUE)
-    # }
+    for (j in 1:nrow(a_vals)) {
+        a0_val <- a_vals$a0[j]
+        a1_val <- a_vals$a1[j]
+        label <- glue("Y(a0={a0_val}, gm(a1={a1_val}))")
+
+        E_y_each <- compute_expected_y(a0_val, a1_val, data)
+
+        truevals_individual[[label]] <- mean(E_y_each, na.rm = TRUE)
+
+        cluster_means <- data  |>
+            mutate(E_y = E_y_each) |>
+            group_by(school) |>
+            summarize(cluster_avg = mean(E_y, na.rm = TRUE))
+        truevals_cluster[[label]] <- mean(cluster_means$cluster_avg, na.rm = TRUE)
+    }
     
     return(list(
-        truevals_individual = NULL, 
-        truevals_cluster = NULL
-        # truevals_individual = truevals_individual,
-        # truevals_cluster = truevals_cluster
+        # truevals_individual = NULL, 
+        # truevals_cluster = NULL
+        truevals_individual = truevals_individual,
+        truevals_cluster = truevals_cluster
     ))
 }

@@ -12,7 +12,7 @@
 # Script Description: this is used to fix, test, and properly build the trueVals funciton 
 #
 #
-# Last Updated: 12/18/2024
+# Last Updated: 12/30/2024
 #
 #
 # Notes:
@@ -22,6 +22,7 @@
 #   Done: 
 #       figure out why trueVals (specifically, pm1() & my() are returning integer(0))
 #               # So far i have been going through the function (qoeking on loop.. section) & commenting out & adding code for one interation of the loops 
+#       + Add overlap code to data generation function (2.0 func)
 #
 ################################################################################
 
@@ -38,8 +39,8 @@ pacman::p_load(
     purrr, # for map()
     glue, # for glue()
     dplyr, 
-    readr 
-    # ggplot2
+    readr, 
+    ggplot2
 )
 
 # ═══════════════════
@@ -516,14 +517,47 @@ ggplot(data_list$data, aes(x = ps_true, fill = factor(A))) +
         plot.title = element_text(hjust = 0.5, face = "bold")
     )
 
+data_list$data
     
 
+# ══════════════════════════════
+#    Test overlap plot in generate_data2.0b() 
+# ══════════════════════════════
 # Look at overlap 
 
 
+# Load updated functions 
+source(file.path("Functions/trueVals2.0b.R"))
+source(file.path("Functions/generate_data2.0b.R"))
+
+# Generate Data 
+set.seed(8675309)
+data_list <- generate_data2.0b(
+    # J = test_condition[["J"]], 
+    # njrange = c(test_condition[["Nj_low"]], test_condition[["Nj_high"]]), 
+    Mfamily = "gaussian", # "binomial", 
+    Yfamily = "gaussian", # "binomial", 
+    seed = 8769,
+    
+    num_x = 3,
+    m_on_a = 3.5,
+    m_on_anj = 0.2,
+    m_on_az = 0.2,
+    y_on_a = 2,
+    y_on_m = 5,
+    y_on_am = 2,
+    y_on_az = 0.2,
+    y_on_mz = 0.2,
+    y_on_anj = 0.2,
+    int.XZ = TRUE
+)
 
 
-data_list$data
+data_list$overlap$overlap_plot
+data_list$overlap$overlap_plot_logit
+
+data_list$overlap$ps_summary
+data_list$overlap$iptw_summary
 
 
 

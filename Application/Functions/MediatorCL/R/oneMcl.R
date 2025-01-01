@@ -1,21 +1,21 @@
 
-oneM.cl <- function(data,
-                      Sname,
-                      Wnames = NULL, Xnames,
-                      Aname,
-                      Mnames,
-                      Yname, Yfamily = "gaussian",
-                      cluster_opt_a = "cwc.FE",
-                      cluster_opt_m = "cwc.FE",
-                      cluster_opt_y = "cwc.FE",
-                      cluster_opt_v = "cwc",
-                      interaction_fity = c("AM"),
-                      num_folds = 1,
-                      # bounds ,
-                      learners_a = c("SL.glm"),
-                      learners_m = c("SL.glm"),
-                      learners_y = c("SL.glm"),
-                      contrast_a = c(a=1, astar=0)
+    oneM.cl <- function(data,
+                          Sname,
+                          Wnames = NULL, Xnames,
+                          Aname,
+                          Mnames,
+                          Yname, Yfamily = "gaussian",
+                          cluster_opt_a = "cwc.FE",
+                          cluster_opt_m = "cwc.FE",
+                          cluster_opt_y = "cwc.FE",
+                          cluster_opt_v = "cwc",
+                          interaction_fity = c("AM"),
+                          num_folds = 1,
+                          # bounds ,
+                          learners_a = c("SL.glm"),
+                          learners_m = c("SL.glm"),
+                          learners_y = c("SL.glm"),
+                          contrast_a = c(a=1, astar=0)
 ) {
   set.seed(12345)
 
