@@ -74,6 +74,7 @@ generate_confounders <- function(data_list,
         # xb = xb,
         # xe = xe,
         num_x = num_x, 
+        iccx = iccx, 
         x_z = x_z
     )))
 }

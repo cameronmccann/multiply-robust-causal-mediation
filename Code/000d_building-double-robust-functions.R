@@ -10,10 +10,13 @@
 #
 #
 # Script Description: This script is used to build the functions for doubly robust estimation. 
+#   Generally, the goal is to create a function equivalent to oneMcl.R (from Dr Liu's package). 
 #   We will focus on binary mediator & outcome currently then work towards handling continuous mediator and outcomes. 
 #
-#
-# Last Updated: 12/19/2024
+#   There is a markdown file corresponding to this script for greater detail: [000d_building-double-robust-functions.md]
+# 
+# 
+# Last Updated: 2025-01-03
 #
 #
 # Notes:
@@ -34,6 +37,9 @@
 
 
 # building fun equivalent to oneMcl.R -------------------------------------
+
+
+## Generate data -----------------------------------------------------------
 
 # ══════════════════════════════
 #    generate data 
@@ -64,7 +70,11 @@ function_names <- c(
     "generate_outcome", 
     "pm1",
     "my",
-    "trueVals2.0"
+    "trueVals2.0", 
+    
+    # As of 2025-01-02, these are the most up-to-date functions 
+    "generate_data2.0c", 
+    "trueVals2.0c"
 )
 
 # Loop through the function names and source each file
@@ -73,12 +83,12 @@ for (func in function_names) {
 }
 
 # Generate data 
-data_list <- generate_data2.0(
+data_list <- generate_data2.0c(
     J = 100,
     njrange = c(50, 100),
     Mfamily = "binomial",
     Yfamily = "binomial",
-    seed = 8769,
+    seed = 8675309,
     num_x = 3,
     m_on_a = 3.5,
     m_on_anj = 0.2,
@@ -94,12 +104,17 @@ data_list <- generate_data2.0(
 
 
 
+## Slowly adding components from oneMcl() ----------------------------------
+
 # ══════════════════════════════
 #    From oneMcl.R func 
 # ══════════════════════════════
 
 # Here I am slowly added pieces of the oneMcl() and commenting to understand 
 
+# ══════════════════════════════
+#    arguments 
+# ══════════════════════════════
 # arguments for function: 
 data = data_list$data
 Sname = "school"
@@ -108,7 +123,7 @@ Xnames = names(data)[grep("^X", names(data))]
 Aname = "A"
 Mnames = "M"
 Yname = "Y"
-Yfamily = "gaussian" # change to binomial (or work on continuous outcome?)
+Yfamily = "binomial" #"gaussian" # change to binomial (or work on continuous outcome?)
 cluster_opt_a = "cwc.FE"
 cluster_opt_m = "cwc.FE"
 cluster_opt_y = "cwc.FE"
@@ -122,7 +137,9 @@ learners_y = c("SL.glm")
 contrast_a = c(a = 1, astar = 0)
 
 
-
+# ══════════════════════════════
+#    initial set up (beginning) of function 
+# ══════════════════════════════
 # 
 set.seed(12345)
 
@@ -139,7 +156,7 @@ Sdumm <- fastDummies::dummy_cols(data[[Sname]], remove_first_dummy = TRUE, remov
 colnames(Sdumm) <- paste0("S", 1:ncol(Sdumm))
 Sname_dummies <- colnames(Sdumm)
 
-# Compute cluster-level means and cluster-within-cluster (cwc) transformations
+# Compute cluster-level means and centering within cluster (cwc) transformations
 # The idea is to partial out cluster-level means from predictors to handle clustering
 data_in <- data.frame(data, AM) %>%
     group_by(!!as.name(Sname)) %>%
@@ -171,34 +188,113 @@ if (num_folds <= 1) {
 }
 
 
+
+
+
+### Fit models for P(A|C), P(A|M,C), Y(a,m,c), v_ac(c), and mu(a,c) ---------
+
+# ══════════════════════════════
+#    These are the next general steps/overview of the code that follows 
+# ══════════════════════════════
+
 ## Likely need to modify mu.mac, v.ac, & eif (maybe even mu.ac, a.c, & a.mc)
 # Fit models for P(A|C), P(A|M,C), Y(a,m,c), v_ac(c), and mu(a,c)
-source("Functions/crossfit.R")
-source("Functions/a.c.R")
-a_c <- a.c(data_in, varnames, cluster_opt_a, folds, learners_a, bounded = FALSE) # I believe a.c does not change for natural effects (so it is same as prior version; dr liu version)
+if (FALSE) { # Note: skipping this chunk of code (to avoid commenting it out)
+    source("Functions/crossfit.R")
+    source("Functions/a.c.R")
+    a_c <- a.c(data_in, varnames, cluster_opt_a, folds, learners_a, bounded = FALSE) # I believe a.c does not change for natural effects (so it is same as prior version; dr liu version)
+    
+    source("Functions/a.mc.R")
+    a_mc <- a.mc(data_in, varnames, cluster_opt_a, folds, learners_a, bounded = FALSE) # why is this here? why is m included?
+    
+    # source("Functions/m.ac.R")
+    # m_ac <- m.ac(data_in, varnames, ipw = NULL, cluster_opt = cluster_opt_m,
+    #              folds, learners = learners_m, bounded = FALSE, Mfamily = "binomial") # <-- NOT USED (need it for multiple mediators)
+    
+    source("Functions/mu.mac.R")
+    mu_mac <- mu.mac(data_in, varnames, Yfamily = Yfamily, ipw = NULL,
+                     cluster_opt = cluster_opt_y,
+                     interaction = interaction_fity,
+                     folds, learners_y, bounded = FALSE)
+    
+    v_ac <- v.ac(a=contrast_a["a"], astar=contrast_a["astar"], mu_mac,
+                 data_in, varnames, Yfamily = Yfamily, ipw = NULL,
+                 cluster_opt = cluster_opt_v,
+                 folds, learners_y, bounded = FALSE,
+                 full.sample = FALSE) # this handles mediator & stuff
+    mu_ac <- mu.ac(data_in, varnames, Yfamily = Yfamily, ipw = NULL,
+                   cluster_opt = cluster_opt_y,
+                                  folds, learners_y, bounded = FALSE)
+}
 
-source("Functions/a.mc.R")
-a_mc <- a.mc(data_in, varnames, cluster_opt_a, folds, learners_a, bounded = FALSE) # why is this here? why is m included?
 
-# source("Functions/m.ac.R")
-# m_ac <- m.ac(data_in, varnames, ipw = NULL, cluster_opt = cluster_opt_m, 
-#              folds, learners = learners_m, bounded = FALSE, Mfamily = "binomial")
 
-source("Functions/mu.mac.R")
-mu_mac <- mu.mac(data_in, varnames, Yfamily = Yfamily, ipw = NULL,
-                 cluster_opt = cluster_opt_y,
-                 interaction = interaction_fity,
-                 folds, learners_y, bounded = FALSE)
 
-v_ac <- v.ac(a=contrast_a["a"], astar=contrast_a["astar"], mu_mac,
-             data_in, varnames, Yfamily = Yfamily, ipw = NULL,
-             cluster_opt = cluster_opt_v,
-             folds, learners_y, bounded = FALSE,
-             full.sample = FALSE) # this handles mediator & stuff
-mu_ac <- mu.ac(data_in, varnames, Yfamily = Yfamily, ipw = NULL,
-               cluster_opt = cluster_opt_y,
-               folds, learners_y, bounded = FALSE)
+# ══════════════════════════════
+#    crossfit() 
+# ══════════════════════════════
 
+
+
+
+# ══════════════════════════════
+#    a.c() --- PSs 
+# ══════════════════════════════
+
+a.c <- function(data_in, varnames, cluster_opt = "FE.glm", folds, learners, bounded = TRUE) {
+    # Check for required functions
+    if (!exists("crossfit")) {
+        stop("Missing required functions: 'crossfit' not found. Ensure they are loaded.")
+    }
+    
+    # Initialize output matrix
+    a_c <- matrix(nrow = nrow(data_in), ncol = 2)
+    colnames(a_c) <- c("a(0|c)", "a(1|c)")
+    
+    # Adjust folds if no cross-fitting is required
+    if (grepl("glm", cluster_opt)) { 
+        folds <- origami::make_folds(data_in, fold_fun = folds_vfold, V = 1)
+        folds[[1]]$training_set <- folds[[1]]$validation_set
+    }
+    
+    # Check fold structure
+    if (!is.list(folds) || length(folds) == 0) {
+        stop("Invalid 'folds' input. Ensure 'folds' is a properly generated list of training and validation splits.")
+    }
+    
+    # Process each fold
+    for (v in seq_along(folds)) {
+        # Extract training and validation sets
+        train <- origami::training(data_in, folds[[v]])
+        valid <- origami::validation(data_in, folds[[v]])
+        
+        if (is.null(train) || is.null(valid)) {
+            stop(sprintf("Error in fold %d: Training or validation set is NULL. Check your folds generation process.", v))
+        }
+        
+        # Cross-fitting with the crossfit function
+        alist <- tryCatch({
+            crossfit(train, list(valid), varnames$A, c(varnames$X), varnames,
+                     ipw = NULL,
+                     cluster_opt,
+                     type = c("binomial"), learners, bounded)
+        }, error = function(e) {
+            stop(sprintf("Error in 'crossfit' for fold %d: %s", v, e$message))
+        })
+        
+        # Extract predictions
+        preds <- alist$preds
+        if (is.null(preds) || nrow(preds) != length(folds[[v]]$validation_set)) {
+            stop(sprintf("Prediction error in fold %d: Predictions are NULL or do not match the validation set size.", v))
+        }
+        
+        # Populate the output matrix
+        a_c[folds[[v]]$validation_set, "a(0|c)"] <- 1 - preds[, 1]
+        a_c[folds[[v]]$validation_set, "a(1|c)"] <- preds[, 1]
+    }
+    
+    return(a_c)
+}
 
 
 

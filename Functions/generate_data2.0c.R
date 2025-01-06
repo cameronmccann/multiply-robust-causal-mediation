@@ -132,7 +132,8 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
                               icca = 0.2,                      # Intra-class correlation for 'A'
                               iccm = 0.2,                      # Intra-class correlation for 'M'
                               iccy = 0.2,                      # Intra-class correlation for 'Y'
-                              include_truevals = TRUE          # Whether or not to compute true values
+                              include_truevals = TRUE,         # Whether or not to compute true values
+                              include_overlapMsg = TRUE        # Whether or not to display messages about PS overlap in console
 ) {               
     # -----------------------------------------------------
     # 1. CLUSTER GENERATION
@@ -209,7 +210,9 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
         "Number of PSs > 0.99: ", n_ps_above_099, " (",
         round(pct_ps_above_099, 2), "%)"
     )
-    message(ps_msg) # Print info about overlap to console
+    if (include_overlapMsg == TRUE) {
+        message(ps_msg) # Print info about overlap to console
+    }
     
     # Create an IPTW variable for each observation
     data_list$data <- data_list$data %>%
@@ -235,7 +238,9 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
         round(ninety_ninth_percentile, 4), "): ", n_iptw_above_99p, " (",
         round(pct_iptw_above_99p, 2), "%)"
     )
-    message(iptw_msg)  # Print info about IPTW extremes to console
+    if (include_overlapMsg == TRUE) {
+        message(iptw_msg)  # Print info about IPTW extremes to console
+    }
     
     # -----------------------------------------------------
     # 5. GENERATE MEDIATOR (M)

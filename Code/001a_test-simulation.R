@@ -11,7 +11,7 @@
 # Script Description: {Junk file to test project} 
 #
 #
-# Last Updated: 12/13/2024
+# Last Updated: 01/01/2025
 #
 #
 # Notes:
@@ -46,7 +46,10 @@ pacman::p_load(
     glue, # for glue()
     dplyr, 
     readr, 
-    ggplot2
+    ggplot2, 
+    fastDummies, # for Dr Liu's package/function (specifically, for dummy_cols() in fastDummies package)
+    stringr, # for str_detect() in Dr Liu's package/function
+    tibble # for rownames_to_column() in Dr Liu's package/function
 )
 
 
@@ -65,7 +68,11 @@ function_names <- c(
     "generate_outcome", 
     "pm1", 
     "my", 
-    "trueVals"
+    "trueVals", 
+    
+    # As of 01/01/2025 the two funcs below are the updated versions 
+    "generate_data2.0c", 
+    "trueVals2.0c"
     
     # # old 
     # "generate_level1_covariates",
@@ -266,12 +273,12 @@ test_condition <- conditions |>
 
 # Generate Data 
 set.seed(8675309)
-data <- generate_data(
+data <- generate_data2.0c(
     J = test_condition[["J"]], 
     njrange = c(test_condition[["Nj_low"]], test_condition[["Nj_high"]]), 
     Mfamily = "binomial",
     Yfamily = "binomial", 
-    seed = 8769,
+    seed = 8675309,
     num_x = 3,
     
     m_on_a = 15,
@@ -294,22 +301,22 @@ data.frame(
     row.names = names(data$effects$individual)
 )
 # individual    cluster
-# pnde 0.13254019 0.13413533
-# tnie 0.02008776 0.02064484
-# tnde 0.00000000 0.00000000 # A's direct effect only manifests in the absence of mediator change
-# pnie 0.15262795 0.15478017 
+# pnde 0.117075635 0.12222966
+# tnie 0.009099977 0.01098372
+# tnde 0.000000000 0.00000000 # A's direct effect only manifests in the absence of mediator change
+# pnie 0.126175612 0.13321338
 
 
 # Try different parameters 
 set.seed(8675309)
-data <- generate_data(
+data <- generate_data2.0c(#include_truevals = FALSE, 
     J = test_condition[["J"]], 
     njrange = c(test_condition[["Nj_low"]], test_condition[["Nj_high"]]), 
-    Mfamily = "binomial",
+    # Mfamily = "binomial",
     Yfamily = "binomial",
-    # Mfamily = "gaussian",
+    Mfamily = "gaussian",
     # Yfamily = "gaussian",
-    seed = 8769,
+    seed = 8675309,
     num_x = 3,
     
     m_on_a = 3.5,
@@ -332,11 +339,11 @@ data.frame(
     row.names = names(data$effects$individual)
 ) |> 
     format(scientific = FALSE)
-# individual     cluster
-# pnde 0.107344744 0.108667581
-# tnie 0.009257772 0.009533959
-# tnde 0.003682356 0.003771970
-# pnie 0.112920161 0.114429569
+# individual      cluster
+# pnde 0.1221682092 0.1264475446
+# tnie 0.0061939999 0.0070084034
+# tnde 0.0007435363 0.0008976396
+# pnie 0.1276186728 0.1325583084
 
 # PNDE + TNIE = TNDE + PNIE
 (data$effects$individual$pnde + data$effects$individual$tnie) == (data$effects$individual$tnde + data$effects$individual$pnie)
@@ -367,7 +374,7 @@ devtools::load_all("Application/Functions/MediatorCL")
 learners_a <- learners_m <- learners_y <- c("SL.glm","SL.nnet") 
 
 # data$CLUSTER2 <- as.factor(data$CLUSTER2)
-# Sname <- "school" # have to specify this outside of MediatorCL function to work
+Sname <- "school" # have to specify this outside of MediatorCL function to work
 
 results_ml <- MediatorCL::MediatorCL(
     data = data$data,
@@ -385,7 +392,7 @@ results_ml <- MediatorCL::MediatorCL(
     
 )
 
-
+results_ml
 
 
 

@@ -3,6 +3,61 @@
 # [eventually maybe change function to a_c, if it won't interfere with output being labeled a_c]
 # As of 2024-12-19: only modified messaging output 
 
+#' @title a.c
+#'
+#' @description
+#' Estimates propensity scores (predicted probabilities of treatment) using cross-fitting.
+#'
+#' @details
+#' The `a.c()` function takes a dataset along with information about the treatment and covariates, 
+#' applies a cross-fitting procedure (via `crossfit()`) to obtain predictions of the probability 
+#' of receiving treatment (`a(1|c)`) and not receiving treatment (`a(0|c)`) for each observation. 
+#' It supports an option to switch to single-fold (non-crossfit) estimation under certain model 
+#' specifications (i.e., if the `cluster_opt` argument contains `"glm"`). Predictions are stored 
+#' in a matrix with two columns: `"a(0|c)"` (for no treatment) and `"a(1|c)"` (for treatment).
+#'
+#' @param data_in A data frame containing the variables of interest.
+#' @param varnames A list specifying the names of the treatment variable (`A`), covariates (`X`), and potentially other named elements.
+#' @param cluster_opt A character string indicating the clustering or modeling option to use. 
+#'   Defaults to `"FE.glm"`, but if it contains `"glm"`, the function will use a single training/validation split.
+#' @param folds A list of folds (training and validation sets) created via `origami::make_folds` or a custom fold function.
+#' @param learners A set of machine learning algorithms or models passed on to the `crossfit()` function.
+#' @param bounded A logical indicating whether to bound predicted probabilities (e.g., ensure they are within [0, 1]). Defaults to `TRUE`.
+#'
+#' @return
+#' A matrix with two columns: 
+#' \describe{
+#'   \item{\code{a(0|c)}}{Estimated probability of no treatment (i.e., 1 - P(A=1)).}
+#'   \item{\code{a(1|c)}}{Estimated probability of receiving treatment (i.e., P(A=1)).}
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' # Example usage
+#' my_data <- data.frame(A = rbinom(100, 1, 0.5), 
+#'                      X1 = rnorm(100), 
+#'                      X2 = rnorm(100))
+#' my_varnames <- list(A = "A", X = c("X1", "X2"))
+#'
+#' # Suppose we define some folds and a set of learners:
+#' library(origami)
+#' my_folds <- make_folds(my_data, fold_fun = folds_vfold, V = 2)
+#' my_learners <- c("SL.glm", "SL.mean")
+#'
+#' # We can now call a.c():
+#' pred_matrix <- a.c(data_in = my_data,
+#'                    varnames = my_varnames,
+#'                    cluster_opt = "FE.glm",
+#'                    folds = my_folds,
+#'                    learners = my_learners,
+#'                    bounded = TRUE)
+#' head(pred_matrix)
+#' }
+#'
+#' @seealso \code{\link{crossfit}} for details on cross-fitting.
+#' @export
+
+
 a.c <- function(data_in, varnames, cluster_opt = "FE.glm", folds, learners, bounded = TRUE) {
     # Check for required functions
     if (!exists("crossfit")) {

@@ -72,6 +72,11 @@ trueVals2.0c <- function(data_list) {
     Yfamily <- data_list$Yfamily
     iccm <- data_list$iccm
     iccy <- data_list$iccy
+    seed <- data_list$seed
+    iccx <- data_list$iccx
+    x_z <- data_list$x_z
+    num_x <- data_list$num_x
+    
     
     # Extract mediator parameters
     gen_m <- list(
@@ -213,6 +218,7 @@ trueVals2.0c <- function(data_list) {
             
             pop_result <- generate_data2.0c( 
                 include_truevals = FALSE, # 
+                include_overlapMsg = FALSE, 
                 J = large_J,
                 njrange = big_njrange,
                 Mfamily = "gaussian",
@@ -222,7 +228,7 @@ trueVals2.0c <- function(data_list) {
                 num_x = num_x, 
                 # a_x = 0.15, # sqrt(0.15 * 1 / num_x)
                 # a_z = sqrt(0.4 / 1),
-                x_z = x_z, 
+                x_z = x_z,
                 m_on_a = data_list$m_on_a, 
                 m_on_az = data_list$m_on_az, 
                 m_on_anj = data_list$m_on_anj, 
@@ -241,7 +247,7 @@ trueVals2.0c <- function(data_list) {
                 quadratic.A = data_list$quadratic.A, 
                 quadratic.M = data_list$quadratic.M, 
                 quadratic.Y = data_list$quadratic.Y, 
-                iccx = iccx, 
+                iccx = data_list$iccx, 
                 icca = data_list$icca, 
                 iccm = data_list$iccm, 
                 iccy = data_list$iccy 
