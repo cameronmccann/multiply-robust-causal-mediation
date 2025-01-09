@@ -598,7 +598,7 @@ conditions <- data.frame(rbind(
 ))
 
 # limit conditions for testing 
-conditions <- conditions[1:10, ]
+# conditions <- conditions[1:10, ]
 ## binomial M & Y 
 # conditions <- conditions[1:3, ]
 
