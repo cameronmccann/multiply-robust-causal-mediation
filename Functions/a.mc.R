@@ -16,7 +16,7 @@ a.mc <- function(data_in, varnames, cluster_opt = "FE.glm", folds, learners, bou
     
     # Adjust folds if no cross-fitting is required
     if (grepl("glm", cluster_opt)) { 
-        folds <- origami::make_folds(data_in, fold_fun = folds_vfold, V = 1)
+        folds <- origami::make_folds(data_in, fold_fun = origami::folds_vfold, V = 1)
         folds[[1]]$training_set <- folds[[1]]$validation_set
     }
     

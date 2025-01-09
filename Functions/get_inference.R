@@ -1,8 +1,5 @@
 
 
-
-
-
 get_inference <-
     function(estimand = 1,
              eif_clmean,

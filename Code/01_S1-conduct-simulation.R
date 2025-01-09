@@ -553,7 +553,22 @@ function_names <- c(
     
     # As of 01/01/2025 the two funcs below are the updated versions 
     "generate_data2.0c", 
-    "trueVals2.0c"
+    "trueVals2.0c", 
+    
+    # Estimation functions 
+    "crossfit", 
+    "make_fold_K", 
+    "eif", 
+    "a.c",
+    "a.mc",
+    "mu.mac",
+    "v.ac", 
+    "mu.ac",
+    "get_inference", 
+    "internal_estimate_mediation", 
+    "bound", 
+    "effect", 
+    "estimate_mediation"
 )
 for (func in function_names) {
     source(file.path("Functions", paste0(func, ".R")))
@@ -583,7 +598,9 @@ conditions <- data.frame(rbind(
 ))
 
 # limit conditions for testing 
-conditions <- conditions[1:5]
+conditions <- conditions[1:10, ]
+## binomial M & Y 
+# conditions <- conditions[1:3, ]
 
 
 # ══════════════════════════════
@@ -648,8 +665,9 @@ for (cond_idx in seq_len(total_conditions)) {
     
     result_list <- foreach(
         rep_idx = seq_len(reps),
-        .packages = c("dplyr", "ggplot2", "glue", "purrr")#, 
+        .packages = c("dplyr", "ggplot2", "glue", "purrr"), 
         # .export = c("cond_idx")
+        .export = c("get_inference") #, "internal_estimate_mediation")  # Explicitly include your custom functions
     ) %dopar% {
         start_time_iter <- Sys.time()
         set.seed(seeds[rep_idx])
@@ -679,6 +697,7 @@ for (cond_idx in seq_len(total_conditions)) {
             int.XZ = FALSE 
         )
         
+        
         # Save population data if applicable
         if (!is.null(sim_data$truevals$pop_data) && rep_idx == 1) { # drop && rep_idx == 1 to save all pop data
             # Save only for the first replication
@@ -689,38 +708,59 @@ for (cond_idx in seq_len(total_conditions)) {
             cond_idx_padded <- sprintf("%02d", cond_idx) # change condition number: 1 => 01
             pop_data_file <- file.path(pop_data_folder, glue("S1_pop-data-condition-{cond_idx_padded}-rep-{rep_idx}.rds"))
             saveRDS(sim_data$truevals$pop_data, pop_data_file)
+            
+            # free up space 
+            # rm(sim_data$truevals$pop_data)
+            # gc()
         }
         
         
         
         ########################################################################
-        # INSERT ESTIMATION CODE HERE & ADJUST OUTPUT DATAFRAME (A FEW LINES BELOW)
-        # 
-        # 
-        # 
+        # INSERT ESTIMATION CODE HERE 
+        clust_opt <- c("noncluster.glm", "FE.glm", "RE.glm") # "cwc", "cwc.FE"
+        results <- list()
+        
+        for (opt in clust_opt) {
+            warnings_list <- character(0)  # Reset warnings for each iteration
+            
+            estimates <- withCallingHandlers(
+                {
+                    estimate_mediation(
+                        data = sim_data$data,
+                        Sname = "school",
+                        Wnames = NULL,
+                        Xnames = names(sim_data$data)[grep("^X", names(sim_data$data))],
+                        Aname = "A",
+                        Mnames = "M",
+                        Yname = "Y",
+                        learners_a = c("SL.glm"),
+                        learners_m = c("SL.glm"),
+                        learners_y = c("SL.glm"),
+                        cluster_opt = opt,  
+                        num_folds = 1
+                    )
+                },
+                warning = function(w) {
+                    warnings_list <<- c(warnings_list, conditionMessage(w))  # Append warning message
+                    invokeRestart("muffleWarning")  # Muffle warning to continue
+                }
+            )
+            
+            # Store results and warnings in the list for this iteration
+            results[[opt]] <- list(
+                estimates = estimates,
+                warnings = warnings_list, 
+                num_folds = 1           # change later
+            )
+        }
+        
         ########################################################################
         
         end_time_iter <- Sys.time()
         iter_duration <- as.numeric(difftime(end_time_iter, start_time_iter, units = "mins"))
         
         ########################################################################
-        # Prep data for export (update code that follows this)
-        ## Maybe just make one list per condition that has an element for each iteration
-        ## we will have this in the list for each iteration:
-        #   - iteration = rep_idx,
-        #   - seed = seeds[rep_idx],
-        #   - cond_idx # or cond
-        #   - condition_details = as.character(cond_label)
-        #   - iter_time_sec = round(iter_duration, 4),
-        #   - data_list$truevals
-        #   - data_list$effects
-        #   - data_list$overlap
-        #       # data_list$overlap$ps_summary
-        #       # data_list$overlap$iptw_summary
-        #   - data_list$parameters
-        #       # data_list$parameters$J
-        #       # data_list$parameters$njrange
-        #       # data_list$parameters$nj_sizes
         # Prep data for export (update code that follows this)
         iteration_data <- list(
             iteration = rep_idx,
@@ -729,29 +769,27 @@ for (cond_idx in seq_len(total_conditions)) {
             condition_details = as.character(cond_label),
             iter_time_sec = round(iter_duration, 4),
             truevals = list(
-                sim_data$truevals$truevals_individual, 
-                sim_data$truevals$truevals_cluster
+                truevals_individual = sim_data$truevals$truevals_individual, 
+                truevals_cluster = sim_data$truevals$truevals_cluster
             ), 
-            # truevals = sim_data$truevals,
             effects = sim_data$effects,
             overlap = list(
-                sim_data$overlap$ps_summary, 
-                sim_data$overlap$iptw_summary
+                ps_summary = sim_data$overlap$ps_summary, 
+                iptw_summary = sim_data$overlap$iptw_summary
             ), 
-            # overlap = sim_data$overlap,
             parameters = list(
                 J = sim_data$parameters$J,
                 njrange = sim_data$parameters$njrange,
                 nj_sizes = sim_data$parameters$nj_sizes
-            )
+            ), 
+            # 
+            results = results
         )
         
-        
-        #  # THEN ANY ESTIMATIONS
-        # 
-        # 
         ########################################################################
         
+        # clear up space
+        rm(sim_data, results, estimates, warnings_list)
         
         # Return the iteration data
         iteration_data
@@ -809,6 +847,9 @@ for (cond_idx in seq_len(total_conditions)) {
     cond_idx_padded <- sprintf("%02d", cond_idx)
     saveRDS(result_list, file.path(path, glue("S1_condition-{cond_idx_padded}.rds")))
     
+    # clear space
+    rm(result_list)
+    gc()
     
     message(glue(
         "[{format(Sys.time(), '%Y-%m-%d %H:%M:%S')}] Condition {cond_idx_padded}/{total_conditions} ",

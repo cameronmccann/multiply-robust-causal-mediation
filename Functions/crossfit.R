@@ -156,14 +156,14 @@ crossfit <- function(train, valid.list, yname, xnames, varnames,
         
         # Fit either a linear mixed model (gaussian) or a generalized linear mixed model (binomial)
         if (family[[1]] == "gaussian") {
-            fit <- lmer(
+            fit <- lme4::lmer(
                 formula = REformula,
                 weights = wreg,
                 data = df_lm
             )
         }
         if (family[[1]] != "gaussian") {
-            fit <- glmer(
+            fit <- lme4::glmer(
                 formula = REformula,
                 weights = wreg,
                 data = df_lm, 
@@ -179,7 +179,7 @@ crossfit <- function(train, valid.list, yname, xnames, varnames,
                 S = validX[[Sname]]
             )
             # Predict on this new data
-            preds <- predict(fit, newX, type = "response")
+            preds <- stats::predict(fit, newX, type = "response")
             
             # If bounded = TRUE, constrain predictions to [0,1]
             if (!bounded) {
@@ -202,7 +202,7 @@ crossfit <- function(train, valid.list, yname, xnames, varnames,
         
         # Build different formulas depending on whether or not we include S
         if (cluster_opt == "FE.glm") {
-            fit <- glm(
+            fit <- stats::glm(
                 formula = paste("Y ~ S +", paste(xnames, collapse = " + ")),
                 weights = wreg,
                 data = df_lm, 
@@ -210,7 +210,7 @@ crossfit <- function(train, valid.list, yname, xnames, varnames,
             )
         }
         if (cluster_opt == "noncluster.glm") {
-            fit <- glm(
+            fit <- stats::glm(
                 formula = paste("Y ~", paste(xnames, collapse = " + ")),
                 weights = wreg,
                 data = df_lm, 
@@ -226,7 +226,7 @@ crossfit <- function(train, valid.list, yname, xnames, varnames,
                 S = validX[[Sname]]
             )
             # Make predictions using glm
-            preds <- predict(fit, newX, type = "response")
+            preds <- stats::predict(fit, newX, type = "response")
             
             # Bound predictions if requested
             if (!bounded) {
@@ -274,7 +274,7 @@ crossfit <- function(train, valid.list, yname, xnames, varnames,
                 validX[, c(xnames, varnames$W, Sname_dummies), drop = FALSE]
             )
             # Predict returns a list; we extract the 'pred' element
-            preds <- predict(fit, newX[, fit$varNames])$pred
+            preds <- stats::predict(fit, newX[, fit$varNames])$pred
             
             # Bound if necessary
             if (!bounded) {
@@ -291,8 +291,8 @@ crossfit <- function(train, valid.list, yname, xnames, varnames,
     if (cluster_opt == "cwc") { 
         # Create data frame for training that includes: outcome (Y), cluster-mean-centered covariates (xnames_cwc), cluster mean of Y (yname_clmean), & additional covariates (varnames$W)
         df_cwc <- data.frame(
-            Y = train[, glue("{yname}"), drop=TRUE],
-            train[, c(glue("{xnames}_cwc"), glue("{yname}_clmean"), varnames$W), drop = FALSE]
+            Y = train[, glue::glue("{yname}"), drop=TRUE],
+            train[, c(glue::glue("{xnames}_cwc"), glue::glue("{yname}_clmean"), varnames$W), drop = FALSE]
         )
         
         # Fit a SuperLearner model on these centered variables
@@ -309,16 +309,16 @@ crossfit <- function(train, valid.list, yname, xnames, varnames,
             
             # Rebuild the new data with cluster means and centered covariates
             newX <- data.frame(
-                validX[, c(xnames, glue("{xnames}_clmean"), glue("{yname}_clmean"), varnames$W), drop = FALSE]
+                validX[, c(xnames, glue::glue("{xnames}_clmean"), glue::glue("{yname}_clmean"), varnames$W), drop = FALSE]
             )
             # Create the within-cluster centered version of the X variables
-            validX_cwc <- validX[, xnames] - validX[, glue("{xnames}_clmean")]
-            colnames(validX_cwc) <- glue("{xnames}_cwc")
+            validX_cwc <- validX[, xnames] - validX[, glue::glue("{xnames}_clmean")]
+            colnames(validX_cwc) <- glue::glue("{xnames}_cwc")
             # Combine centered covariates with newX
-            newX <- newX %>% bind_cols(validX_cwc)
+            newX <- newX %>% dplyr::bind_cols(validX_cwc)
             # colnames(newX)
             # Get predictions using the SuperLearner model
-            preds <- predict(fit, newX[, fit$varNames])$pred
+            preds <- stats::predict(fit, newX[, fit$varNames])$pred
             # preds <- preds + validX[, glue("{yname}_clmean"), drop=TRUE]
             
             if (!bounded) {
@@ -336,15 +336,15 @@ crossfit <- function(train, valid.list, yname, xnames, varnames,
         if (family[[1]] == "binomial") {
             # For binomial, we use Y and cluster-level variables
             df_ss <- data.frame(
-                Y = train[, glue("{yname}"), drop=TRUE],
-                train[, c(glue("{xnames}_cwc"), glue("{xnames}_clmean"), glue("{yname}_clmean"), varnames$W), drop = FALSE]
+                Y = train[, glue::glue("{yname}"), drop=TRUE],
+                train[, c(glue::glue("{xnames}_cwc"), glue::glue("{xnames}_clmean"), glue::glue("{yname}_clmean"), varnames$W), drop = FALSE]
             )
         }
         if (family[[1]] == "gaussian") {
             # For gaussian, we use the cluster-mean-centered Y (yname_cwc)
             df_ss <- data.frame(
-                Y = train[, glue("{yname}_cwc"), drop=TRUE],
-                train[, c(glue("{xnames}_cwc"), glue("{xnames}_clmean"), #glue("{yname}_clmean"), 
+                Y = train[, glue::glue("{yname}_cwc"), drop=TRUE],
+                train[, c(glue::glue("{xnames}_cwc"), glue::glue("{xnames}_clmean"), #glue("{yname}_clmean"), 
                           varnames$W), drop = FALSE]
             )
         }
@@ -363,20 +363,20 @@ crossfit <- function(train, valid.list, yname, xnames, varnames,
             
             # Build the new data frame with cluster means, centered covariates, etc.
             newX <- data.frame(
-                validX[, c(glue("{yname}_clmean"), xnames, glue("{xnames}_clmean"), varnames$W), drop = FALSE]
+                validX[, c(glue::glue("{yname}_clmean"), xnames, glue::glue("{xnames}_clmean"), varnames$W), drop = FALSE]
             )
             # Again, compute the within-cluster centered covariates
-            validX_cwc <- validX[, xnames] - validX[, glue("{xnames}_clmean")]
-            colnames(validX_cwc) <- glue("{xnames}_cwc")
+            validX_cwc <- validX[, xnames] - validX[, glue::glue("{xnames}_clmean")]
+            colnames(validX_cwc) <- glue::glue("{xnames}_cwc")
             # Bind them
-            newX <- newX %>% bind_cols(validX_cwc)
+            newX <- newX %>% dplyr::bind_cols(validX_cwc)
             # colnames(newX)
             # Get predictions from the model
-            preds <- predict(fit, newX[, fit$varNames])$pred
+            preds <- stats::predict(fit, newX[, fit$varNames])$pred
             
             # For Gaussian outcomes, we add back the cluster mean of Y
             if (family[[1]] == "gaussian") {
-                preds <- preds + validX[, glue("{yname}_clmean"), drop=TRUE]
+                preds <- preds + validX[, glue::glue("{yname}_clmean"), drop=TRUE]
             }
             
             # Bound if needed
@@ -396,15 +396,15 @@ crossfit <- function(train, valid.list, yname, xnames, varnames,
         # Build the training data with cluster-centered covariates, cluster means, and dummy variables
         # colnames(train) # note: train[, glue("{yname}"), drop=TRUE] doesn't work well
         if (family[[1]]=="gaussian") {
-            df_cwc <- data.frame(Y = train[, glue("{yname}"), drop=TRUE], 
-                                 train[, c(glue("{xnames}_cwc"), Sname_dummies, glue("{yname}_clmean"), #glue("{varnames$Xnames}_clmean"),# only covariates' cluster means
+            df_cwc <- data.frame(Y = train[, glue::glue("{yname}"), drop=TRUE], 
+                                 train[, c(glue::glue("{xnames}_cwc"), Sname_dummies, glue::glue("{yname}_clmean"), #glue("{varnames$Xnames}_clmean"),# only covariates' cluster means
                                            #glue("{xnames}_clmean"),
                                            varnames$W
                                  ), drop = FALSE])
         }
         if (family[[1]]=="binomial") {
-            df_cwc <- data.frame(Y = train[, glue("{yname}"), drop=TRUE], 
-                                 train[, c(glue("{xnames}_cwc"), Sname_dummies, glue("{yname}_clmean"), #glue("{varnames$Xnames}_clmean"),# only covariates' cluster means
+            df_cwc <- data.frame(Y = train[, glue::glue("{yname}"), drop=TRUE], 
+                                 train[, c(glue::glue("{xnames}_cwc"), Sname_dummies, glue::glue("{yname}_clmean"), #glue("{varnames$Xnames}_clmean"),# only covariates' cluster means
                                            #glue("{xnames}_clmean"),
                                            varnames$W
                                  ), drop = FALSE])
@@ -424,15 +424,15 @@ crossfit <- function(train, valid.list, yname, xnames, varnames,
             
             # Construct new data that includes xnames, cluster means, cluster dummies, etc.
             newX <- data.frame(
-                validX[, c(xnames, glue("{xnames}_clmean"), glue("{yname}_clmean"), Sname_dummies, varnames$W), drop = FALSE]
+                validX[, c(xnames, glue::glue("{xnames}_clmean"), glue::glue("{yname}_clmean"), Sname_dummies, varnames$W), drop = FALSE]
             )
             # Compute within-cluster centered X
-            validX_cwc <- validX[, xnames] - validX[, glue("{xnames}_clmean")]
-            colnames(validX_cwc) <- glue("{xnames}_cwc")
-            newX <- newX %>% bind_cols(validX_cwc)
+            validX_cwc <- validX[, xnames] - validX[, glue::glue("{xnames}_clmean")]
+            colnames(validX_cwc) <- glue::glue("{xnames}_cwc")
+            newX <- newX %>% dplyr::bind_cols(validX_cwc)
             # colnames(newX)
             # Predict using SL
-            preds <- predict(fit, newX[, fit$varNames])$pred
+            preds <- stats::predict(fit, newX[, fit$varNames])$pred
             
             # For gaussian, we might add back the cluster mean 
             # e.g. preds <- preds + validX[, glue("{yname}_clmean"), drop=TRUE]

@@ -1,6 +1,6 @@
 
 # {UPDATE DOCUMENTATION AT SOMEPOINT}
-# As of 2025-01-03: did not modify anything yet  
+# As of 2025-01-09: ony modified `type` argument in crossfit() to take on `Yfamily` instead of "gaussian"; did not modify anything else yet  
 
 
 v.ac <- function(a=1, astar=0, mu_mac, data_in, varnames, Yfamily = "gaussian", ipw = NULL, cluster_opt = "FE.glm",
@@ -41,7 +41,8 @@ v.ac <- function(a=1, astar=0, mu_mac, data_in, varnames, Yfamily = "gaussian", 
                               varnames,
                               ipw,
                               cluster_opt,
-                              type = "gaussian",
+                              # type = "gaussian",
+                              type = Yfamily, 
                               learners, bounded)
         }
         

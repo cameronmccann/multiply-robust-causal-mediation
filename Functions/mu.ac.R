@@ -1,5 +1,5 @@
 # {UPDATE DOCUMENTATION AT SOMEPOINT}
-# As of 2025-01-07: nothing modified yet 
+# As of 2025-01-07: nothing modified yet (only added package names; e.g., origami::)
 
 mu.ac <- function(data_in, varnames, Yfamily = "gaussian", ipw = NULL, cluster_opt = "FE.glm",
                    folds, learners, bounded = FALSE) {
@@ -7,10 +7,10 @@ mu.ac <- function(data_in, varnames, Yfamily = "gaussian", ipw = NULL, cluster_o
     a_vals <- expand.grid(a=c(0,1))
 
     mu <- matrix(nrow = nrow(data_in), ncol = nrow(a_vals))
-    colnames(mu) <- (glue("mu(a{a_vals$a},c)"))
+    colnames(mu) <- (glue::glue("mu(a{a_vals$a},c)"))
 
-    if (str_detect(cluster_opt, "glm")) { # no cross-fitting if glm
-        folds <- make_folds(data_in, fold_fun = folds_vfold, V = 1)
+    if (stringr::str_detect(cluster_opt, "glm")) { # no cross-fitting if glm
+        folds <- origami::make_folds(data_in, fold_fun = origami::folds_vfold, V = 1)
         folds[[1]]$training_set <- folds[[1]]$validation_set
     }
 
@@ -40,7 +40,7 @@ mu.ac <- function(data_in, varnames, Yfamily = "gaussian", ipw = NULL, cluster_o
         # alist$fit$fitLibrary$SL.glm_All$object$coefficients
         preds <- alist$preds
         for (jj in 1:nrow(a_vals)) {
-            mu[folds[[v]]$validation_set, glue("mu(a{a_vals$a[jj]},c)")] <-  preds[, jj]
+            mu[folds[[v]]$validation_set, glue::glue("mu(a{a_vals$a[jj]},c)")] <-  preds[, jj]
         }
     }
     mu

@@ -120,7 +120,36 @@ estimate_mediation <- function(data,
         dplyr::rename_with(.fn = ~gsub("waldci2_", "CI.upper_", .)) %>%
         dplyr::select(Effect, dplyr::contains("Individual.Average"), dplyr::contains("Cluster.Average"))
     
-    return(results1)
+    # return(results1)
+    
+    # Changing output to different format and titles (maybe change back or modify headers to be like glm outputs)
+    results2 <- results1
+    names(results2) <-
+        c(
+            "Effect",
+            "Individual.Average_Estimate",
+            "Individual.Average_StdError",
+            "Individual.Average_CILower",
+            "Individual.Average_CIUpper",
+            "Cluster.Average_Estimate",
+            "Cluster.Average_StdError",
+            "Cluster.Average_CILower",
+            "Cluster.Average_CIUpper"
+        )
+    results2 <- results2 |>
+        tidyr::pivot_longer(
+            cols = -Effect,
+            names_to = c("EffectVersion", "Measure"),
+            names_pattern = "(.*)_(.*)"
+        ) |>
+        tidyr::pivot_wider(names_from = Measure,
+                           values_from = value) |>
+        mutate(EffectVersion = gsub(".Average", "-Avg", EffectVersion)) |>
+        arrange(factor(EffectVersion, levels = c("Individual-Avg", "Cluster-Avg")), Effect) |> 
+        as.data.frame()
+    
+    return(results2)
+    
 }
 
 
