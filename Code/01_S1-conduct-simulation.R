@@ -29,7 +29,7 @@
 #           + performance criteria: power, coverage, bias, RMSE, etc
 #           + test 100 reps, 200, 500, and then 1,000 reps for final 
 #
-#   Done: Completed tasks
+#   Done: 
 #
 ################################################################################
 
