@@ -13,7 +13,7 @@
 #       Note: data generation creates pop data (when Mfamily & Yfamily meet "gaussian" &. "binomial") for every iteration but only saves first iteration into pop data folder. 
 #
 #
-# Last Updated: 2025-01-08
+# Last Updated: 2025-01-09
 #
 #
 # Notes:
@@ -582,6 +582,10 @@ conditions <- data.frame(rbind(
     )
 ))
 
+# limit conditions for testing 
+conditions <- conditions[1:5]
+
+
 # ══════════════════════════════
 #     Number of Replications and Output Paths
 # ══════════════════════════════
@@ -724,9 +728,17 @@ for (cond_idx in seq_len(total_conditions)) {
             cond_idx = cond_idx,
             condition_details = as.character(cond_label),
             iter_time_sec = round(iter_duration, 4),
-            truevals = sim_data$truevals,
+            truevals = list(
+                sim_data$truevals$truevals_individual, 
+                sim_data$truevals$truevals_cluster
+            ), 
+            # truevals = sim_data$truevals,
             effects = sim_data$effects,
-            overlap = sim_data$overlap,
+            overlap = list(
+                sim_data$overlap$ps_summary, 
+                sim_data$overlap$iptw_summary
+            ), 
+            # overlap = sim_data$overlap,
             parameters = list(
                 J = sim_data$parameters$J,
                 njrange = sim_data$parameters$njrange,
