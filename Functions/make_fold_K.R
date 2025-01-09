@@ -2,7 +2,7 @@
 
 # within cluster sample split and cross fit 
 
-make_fold_K <- function(data_in, Sname, cv_folds=4) {
+make_fold_K <- function(data_in, Sname, cv_folds = 4) {
   
   fold_K <- lapply(unique(data_in[[Sname]]), FUN = function(k=1) {
     data_in$K <- match(data_in[[Sname]], unique(data_in[[Sname]]))

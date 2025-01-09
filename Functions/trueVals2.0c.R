@@ -309,10 +309,17 @@ trueVals2.0c <- function(data_list) {
     # -------------------------------------------------------------------------
     # 5. RETURN THE TRUE VALUES
     # -------------------------------------------------------------------------
+    # return(
+    #     list(
+    #         truevals_individual = truevals_individual,
+    #         truevals_cluster    = truevals_cluster
+    #     )
+    # )
     return(
         list(
             truevals_individual = truevals_individual,
-            truevals_cluster    = truevals_cluster
+            truevals_cluster    = truevals_cluster,
+            pop_data = if (exists("pop_result") && !is.null(pop_result$data)) pop_result$data else NULL
         )
     )
 }
