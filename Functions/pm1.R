@@ -27,14 +27,37 @@
 
 pm1 <- function(m, a, z, nj, given, gen_m) {
     
-    latent <- gen_m[["m_on_a"]] * a + 
-        gen_m[["m_on_az"]] * a * z + 
-        gen_m[["m_on_anj"]] * a * nj + 
+    latent <- gen_m[["m_on_a"]] * a +
+        gen_m[["m_on_az"]] * a * z +
+        gen_m[["m_on_anj"]] * a * nj +
         given
     prob1 <- pnorm(latent, mean = 0, sd = sqrt(1 - gen_m[["iccm"]]))
     # m * prob1 + (1 - m) * (1 - prob1)
     return(m * prob1 + (1 - m) * (1 - prob1))
+    
+    # tried using nearly exact func below (did not work 2025-01-14)
+        # latent <- gen_m[["m_on_a"]] * a + gen_m[["m_on_az"]] * a*z + gen_m[["m_on_anj"]] * a*nj + given
+        # prob1 <- pnorm(latent, mean = 0, sd = sqrt(1 - gen_m[["iccm"]]))
+        # m * prob1 + (1 - m) * (1 - prob1)
+    
+    # # Add individual-level residual?
+    # N <- length(a) 
+    # latent <- gen_m[["m_on_a"]] * a +
+    #     gen_m[["m_on_az"]] * a * z +
+    #     gen_m[["m_on_anj"]] * a * nj +
+    #     given
+    # latent_m <- latent + rnorm(N, sd = sqrt(1 - gen_m[["iccm"]]))
+    # prob1 <- pnorm(latent_m, mean = 0, sd = sqrt(1 - gen_m[["iccm"]]))
+    # return(m * prob1 + (1 - m) * (1 - prob1))
 }
 
 
 ##################################### END ######################################
+
+
+# Dr Liu's 
+# pm1 <- function(m1, a, z, nj, given, gen_m) {
+#     latent <- gen_m[["m1_on_a"]] * a + gen_m[["m1_on_az"]] * a*z + gen_m[["m1_on_anj"]] * a*nj + given
+#     prob1 <- pnorm(latent, mean = 0, sd = sqrt(1 - gen_m[["iccm1"]]))
+#     m1 * prob1 + (1 - m1) * (1 - prob1)
+# }

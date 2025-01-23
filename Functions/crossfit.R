@@ -391,24 +391,73 @@ crossfit <- function(train, valid.list, yname, xnames, varnames,
     # 8. CWC WITH FIXED EFFECTS (cwc.FE)
     # --------------------------------------------------------------------------
     # Similar to 'cwc' but also including cluster dummy variables for FE.
+    # ═══════════════════
+    #    Debugging version of code 
+    # ═══════════════════
+    # if (cluster_opt == "cwc.FE") {
+    #     print("Fitting CWC.FE...")
+    #     print(glue::glue("Columns in training data: {paste(colnames(df_cwc), collapse=', ')}"))
+    #     
+    #     fit <- SuperLearner::SuperLearner(
+    #         Y = df_cwc$Y,
+    #         X = df_cwc[, -1, drop = FALSE],
+    #         family = family[[1]],
+    #         SL.library = learners,
+    #         env = environment(SuperLearner::SuperLearner)
+    #     )
+    #     
+    #     if (is.null(fit)) stop("Error: `fit` returned NULL in `cwc.FE`")
+    #     
+    #     preds <- sapply(valid.list, function(validX) {
+    #         print(glue::glue("Validation fold size: {nrow(validX)}"))
+    #         
+    #         newX <- data.frame(
+    #             validX[, c(xnames, glue::glue("{xnames}_clmean"), glue::glue("{yname}_clmean"), Sname_dummies, varnames$W), drop = FALSE]
+    #         )
+    #         
+    #         # Center X within clusters
+    #         validX_cwc <- validX[, xnames] - validX[, glue::glue("{xnames}_clmean")]
+    #         colnames(validX_cwc) <- glue::glue("{xnames}_cwc")
+    #         newX <- newX %>% dplyr::bind_cols(validX_cwc)
+    #         
+    #         if (is.null(newX) || ncol(newX) == 0) stop("Error: Validation data is NULL or empty.")
+    #         if (!all(fit$varNames %in% colnames(newX))) stop("Error: Missing predictors in newX")
+    #         
+    #         preds <- stats::predict(fit, newX[, fit$varNames])$pred
+    #         
+    #         if (is.null(preds) || nrow(preds) == 0) {
+    #             stop(glue::glue("Error: Predictions are NULL or empty for fold {v}."))
+    #         }
+    #         
+    #         preds
+    #     }, simplify = TRUE)
+    # }
+    
+    # ═══════════════════
+    #    origianl version of code 
+    # ═══════════════════
     # cwc.FE ----
     if (cluster_opt == "cwc.FE") { # continuous outcome
         # Build the training data with cluster-centered covariates, cluster means, and dummy variables
         # colnames(train) # note: train[, glue("{yname}"), drop=TRUE] doesn't work well
         if (family[[1]]=="gaussian") {
-            df_cwc <- data.frame(Y = train[, glue::glue("{yname}"), drop=TRUE], 
+            df_cwc <- data.frame(Y = train[, glue::glue("{yname}"), drop=TRUE],
                                  train[, c(glue::glue("{xnames}_cwc"), Sname_dummies, glue::glue("{yname}_clmean"), #glue("{varnames$Xnames}_clmean"),# only covariates' cluster means
                                            #glue("{xnames}_clmean"),
                                            varnames$W
                                  ), drop = FALSE])
         }
         if (family[[1]]=="binomial") {
-            df_cwc <- data.frame(Y = train[, glue::glue("{yname}"), drop=TRUE], 
+            df_cwc <- data.frame(Y = train[, glue::glue("{yname}"), drop=TRUE],
                                  train[, c(glue::glue("{xnames}_cwc"), Sname_dummies, glue::glue("{yname}_clmean"), #glue("{varnames$Xnames}_clmean"),# only covariates' cluster means
                                            #glue("{xnames}_clmean"),
                                            varnames$W
                                  ), drop = FALSE])
         }
+
+        ##
+        print("Fitting CWC.FE...")
+        print(glue::glue("Columns in training data: {paste(colnames(df_cwc), collapse=', ')}"))
         
         # Fit a SuperLearner model, now with cluster dummies + cwc columns
         fit <- SuperLearner::SuperLearner(
@@ -419,8 +468,14 @@ crossfit <- function(train, valid.list, yname, xnames, varnames,
             env = environment(SuperLearner::SuperLearner)
         )
         
+        ##
+        if (is.null(fit)) stop("Error: `fit` returned NULL in `cwc.FE`")
+
         # Predict on validation sets
         preds <- sapply(valid.list, function(validX) {
+
+            ##
+            print(glue::glue("Validation fold size: {nrow(validX)}"))
             
             # Construct new data that includes xnames, cluster means, cluster dummies, etc.
             newX <- data.frame(
@@ -431,13 +486,23 @@ crossfit <- function(train, valid.list, yname, xnames, varnames,
             colnames(validX_cwc) <- glue::glue("{xnames}_cwc")
             newX <- newX %>% dplyr::bind_cols(validX_cwc)
             # colnames(newX)
+            
+            ##
+            if (is.null(newX) || ncol(newX) == 0) stop("Error: Validation data is NULL or empty.")
+            if (!all(fit$varNames %in% colnames(newX))) stop("Error: Missing predictors in newX")
+            
             # Predict using SL
             preds <- stats::predict(fit, newX[, fit$varNames])$pred
-            
-            # For gaussian, we might add back the cluster mean 
+
+            # For gaussian, we might add back the cluster mean
             # e.g. preds <- preds + validX[, glue("{yname}_clmean"), drop=TRUE]
             if (family[[1]]=="gaussian") {
                 preds <- preds #+ validX[, glue("{yname}_clmean"), drop=TRUE]
+            }
+
+            ##
+            if (is.null(preds) || nrow(preds) == 0) {
+                stop(glue::glue("Error: Predictions are NULL or empty for fold {v}."))
             }
             
             if (!bounded) {

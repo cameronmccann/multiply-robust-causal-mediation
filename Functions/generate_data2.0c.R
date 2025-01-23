@@ -13,7 +13,7 @@
 #'   \item Simulating a treatment variable \code{A} with optional intraclass correlation.
 #'   \item Simulating the mediator \code{M} given \code{A}, \code{Z}, cluster size, and user-specified interactions.
 #'   \item Simulating the outcome \code{Y} given \code{A}, \code{M}, \code{Z}, cluster size, user-specified interactions, etc.
-#'   \item (Optionally) Computing the true potential outcomes and mediation effects by calling \code{trueVals2.0c()}.
+#'   \item (Optionally) Computing the true potential outcomes and mediation effects by calling \code{trueVals2.0d()}.
 #' }
 #'
 #' @param J Integer. Number of clusters (default: 100).
@@ -49,7 +49,7 @@
 #' @param icca Numeric. Intra-class correlation for treatment \code{A} (default: 0.2).
 #' @param iccm Numeric. Intra-class correlation for mediator \code{M} (default: 0.2).
 #' @param iccy Numeric. Intra-class correlation for outcome \code{Y} (default: 0.2).
-#' @param include_truevals Logical. If \code{TRUE}, call \code{trueVals2.0c()} to compute the true potential outcomes and 
+#' @param include_truevals Logical. If \code{TRUE}, call \code{trueVals2.0d()} to compute the true potential outcomes and 
 #'   mediation effects (default: TRUE).
 #'
 #' @return A list containing:
@@ -78,7 +78,7 @@
 #'                                     using the family (\code{binomial} or \code{gaussian}).
 #'   \item \code{generate_outcome()}: Constructs outcome \code{Y} based on \code{A}, \code{M}, \code{Z}, 
 #'                                    interactions, ICC, etc., again depending on the family chosen.
-#'   \item \code{trueVals2.0c()}: (Optional) Computes the true potential outcomes for \code{Y(a0, gm(a1))}, 
+#'   \item \code{trueVals2.0d()}: (Optional) Computes the true potential outcomes for \code{Y(a0, gm(a1))}, 
 #'                                cluster-level means, and resulting mediation effects.
 #' }
 #'
@@ -115,7 +115,7 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
                               m_on_anj = 0.2,                  # Interaction: 'A' x cluster size on 'M'
                               m_on_x = sqrt(0.15 / num_x),     # Effect of 'X' on 'M'
                               m_on_z = sqrt(0.4),              # Effect of 'Z' on 'M'
-                              int.XZ = TRUE,                   # Include X:Z interaction in mediator/outcome model
+                              # int.XZ = TRUE,                   # Include X:Z interaction in mediator/outcome model
                               yintercept = 1,                  # Intercept for outcome model
                               y_on_a = 0.5,                    # Effect of 'A' on 'Y'
                               y_on_m = 1,                      # Effect of 'M' on 'Y'
@@ -135,18 +135,14 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
                               include_truevals = TRUE,         # Whether or not to compute true values
                               include_overlapMsg = TRUE        # Whether or not to display messages about PS overlap in console
 ) {               
-    # -----------------------------------------------------
-    # 1. CLUSTER GENERATION
-    # -----------------------------------------------------
+    # 1. Cluster generation  --------------------------------------------------
     set.seed(seed)  
     
     # Generate initial cluster structure 
     # (cluster IDs, cluster sizes) based on J and njrange
     data_list <- generate_clusters(J = J, njrange = njrange, seed = seed)
-    
-    # -----------------------------------------------------
-    # 2. GENERATE CONFOUNDERS (X and Z)
-    # -----------------------------------------------------
+
+    # 2. Generate confounders (X & Z) -----------------------------------------
     data_list <- generate_confounders(
         data_list = data_list,
         nj_sizes = data_list$nj_sizes,
@@ -154,10 +150,8 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
         iccx = iccx,
         x_z = x_z
     )
-    
-    # -----------------------------------------------------
-    # 3. GENERATE TREATMENT (A)
-    # -----------------------------------------------------
+
+    # 3. Generate treatment (A) -----------------------------------------------
     data_list <- generate_treatment(
         data_list = data_list,
         nj_sizes = data_list$nj_sizes,
@@ -168,9 +162,7 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
         # a_z = a_z, 
     )
     
-    # -----------------------------------------------------
-    # 4. DIAGNOSTIC PLOTS OF THE PROPENSITY SCORE
-    # -----------------------------------------------------
+    # 4. Diagnostic plots of the propensity scores ----------------------------
     # Overlap plot (density of ps_true by treatment group)
     overlap_plot <- ggplot(data_list$data, aes(x = ps_true, color = factor(A), fill = factor(A))) +
         geom_density(alpha = 0.5) +
@@ -242,9 +234,7 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
         message(iptw_msg)  # Print info about IPTW extremes to console
     }
     
-    # -----------------------------------------------------
-    # 5. GENERATE MEDIATOR (M)
-    # -----------------------------------------------------
+    # 5. Generate mediator (M) ------------------------------------------------
     data_list <- generate_mediator(
         data_list = data_list,
         nj_sizes = data_list$nj_sizes,
@@ -253,16 +243,14 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
         m_on_a = m_on_a,
         m_on_az = m_on_az,
         m_on_anj = m_on_anj,
-        # m_on_x = m_on_x, 
-        # m_on_z = m_on_z,
+        m_on_x = m_on_x, #
+        m_on_z = m_on_z, #
         quadratic.M = quadratic.M,
-        int.XZ = int.XZ, 
+        # int.XZ = int.XZ, 
         Mfamily = Mfamily
     )
-    
-    # -----------------------------------------------------
-    # 6. GENERATE OUTCOME (Y)
-    # -----------------------------------------------------
+
+    # 6. Generate outcome (Y) -------------------------------------------------
     data_list <- generate_outcome(
         data_list = data_list,
         iccy = iccy,
@@ -274,29 +262,24 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
         y_on_mz = y_on_mz,
         y_on_anj = y_on_anj,
         num_x = num_x,
-        # y_on_x = y_on_x,
-        # y_on_z = y_on_z,
+        y_on_x = y_on_x, #
+        y_on_z = y_on_z, #
         quadratic.Y = quadratic.Y,
-        int.XZ = int.XZ,
+        # int.XZ = int.XZ,
         Yfamily = Yfamily,
         if.null = if.null
     )
 
-    # -----------------------------------------------------
-    # 7. (OPTIONAL) COMPUTE TRUE POTENTIAL OUTCOMES
-    # -----------------------------------------------------
+    # 7. (Optional) Compute true potential outcomes  --------------------------
     # If include_truevals is TRUE, compute Y(a0, gm(a1)) values
     # and obtain mediation effects (PNDE, PNIE, etc.).
     if (include_truevals == TRUE) {
-        true_vals <- trueVals2.0c(data_list = data_list)
+        true_vals <- trueVals2.0f(data_list = data_list) #trueVals2.0d(data_list = data_list) # 
     } else {
         true_vals <- NULL
     }
     
-    # -----------------------------------------------------
-    # 8. CALCULATE MEDIATION EFFECTS (IF TRUE VALUES AVAILABLE)
-    # -----------------------------------------------------
-    
+    # 8. Calculate mediation effects (if true values available) ---------------
     
     # Extract the relevant potential outcomes from true_vals
     if (!is.null(true_vals)) {
@@ -324,14 +307,12 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
         tnde_cluster <- y_cl_a1_m1 - y_cl_a0_m1
         tnie_cluster <- y_cl_a1_m1 - y_cl_a1_m0
     } else {
-        # If we didn't compute trueVals2.0c, set effects to NULL
+        # If we didn't compute trueVals2.0d, set effects to NULL
         pnde_ind <- pnie_ind <- tnde_ind <- tnie_ind <- NULL
         pnde_cluster <- pnie_cluster <- tnde_cluster <- tnie_cluster <- NULL
     }
     
-    # -----------------------------------------------------
-    # 9. POST-PROCESSING: SEPARATE OUT X COLUMNS IF NEEDED
-    # -----------------------------------------------------
+    # 9. Post-processing: separate out X columns if needed --------------------
     datobs <- data_list$data
     if (is.matrix(datobs$X)) {
         # If X was stored as a matrix, split it into X1, X2, ..., X_{num_x}
@@ -343,9 +324,7 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
     data_list$data <- datobs
     rm(datobs)
     
-    # -----------------------------------------------------
-    # 10. PREPARE FINAL OUTPUT
-    # -----------------------------------------------------
+    # 10. Prepare final output  -----------------------------------------------
     result_data <- list(
         data = data_list$data,
         truevals = true_vals,
@@ -371,6 +350,7 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
         ),
         parameters = list(
             J = J,
+            # N = N, 
             njrange = njrange,
             nj_sizes = data_list$nj_sizes,
             y_given = data_list$y_given,
@@ -385,8 +365,10 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
             m_on_a = m_on_a,
             m_on_az = m_on_az,
             m_on_anj = m_on_anj,
+            m_on_x = m_on_x, #
+            m_on_z = m_on_z, #
             quadratic.M = quadratic.M,
-            int.XZ = int.XZ,
+            # int.XZ = int.XZ,
             iccy = iccy,
             yintercept = yintercept,
             y_on_a = y_on_a,
@@ -395,8 +377,11 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
             y_on_az = y_on_az,
             y_on_mz = y_on_mz,
             y_on_anj = y_on_anj,
+            y_on_x = y_on_x, #
+            y_on_z = y_on_z, #
             quadratic.Y = quadratic.Y,
             Yfamily = Yfamily,
+            Mfamily = Mfamily,
             if.null = if.null
         )
     )
@@ -647,7 +632,7 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
 #'     
 #'     # Compute True Values (if possible)
 #'     if (include_truevals == TRUE) {
-#'         true_vals <- trueVals2.0c(data_list = data_list)
+#'         true_vals <- trueVals2.0d(data_list = data_list)
 #'     } else {
 #'         true_vals <- NULL
 #'     }

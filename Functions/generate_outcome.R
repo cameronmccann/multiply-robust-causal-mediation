@@ -25,10 +25,10 @@ generate_outcome <- function(data_list, iccy = 0.2, yintercept = 1,
                              y_on_mz = 0.2, 
                              y_on_anj = 0.2,
                              num_x = 3,
-                             # y_on_x = sqrt(0.15 / num_x),
-                             # y_on_z = sqrt(0.4),
+                             y_on_x = sqrt(0.15 / num_x),
+                             y_on_z = sqrt(0.4),
                              quadratic.Y = FALSE, 
-                             int.XZ = TRUE, 
+                             # int.XZ = TRUE, 
                              Yfamily = "gaussian", if.null = FALSE) {
     
     # Define parameters for the outcome model
@@ -71,11 +71,11 @@ generate_outcome <- function(data_list, iccy = 0.2, yintercept = 1,
         )
     }
     
-    # Skipping this part
-    # If interaction between 'A' and cluster size is not included
-    if (int.XZ == FALSE) {
-        gen_y[c("y_on_anj")] <- 0 # NOTE : derlete
-    }
+    # # Skipping this part
+    # # If interaction between 'A' and cluster size is not included
+    # if (int.XZ == FALSE) {
+    #     gen_y[c("y_on_anj")] <- 0 # NOTE : derlete
+    # }
     
     # Compute the linear predictor for 'Y'
     if (quadratic.Y == TRUE) {
@@ -100,10 +100,33 @@ generate_outcome <- function(data_list, iccy = 0.2, yintercept = 1,
         data_list$data$Y <- condmy + rnorm(N, sd = sqrt(1 - gen_y[["iccy"]]))
     } else if (Yfamily == "binomial") {
         # For binary outcome
-        condmy <- my(m = data_list$data$M, a = data_list$data$A, z = data_list$data$Z, nj = data_list$data$W_nj, given = y_given, gen_y = gen_y, binary = TRUE)
+        
+        # latent_y <- my(m = data_list$data$M, a = data_list$data$A, z = data_list$data$Z, nj = data_list$data$W_nj, given = y_given, gen_y = gen_y, binary = TRUE)
         # latent <- gen_y[["y_on_m"]] * data_list$data$M + gen_y[["y_on_a"]] * data_list$data$A + gen_y[["y_on_am"]] * data_list$data$A * data_list$data$M + gen_y[["y_on_az"]] * data_list$data$A * data_list$data$Z + gen_y[["y_on_mz"]] * data_list$data$M * data_list$data$Z + gen_y[["y_on_anj"]] * data_list$data$A * data_list$data$W_nj + y_given
-        # condmy <- pnorm(latent, mean = 0, sd = sqrt(1 - gen_y[["iccy"]]))
+        # condmy <- pnorm(latent_y, mean = 0, sd = sqrt(1 - gen_y[["iccy"]])) # 0-1
+        # data_list$data$Y <- rbinom(N, 1, condmy)
+        
+        # # try plogis 
+        # latent <- gen_y[["y_on_m"]] * data_list$data$M + 
+        #     gen_y[["y_on_a"]] * data_list$data$A + 
+        #     gen_y[["y_on_am"]] * data_list$data$A * data_list$data$M + 
+        #     gen_y[["y_on_az"]] * data_list$data$A * data_list$data$Z + 
+        #     gen_y[["y_on_mz"]] * data_list$data$M * data_list$data$Z + 
+        #     gen_y[["y_on_anj"]] * data_list$data$A * data_list$data$W_nj + 
+        #     y_given
+        # condmy <- plogis(latent)
+        # data_list$data$Y <- rbinom(N, size = 1, prob = condmy + rnorm(N, 0, sd = sqrt(1 - gen_y[["iccy"]])))
+        
+        #
+        condmy <- my(m = data_list$data$M, a = data_list$data$A, z = data_list$data$Z, nj = data_list$data$W_nj, given = y_given, gen_y = gen_y, binary = TRUE)
+        # my() already uses pnorm(), so I go straight to rbinom()
         data_list$data$Y <- rbinom(N, 1, condmy)
+        
+        # Add individual-level residual?
+        # condmy <- my(m = data_list$data$M, a = data_list$data$A, z = data_list$data$Z, nj = data_list$data$W_nj, given = y_given, gen_y = gen_y, binary = FALSE)
+        # latent_y <- condmy + rnorm(N, sd = sqrt(1 - gen_y[["iccy"]]))
+        # data_list$data$Y <- rbinom(N, size = 1, prob = pnorm(latent_y))
+        
     }
     
     return(modifyList(data_list, list(
@@ -118,7 +141,7 @@ generate_outcome <- function(data_list, iccy = 0.2, yintercept = 1,
         y_on_x = gen_y[["y_on_x"]], 
         y_on_z = gen_y[["y_on_z"]], 
         quadratic.Y = quadratic.Y, 
-        int.XZ = int.XZ, 
+        # int.XZ = int.XZ, 
         Yfamily = Yfamily, 
         y_given = y_given
     )))

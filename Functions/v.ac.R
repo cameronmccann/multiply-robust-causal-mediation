@@ -23,14 +23,58 @@ v.ac <- function(a=1, astar=0, mu_mac, data_in, varnames, Yfamily = "gaussian", 
     v_ac <- matrix(nrow = nrow(data_in), ncol = 1)
     colnames(v_ac) <- glue::glue("v_ac(c)")
     v <- 1
+    # ═══════════════════
+    #    Debugging version of code 
+    # ═══════════════════
+    # for (v in seq_along(folds)) {
+    #     train <- origami::training(data_in, folds[[v]])
+    #     valid <- origami::validation(data_in, folds[[v]])
+    #     
+    #     valid_list <- lapply(1:1, function(jj=1) {
+    #         valid_v <- valid
+    #         valid_v[, c(varnames$A)] <- astar
+    #         valid_v
+    #     })
+    #     
+    #     if (is.null(unique(valid_list[[1]][[varnames$A]]))) {
+    #         stop("Invalid value for A in validation set.")
+    #     }
+    #     
+    #     predict_subset <- (train[[varnames$A]] == unique(valid_list[[1]][[varnames$A]]))
+    #     
+    #     if (sum(predict_subset) == 0) {
+    #         stop(glue("No matching rows in train where A equals astar for fold {v}."))
+    #     }
+    #     
+    #     alist <- crossfit(
+    #         train[predict_subset, ], valid_list,
+    #         "mu",
+    #         c(varnames$X),
+    #         varnames,
+    #         ipw,
+    #         cluster_opt,
+    #         type = Yfamily,
+    #         learners, bounded
+    #     )
+    #     
+    #     if (is.null(alist$preds) || nrow(alist$preds) == 0) {
+    #         stop(glue("Error: `crossfit()` returned no predictions for fold {v}."))
+    #     }
+    #     
+    #     v_ac[folds[[v]]$validation_set, glue("v_ac(c)")] <- alist$preds[, 1]
+    # }
+    # ═══════════════════
+    #    original code 
+    # ═══════════════════
+
     for (v in seq_along(folds)) {
         train <- origami::training(data_in, folds[[v]])
         valid <- origami::validation(data_in, folds[[v]])
-        
+
         valid_list <- lapply(1:1, function(jj=1) {
             valid_v <- valid
             valid_v[, c(varnames$A)] <- astar
-            
+
             valid_v
         })
         if (full.sample == TRUE) {
@@ -42,11 +86,11 @@ v.ac <- function(a=1, astar=0, mu_mac, data_in, varnames, Yfamily = "gaussian", 
                               ipw,
                               cluster_opt,
                               # type = "gaussian",
-                              type = Yfamily, 
+                              type = Yfamily,
                               learners, bounded)
         }
-        
-        
+
+
         if (full.sample == FALSE) {
             # predict_subset <- ( (train[[varnames$tt]] == tt) & (train[[varnames$R]] == rstar) )
             # predict_subset <- (train[[varnames$A]] == unique(valid_list[[1]][[varnames$A]]))
@@ -54,8 +98,19 @@ v.ac <- function(a=1, astar=0, mu_mac, data_in, varnames, Yfamily = "gaussian", 
                 stop("Invalid value for A in validation set.")
             }
             predict_subset <- (train[[varnames$A]] == unique(valid_list[[1]][[varnames$A]]))
+
+            ##
+            train_sub <- train[predict_subset, ]
+            message("In v.ac() fold ", v, ": nrow(train_sub) = ", nrow(train_sub))
+            if (nrow(train_sub) == 0) {
+                stop("Predict subset is empty—cannot fit a model.")
+            }
             
-            
+            ##
+            if (sum(predict_subset) == 0) {
+                stop(glue("No matching rows in train where A equals astar for fold {v}."))
+            }
+
             alist <- crossfit(train[predict_subset, ], valid_list,
                               "mu",
                               c(varnames$X),
@@ -65,15 +120,15 @@ v.ac <- function(a=1, astar=0, mu_mac, data_in, varnames, Yfamily = "gaussian", 
                               type = "gaussian",
                               learners, bounded)
         }
-        
+
         # ADD DEBUGGING
         if (is.null(alist$preds) || nrow(alist$preds) == 0) {
             stop("Error: `crossfit()` returned no predictions.")
         }
-        
+
         preds <- alist$preds
         v_ac[folds[[v]]$validation_set, glue("v_ac(c)")] <- preds[, 1]
-        
+
     }
     
     v_ac

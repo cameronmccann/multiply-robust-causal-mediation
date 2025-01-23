@@ -36,6 +36,8 @@ generate_clusters <- function(J = 100, njrange = c(50, 100), seed) {
         data = data,
         nj_sizes = nj_sizes,
         njrange = njrange, 
+        J = J, 
+        N = N, 
         seed = seed
     ))
 }

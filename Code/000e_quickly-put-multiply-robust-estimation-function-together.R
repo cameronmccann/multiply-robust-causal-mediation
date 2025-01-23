@@ -16,7 +16,7 @@
 #   and more for getting usable functions quickly. 
 # 
 # 
-# Last Updated: 2025-01-09
+# Last Updated: 2025-01-10
 #
 #
 # Notes:
@@ -27,9 +27,6 @@
 #   Done: 
 #
 ################################################################################
-
-
-
 
 
 
@@ -290,7 +287,7 @@ results1 <- estimate_mediation(
     learners_a = c("SL.glm"),
     learners_m = c("SL.glm"),
     learners_y = c("SL.glm"),
-    cluster_opt = "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
+    cluster_opt = "FE.glm", # "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
     num_folds = 1
 )
 
@@ -305,6 +302,8 @@ results1
 # 2: In predict.lm(object, newdata, se.fit, scale = 1, type = if (type ==  :
 #                                                                 prediction from rank-deficient fit; attr(*, "non-estim") has doubtful cases
 #                                                                 3: glm.fit: fitted probabilities numerically 0 or 1 occurred 
+(results1[results1$Effect == "Direct Effect (DE)" & results1$EffectVersion == "Individual-Avg", ]$Estimate - data_list$effects$individual$tnde) / data_list$effects$individual$tnde
+(results1[results1$Effect == "Indirect Effect (IE)" & results1$EffectVersion == "Individual-Avg", ]$Estimate - data_list$effects$individual$pnie) / data_list$effects$individual$pnie
 results1[results1$Effect == "Direct Effect (DE)" & results1$EffectVersion == "Individual-Avg", ]$Estimate - data_list$effects$individual$tnde
 results1[results1$Effect == "Indirect Effect (IE)" & results1$EffectVersion == "Individual-Avg", ]$Estimate - data_list$effects$individual$pnie
 # [1] -0.01082346
@@ -343,798 +342,130 @@ results1[results1$Effect == "Indirect Effect (IE)" & results1$EffectVersion == "
 
 
 
+# Investigating warning messages ------------------------------------------
 
-
-
-
-
-# Effect Individual.Average_Estimate Individual.Average_StdError CI.lower_Individual.Average
-# 1   Direct Effect (DE)                  -0.0394788                 0.004830252                 -0.04916159
-# 2 Indirect Effect (IE)                   0.1932492                 0.022367744                  0.14841045
-# CI.upper_Individual.Average Cluster.Average_Estimate Cluster.Average_StdError CI.lower_Cluster.Average
-# 1                  -0.0297960              -0.03998655              0.004913223              -0.04983567
-# 2                   0.2380879               0.19185554              0.020904177               0.14995072
-# CI.upper_Cluster.Average
-# 1              -0.03013743
-# 2               0.23376036
-# There were 32 warnings (use warnings() to see them)
-
-# Check with true values 
-# Likely these are the true corresponding estimates 
-data_list$effects$individual$tnde
-data_list$effects$individual$pnie
-## other effects 
-data_list$effects$individual$pnde
-data_list$effects$individual$tnie
-
-
-# data_list$effects$individual
-
-
-
-# learners_a = c("SL.glm"),
-# learners_m = c("SL.glm"),
-# learners_y = c("SL.glm"),
-# cluster_opt = "cwc.FE",
-# num_folds = 1
-results1[results1$Effect == "Direct Effect (DE)" & results1$EffectVersion == "Individual-Avg", ]$Estimate - data_list$effects$individual$tnde
-results1[results1$Effect == "Indirect Effect (IE)" & results1$EffectVersion == "Individual-Avg", ]$Estimate - data_list$effects$individual$pnie
-
-results1[results1$Effect == "Direct Effect (DE)" & results1$EffectVersion == "Cluster-Avg", ]$Estimate - data_list$effects$cluster$tnde
-results1[results1$Effect == "Indirect Effect (IE)" & results1$EffectVersion == "Cluster-Avg", ]$Estimate - data_list$effects$cluster$pnie
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Generate data 
-sim_data <- generate_data2.0c(
-    J = 100,
-    njrange = c(50, 100),
-    Mfamily = "binomial",
-    Yfamily = "binomial", # "gaussian", 
-    seed = 8675309,
-    num_x = 3,
-    # include_overlapMsg = FALSE,
-    
-    m_on_a = 15,
-    m_on_anj = 0.5,
-    m_on_az = 0.2,
-    y_on_a = 2,
-    y_on_m = 15,
-    y_on_am = 5,
-    y_on_az = 0.2,
-    y_on_mz = 0.2,
-    y_on_anj = 5,
-    int.XZ = FALSE 
-)
-
-data_list$overlap$ps_summary
-
-results1 <- estimate_mediation(
-    data = data_list$data,
-    Sname = "school",
-    Wnames = NULL,
-    Xnames = names(data_list$data)[grep("^X", names(data_list$data))],
-    Aname = "A",
-    Mnames = "M",
-    Yname = "Y",
-    learners_a = c("SL.glm"),
-    learners_m = c("SL.glm"),
-    learners_y = c("SL.glm"),
-    cluster_opt = "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
-    num_folds = 1
-)
-
-
-
-
-
-# # Initialize variables to store warnings and errors
-warnings_list <- character(0)
-estimation_result <- list(estimate = NULL, error = NULL, warning = NULL)
-
-tryCatch({
-    # Use `withCallingHandlers` to capture warnings while still running the code
-    withCallingHandlers({
-        # Place your estimation function or code here
-        # estimate <- estimation_function(sim_data)  # Replace with actual function
-        estimate <- estimate_mediation(data = sim_data$data, 
-                                       Sname = "school", 
-                                       Wnames = NULL,
-                                       Xnames = names(sim_data$data)[grep("^X", names(sim_data$data))],
-                                       Aname = "A",
-                                       Mnames = "M",
-                                       Yname = "Y",
-                                       learners_a = c("SL.glm"),
-                                       learners_m = c("SL.glm"),
-                                       learners_y = c("SL.glm"),
-                                       cluster_opt = "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
-                                       num_folds = 1)
-        
-        # If estimation succeeds, store the estimate
-        estimation_result$estimate <- estimate
-    }, warning = function(w) {
-        # Append warning message to the warnings list
-        warnings_list <- c(warnings_list, conditionMessage(w))
-        invokeRestart("muffleWarning")  # Prevent warnings from stopping execution
-    })
-}, error = function(e) {
-    # Handle errors
-    estimation_result$error <- conditionMessage(e)
-})
-
-# Store warnings in the final result list
-if (length(warnings_list) > 0) {
-    estimation_result$warning <- paste(warnings_list, collapse = "; ")
-}
-
-
-
-
-
-# trying to test catching warnings ----------------------------------------
-
-result <- list()
-
-output <- withCallingHandlers(
-    {
-        estimate <- estimate_mediation(data = sim_data$data, 
-                                       Sname = "school", 
-                                       Wnames = NULL,
-                                       Xnames = names(sim_data$data)[grep("^X", names(sim_data$data))],
-                                       Aname = "A",
-                                       Mnames = "M",
-                                       Yname = "Y",
-                                       learners_a = c("SL.glm"),
-                                       learners_m = c("SL.glm"),
-                                       learners_y = c("SL.glm"),
-                                       cluster_opt = "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
-                                       num_folds = 1)
-        list(estimates = estimate)
-    }, 
-    warning = function(w) {
-        if (is.null(result$warnings)) result$warnings <- list()
-        result$warnings <- c(result$warnings, list(w$message))
-        invokeRestart("muffleWarning")
-    }
-)
-
-result$estimates <- output$estimates
-
-
-
-warnings <- tryCatch({
-    estimate <- estimate_mediation()
-    result$estimates <- estimate 
-})
-
-
-warnings_list <- character(0)
-estimation_result <- list(estimate = NULL, error = NULL, warning = NULL)
-
-tryCatch(
-    estimate <- estimate_mediation(data = sim_data$data, 
-                                   Sname = "school", 
-                                   Wnames = NULL,
-                                   Xnames = names(sim_data$data)[grep("^X", names(sim_data$data))],
-                                   Aname = "A",
-                                   Mnames = "M",
-                                   Yname = "Y",
-                                   learners_a = c("SL.glm"),
-                                   learners_m = c("SL.glm"),
-                                   learners_y = c("SL.glm"),
-                                   cluster_opt = "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
-                                   num_folds = 1), 
-    error = function(e){
-        # messge
-        e
-    }, 
-    warning = function(w){
-        warnings_list <- w
-    }
-)
-
-w
-warnings_list
-
-
-# # Initialize variables to store warnings and errors
-warnings_list <- character(0)
-estimation_result <- list(estimate = NULL, error = NULL, warning = NULL)
-
-tryCatch({
-    # Use `withCallingHandlers` to capture warnings while still running the code
-    withCallingHandlers({
-        # Place your estimation function or code here
-        # estimate <- estimation_function(sim_data)  # Replace with actual function
-        estimate <- estimate_mediation(data = sim_data$data, 
-                                       Sname = "school", 
-                                       Wnames = NULL,
-                                       Xnames = names(sim_data$data)[grep("^X", names(sim_data$data))],
-                                       Aname = "A",
-                                       Mnames = "M",
-                                       Yname = "Y",
-                                       learners_a = c("SL.glm"),
-                                       learners_m = c("SL.glm"),
-                                       learners_y = c("SL.glm"),
-                                       cluster_opt = "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
-                                       num_folds = 1)
-        
-        # If estimation succeeds, store the estimate
-        estimation_result$estimate <- estimate
-    }, warning = function(w) {
-        # Append warning message to the warnings list
-        warnings_list <- c(warnings_list, conditionMessage(w))
-        invokeRestart("muffleWarning")  # Prevent warnings from stopping execution
-    })
-}, error = function(e) {
-    # Handle errors
-    estimation_result$error <- conditionMessage(e)
-})
-
-# Store warnings in the final result list
-if (length(warnings_list) > 0) {
-    estimation_result$warning <- paste(warnings_list, collapse = "; ")
-}
-
-
-
-# in the code that follows, how can i properly collect warning messages from estimate_mediation() and store it in the list. if there is a warning i would like to have the warning message and estimates if both occur. if an error occurs i would like to save the error message. 
 # ══════════════════════════════
-#     Main Loop Over Conditions
+#     Load Packages
 # ══════════════════════════════
-total_conditions <- nrow(conditions)
-for (cond_idx in seq_len(total_conditions)) {
+if (!require("pacman"))
+    install.packages("pacman")
+pacman::p_load(
+    doParallel,
+    foreach,
+    parallel,
+    purrr,
+    glue,
+    dplyr,
+    readr,
+    ggplot2,
+    fastDummies,
+    stringr,
+    tibble
+)
+
+# ══════════════════════════════
+#     Load data generation functions 
+# ══════════════════════════════
+function_names <- c(
+    # "generate_data", 
+    "generate_clusters", 
+    "generate_confounders", 
+    "generate_treatment", 
+    "generate_mediator", 
+    "generate_outcome", 
+    "pm1", 
+    "my", 
+    # "trueVals", 
     
-    cond <- conditions[cond_idx, ]
-    isQuad <- cond[["quadratic"]]
-    Mfamily <- cond[["Mfamily"]]
-    Yfamily <- cond[["Yfamily"]]
-    Nj_low <- cond[["Nj_low"]]
-    Nj_high <- cond[["Nj_high"]]
-    Jval <- cond[["J"]]
-    
-    cond_label <- glue(
-        "quad={isQuad}, M={Mfamily}, Y={Yfamily}, nj=[{Nj_low},{Nj_high}], J={Jval}"
-    )
-    
-    # --------------------------------
-    #     Start Timing for Condition
-    # --------------------------------
-    start_time_cond <- Sys.time()
-    seeds <- sample.int(1e7, reps)
-    
-    result_list <- foreach(
-        rep_idx = seq_len(reps),
-        .packages = c("dplyr", "ggplot2", "glue", "purrr"), 
-        # .export = c("cond_idx")
-        .export = c("get_inference") #, "internal_estimate_mediation")  # Explicitly include your custom functions
-    ) %dopar% {
-        start_time_iter <- Sys.time()
-        set.seed(seeds[rep_idx])
-        
-        # Generate data
-        sim_data <- generate_data2.0c(
-            J = Jval, 
-            njrange = c(Nj_low, Nj_high), 
-            Mfamily = Mfamily,
-            Yfamily = Yfamily,
-            seed = seeds[rep_idx],
-            quadratic.A = isQuad,
-            quadratic.M = isQuad,
-            quadratic.Y = isQuad,
-            num_x = 3,
-            include_overlapMsg = FALSE,
-            
-            m_on_a = 15,
-            m_on_anj = 0.5,
-            m_on_az = 0.2,
-            y_on_a = 2,
-            y_on_m = 15,
-            y_on_am = 5,
-            y_on_az = 0.2,
-            y_on_mz = 0.2,
-            y_on_anj = 5,
-            int.XZ = FALSE 
-        )
-        
-        # Save population data if applicable
-        if (!is.null(sim_data$truevals$pop_data) && rep_idx == 1) { # drop && rep_idx == 1 to save all pop data
-            # Save only for the first replication
-            # pop_data_file <- file.path(pop_data_folder, glue("S1_pop-data-condition-{cond_idx}-rep-{rep_idx}.rds"))
-            # saveRDS(sim_data$truevals$pop_data, pop_data_file)
-            
-            # Zero-padded condition number
-            cond_idx_padded <- sprintf("%02d", cond_idx) # change condition number: 1 => 01
-            pop_data_file <- file.path(pop_data_folder, glue("S1_pop-data-condition-{cond_idx_padded}-rep-{rep_idx}.rds"))
-            saveRDS(sim_data$truevals$pop_data, pop_data_file)
-        }
-        
-        
-        
-        ########################################################################
-        # INSERT ESTIMATION CODE HERE & ADJUST OUTPUT DATAFRAME (A FEW LINES BELOW)
-        # 
-        # Dumb run 
-        estimates <- estimate_mediation(
-            data = sim_data$data,
-            Sname = "school",
-            Wnames = NULL,
-            Xnames = names(sim_data$data)[grep("^X", names(sim_data$data))],
-            Aname = "A",
-            Mnames = "M",
-            Yname = "Y",
-            learners_a = c("SL.glm"),
-            learners_m = c("SL.glm"),
-            learners_y = c("SL.glm"),
-            cluster_opt = "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
-            num_folds = 1
-        )
-        ## add info to list 
-        
-        
-        # # Initialize variables to store warnings and errors
-        # warnings_list <- character(0)
-        # estimation_result <- list(estimate = NULL, error = NULL, warning = NULL)
-        # 
-        # tryCatch({
-        #     # Use withCallingHandlers to capture warnings while still running the code
-        #     withCallingHandlers({
-        #         # Place your estimation function or code here
-        #         # estimate <- estimation_function(sim_data)  # Replace with actual function
-        #         estimate <- estimate_mediation(data = sim_data$data, 
-        #                                        Sname = "school", 
-        #                                        Wnames = NULL,
-        #                                        Xnames = names(sim_data$data)[grep("^X", names(sim_data$data))],
-        #                                        Aname = "A",
-        #                                        Mnames = "M",
-        #                                        Yname = "Y",
-        #                                        learners_a = c("SL.glm"),
-        #                                        learners_m = c("SL.glm"),
-        #                                        learners_y = c("SL.glm"),
-        #                                        cluster_opt = "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
-        #                                        num_folds = 1)
-        #         
-        #         # If estimation succeeds, store the estimate
-        #         estimation_result$estimate <- estimate
-        #     }, warning = function(w) {
-        #         # Append warning message to the warnings list
-        #         warnings_list <- c(warnings_list, conditionMessage(w))
-        #         invokeRestart("muffleWarning")  # Prevent warnings from stopping execution
-        #     })
-        # }, error = function(e) {
-        #     # Handle errors
-        #     estimation_result$error <- conditionMessage(e)
-        # })
-        # 
-        # # Store warnings in the final result list
-        # if (length(warnings_list) > 0) {
-        #     estimation_result$warning <- paste(warnings_list, collapse = "; ")
-        # }
-        # 
-        ########################################################################
-        
-        end_time_iter <- Sys.time()
-        iter_duration <- as.numeric(difftime(end_time_iter, start_time_iter, units = "mins"))
-        
-        ########################################################################
-        # Prep data for export (update code that follows this)
-        ## Maybe just make one list per condition that has an element for each iteration
-        ## we will have this in the list for each iteration:
-        #   - iteration = rep_idx,
-        #   - seed = seeds[rep_idx],
-        #   - cond_idx # or cond
-        #   - condition_details = as.character(cond_label)
-        #   - iter_time_sec = round(iter_duration, 4),
-        #   - data_list$truevals
-        #   - data_list$effects
-        #   - data_list$overlap
-        #       # data_list$overlap$ps_summary
-        #       # data_list$overlap$iptw_summary
-        #   - data_list$parameters
-        #       # data_list$parameters$J
-        #       # data_list$parameters$njrange
-        #       # data_list$parameters$nj_sizes
-        # Prep data for export (update code that follows this)
-        iteration_data <- list(
-            iteration = rep_idx,
-            seed = seeds[rep_idx],
-            cond_idx = cond_idx,
-            condition_details = as.character(cond_label),
-            iter_time_sec = round(iter_duration, 4),
-            truevals = list(
-                truevals_individual = sim_data$truevals$truevals_individual, 
-                truevals_cluster = sim_data$truevals$truevals_cluster
-            ), 
-            effects = sim_data$effects,
-            overlap = list(
-                ps_summary = sim_data$overlap$ps_summary, 
-                iptw_summary = sim_data$overlap$iptw_summary
-            ), 
-            parameters = list(
-                J = sim_data$parameters$J,
-                njrange = sim_data$parameters$njrange,
-                nj_sizes = sim_data$parameters$nj_sizes
-            ), 
-            # 
-            estimates = estimates, 
-            cluster_opt = "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
-            num_folds = 1
-            
-            # estimation_result = estimation_result # Store estimation results including warnings/errors
-            
-        )
-        
-        
-        #  # THEN ANY ESTIMATIONS
-        
-        # 
-        # 
-        ########################################################################
-        
-        
-        # Return the iteration data
-        iteration_data
-        
-        # Commented out previous code:
-        # data.frame(
-        #     iteration = rep_idx,
-        #     seed = seeds[rep_idx],
-        #     sim_data$
-        #     
-        #     
-        #     iter_time_sec = round(iter_duration, 4),
-        #     stringsAsFactors = FALSE
-        # )
-        
-    }
-    
-    
-    # Extract relevant fields and convert to a data frame
-    iteration_summary_df <- map_dfr(result_list, ~{
-        tibble(
-            iteration = .x$iteration,
-            seed = .x$seed,
-            cond_idx = .x$cond_idx,
-            iter_time_sec = .x$iter_time_sec
-        )
-    })
-    
-    # iteration_summary_df <- do.call(rbind, result_list)
-    mean_iter_time <- mean(iteration_summary_df$iter_time_sec)
-    
-    end_time_cond <- Sys.time()
-    cond_duration <- as.numeric(difftime(end_time_cond, start_time_cond, units = "secs"))
-    cond_time_formatted <- glue("{floor(cond_duration / 60)} min {round(cond_duration %% 60)} s")
-    
-    OverallPar_time <- rbind(
-        OverallPar_time,
-        data.frame(
-            condition_index = cond_idx,
-            condition_details = as.character(cond_label),
-            n_reps = reps,
-            total_time = cond_time_formatted,
-            avg_iter_time = glue("{floor(mean_iter_time / 60)} min {round(mean_iter_time %% 60)} s"),
-            stringsAsFactors  = FALSE
-        )
-    )
-    
-    # Save iteration summary in main folder
-    # Commented out previous code:
-    # saveRDS(iteration_summary_df, file.path(path, glue("S1_condition-{cond_idx}.rds")))
-    # cond_idx_padded <- sprintf("%02d", cond_idx) # change condition number: 1 => 01
-    # saveRDS(iteration_summary_df, file.path(path, glue("S1_condition-{cond_idx_padded}.rds")))
-    
-    # New code to save the list for each condition
-    cond_idx_padded <- sprintf("%02d", cond_idx)
-    saveRDS(result_list, file.path(path, glue("S1_condition-{cond_idx_padded}.rds")))
-    
-    
-    message(glue(
-        "[{format(Sys.time(), '%Y-%m-%d %H:%M:%S')}] Condition {cond_idx_padded}/{total_conditions} ",
-        "({round((cond_idx / total_conditions) * 100)}%) completed. ({cond_label}) ",
-        "Time: {cond_time_formatted}"
-    ))
+    # As of 01/01/2025 the two funcs below are the updated versions 
+    "generate_data2.0c", 
+    "trueVals2.0c"
+)
+for (func in function_names) {
+    source(file.path("Functions", paste0(func, ".R")))
 }
 
 
+# ══════════════════════════════
+#     Load estimation functions 
+# ══════════════════════════════
+function_names <- c(
+    "crossfit", 
+    "make_fold_K", 
+    "eif", 
+    "a.c",
+    "a.mc",
+    "mu.mac",
+    "v.ac", 
+    "mu.ac",
+    "get_inference", 
+    "internal_estimate_mediation", 
+    "bound", 
+    "effect", 
+    "estimate_mediation"
+    
+)
+for (func in function_names) {
+    source(file.path("Functions", paste0(func, ".R")))
+}
 
 
+# using the following values based on the possible data generation values script for M binomial & Y binomial 
+## this is what ill use for now 
+#   m_on_a m_on_anj m_on_az y_on_a y_on_m y_on_am y_on_az y_on_mz y_on_anj       tnde      pnie       pnde       tnie
+# 3      2      0.5     0.2      1      2       3     0.2     0.2        1 0.02728740 0.1123586 0.09483227 0.04481371
 
 
+# Test 1 ------------------------------------------------------------------
 
-
-
-
-
-
-
-
+# Here I tested both Dr Liu's package & the new estimation for both FE.glm & cwc with c("SL.glm", "SL.nnet"). 
+# I focus on M = binomial & Y = binomial.
+# For FE.glm I recieved an warning about fit probabilities being numerically 0 or 1 & the relative bias was large (did not look at package due to small error)
+# For cwc with c("SL.glm", "SL.nnet") the package & new function did not differ nor had warnings. However, the relative bias was large. 
 
 
 # Generate data 
 data_list <- generate_data2.0c(
     J =  100,
     njrange = c(5, 20), #c(50, 100),
-    Mfamily = "binomial",
+    Mfamily = "binomial", # "gaussian", 
     Yfamily = "binomial", # "gaussian", 
     seed = 8675309,
     num_x = 3,
     # include_overlapMsg = FALSE,
     
-    m_on_a = 15,
+    m_on_a = 2, #2.5, #3, #5, #10, #15,
     m_on_anj = 0.5,
     m_on_az = 0.2,
-    y_on_a = 2,
-    y_on_m = 15,
-    y_on_am = 5,
+    y_on_a = 1, 
+    y_on_m = 2, #2.5, #3, #5, #10, #15,
+    y_on_am = 2, #3, #5,
     y_on_az = 0.2,
     y_on_mz = 0.2,
-    y_on_anj = 5,
+    y_on_anj = 1, #5,
     int.XZ = FALSE 
 )
 
 data_list$overlap$ps_summary
-
-
-# ═══════════════════
-#    test wrapper 
-# ═══════════════════
-
-
-catch_warnings <- function(f) {
-    warnings_list <- c()  # Local list for warnings
-    result <- withCallingHandlers(
-        f(),
-        warning = function(w) {
-            warnings_list <<- c(warnings_list, conditionMessage(w))
-            invokeRestart("muffleWarning")
-        }
-    )
-    list(result = result, warnings = warnings_list)
-}
-
-# Example usage:
-outcome <- catch_warnings(risky_function)
-print(outcome$result)
-print(outcome$warnings)
+# [1] "Number of PSs < 0.01: 7 (0.54%); Number of PSs > 0.99: 18 (1.39%)"
+data_list$effects$individual$tnde
+data_list$effects$individual$pnie
+# [1] 0.02728499
+# [1] 0.1123586
+data_list$effects$individual$pnde
+data_list$effects$individual$tnie
+# [1] 0.09483189
+# [1] 0.04481169
 
 
 
-catch_warnings <- function(f) {
-    warnings_list <- c()  # Local list for warnings
-    result <- withCallingHandlers(
-        f(),
-        warning = function(w) {
-            warnings_list <<- c(warnings_list, conditionMessage(w))
-            invokeRestart("muffleWarning")
-        }
-    )
-    list(result = result, warnings = warnings_list)
-}
-
-# Example usage:
-outcome <- catch_warnings(f = estimate_mediation(
-    data = data_list$data,
-    Sname = "school",
-    Wnames = NULL,
-    Xnames = names(data_list$data)[grep("^X", names(data_list$data))],
-    Aname = "A",
-    Mnames = "M",
-    Yname = "Y",
-    learners_a = c("SL.glm"),
-    learners_m = c("SL.glm"),
-    learners_y = c("SL.glm"),
-    cluster_opt = "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
-    num_folds = 1
-))
-outcome <- catch_warnings(estimate_mediation(
-    data = data_list$data,
-    Sname = "school",
-    Wnames = NULL,
-    Xnames = names(data_list$data)[grep("^X", names(data_list$data))],
-    Aname = "A",
-    Mnames = "M",
-    Yname = "Y",
-    learners_a = c("SL.glm"),
-    learners_m = c("SL.glm"),
-    learners_y = c("SL.glm"),
-    cluster_opt = "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
-    num_folds = 1
-))
-print(outcome$result)
-print(outcome$warnings)
 
 
-# ═══════════════════
-#    withCallingHandlers 
-# ═══════════════════
+# ══════════════════════════════
+#    FE.glm
+# ══════════════════════════════
 
-
-
-result <- withCallingHandlers(
-    {
-        estimates <- risky_function()  # Function call
-        list(result = estimates, warnings = character(0))  # Initialize warnings as an empty character vector
-    },
-    warning = function(w) {
-        message("Warning caught: ", conditionMessage(w))
-        # Add the warning message to the existing list without returning NULL for the result
-        result$warnings <- c(result$warnings, conditionMessage(w))  # Append the warning to the warnings list
-        invokeRestart("muffleWarning")  # Muffle the warning so it doesn't interrupt
-    }
-)
-
-# Print both the result and warnings
-print(result$result)  # Check estimates
-print(result$warnings)  # Check captured warnings
-
-
-
-result <- withCallingHandlers(
-    {
-        estimates <- estimate_mediation(
-            data = data_list$data,
-            Sname = "school",
-            Wnames = NULL,
-            Xnames = names(data_list$data)[grep("^X", names(data_list$data))],
-            Aname = "A",
-            Mnames = "M",
-            Yname = "Y",
-            learners_a = c("SL.glm"),
-            learners_m = c("SL.glm"),
-            learners_y = c("SL.glm"),
-            cluster_opt = "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
-            num_folds = 1
-        )  # Function call
-        list(result = estimates, warnings = NULL) #character(0))  # Initialize warnings as an empty character vector
-    },
-    warning = function(w) {
-        message("Warning caught: ", conditionMessage(w))
-        # Add the warning message to the existing list without returning NULL for the result
-        result$warnings <- c(result$warnings, conditionMessage(w))  # Append the warning to the warnings list
-        invokeRestart("muffleWarning")  # Muffle the warning so it doesn't interrupt
-    }
-)
-
-# Print both the result and warnings
-print(result$result)  # Check estimates
-print(result$warnings)  # Check captured warnings
-
-
-
-result <- withCallingHandlers(
-    {
-        estimates <- estimate_mediation(
-            data = data_list$data,
-            Sname = "school",
-            Wnames = NULL,
-            Xnames = names(data_list$data)[grep("^X", names(data_list$data))],
-            Aname = "A",
-            Mnames = "M",
-            Yname = "Y",
-            learners_a = c("SL.glm"),
-            learners_m = c("SL.glm"),
-            learners_y = c("SL.glm"),
-            cluster_opt = "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
-            num_folds = 1
-        )
-        # estimates <- risky_function()  # Function call
-        list(result = estimates, warnings = NULL)  # Default warnings to NULL
-    },
-    warning = function(w) {
-        message("Warning caught: ", conditionMessage(w))
-        # Return both the result and the warning
-        return(list(result = NULL, warnings = conditionMessage(w)))
-    }
-)
-
-print(result$result)  # Check estimates
-print(result$warnings)  # Check captured warnings
-
-
-###
-warnings_list <- list()
-
-result <- withCallingHandlers(
-    estimate_mediation(
-        data = data_list$data,
-        Sname = "school",
-        Wnames = NULL,
-        Xnames = names(data_list$data)[grep("^X", names(data_list$data))],
-        Aname = "A",
-        Mnames = "M",
-        Yname = "Y",
-        learners_a = c("SL.glm"),
-        learners_m = c("SL.glm"),
-        learners_y = c("SL.glm"),
-        cluster_opt = "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
-        num_folds = 1
-    ),
-    # risky_function(),
-    warning = function(w) {
-        warnings_list <<- c(warnings_list, conditionMessage(w))
-        invokeRestart("muffleWarning")  # Prevent the warning from interrupting
-    }
-)
-
-# Print the result and any captured warnings
-print(result)
-print(warnings_list)
-
-
-result <- list(estimates = NULL, warnings = NULL)
-
-# Custom warning handler
-
-result <- tryCatch(
-    {
-        result$estimates <- estimate_mediation(
-            data = data_list$data,
-            Sname = "school",
-            Wnames = NULL,
-            Xnames = names(data_list$data)[grep("^X", names(data_list$data))],
-            Aname = "A",
-            Mnames = "M",
-            Yname = "Y",
-            learners_a = c("SL.glm"),
-            learners_m = c("SL.glm"),
-            learners_y = c("SL.glm"),
-            cluster_opt = "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
-            num_folds = 1
-        )
-        # result
-    }, 
-    warning = function(w) {
-        # result$estimates <- estimate_mediation(
-        #     data = data_list$data,
-        #     Sname = "school",
-        #     Wnames = NULL,
-        #     Xnames = names(data_list$data)[grep("^X", names(data_list$data))],
-        #     Aname = "A",
-        #     Mnames = "M",
-        #     Yname = "Y",
-        #     learners_a = c("SL.glm"),
-        #     learners_m = c("SL.glm"),
-        #     learners_y = c("SL.glm"),
-        #     cluster_opt = "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
-        #     num_folds = 1
-        # )
-        result$warnings <- conditionMessage(w)
-        # invokeRestart("muffleWarning")
-    }
-)
-
-result
-
-
-
-result <- withCallingHandlers(
-    {
-        fit <- glm(formula = formula, data = data, family = family)
-        result$estimates <- coef(fit)  # Collect coefficients
-        result  # Return result if no issues
-    },
-    warning = function(w) {
-        result$warnings <- conditionMessage(w)  # Collect warning message
-        invokeRestart("muffleWarning")  # Suppress warning in output
-    },
-    error = function(e) {
-        result$warnings <- conditionMessage(e)  # Collect error message if any
-    }
-)
-
+# estimate with new function/package 
 results1 <- estimate_mediation(
     data = data_list$data,
     Sname = "school",
@@ -1146,11 +477,604 @@ results1 <- estimate_mediation(
     learners_a = c("SL.glm"),
     learners_m = c("SL.glm"),
     learners_y = c("SL.glm"),
-    cluster_opt = "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
+    cluster_opt = "FE.glm", # "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
     num_folds = 1
 )
 
 results1
+
+## FE.glm 
+# Warning message:
+#     glm.fit: fitted probabilities numerically 0 or 1 occurred 
+abs(results1[results1$Effect == "Direct Effect (DE)" & results1$EffectVersion == "Individual-Avg", ]$Estimate - data_list$effects$individual$tnde) / data_list$effects$individual$tnde
+abs(results1[results1$Effect == "Indirect Effect (IE)" & results1$EffectVersion == "Individual-Avg", ]$Estimate - data_list$effects$individual$pnie) / data_list$effects$individual$pnie
+# [1] 0.8441782
+# [1] 0.3148084
+
+
+
+# ═══════════════════
+#    use Dr Liu package to be safe  
+# ═══════════════════
+devtools::load_all("Functions/MediatorCL")
+
+Sname = "school"
+results2 <- MediatorCL::MediatorCL(data = data_list$data, 
+                                   Sname = "school",
+                                   Wnames = NULL,
+                                   Xnames = names(data_list$data)[grep("^X", names(data_list$data))],
+                                   Aname = "A",
+                                   Mnames = "M",
+                                   Yname = "Y",
+                                   learners_a = c("SL.glm"),
+                                   learners_m = c("SL.glm"),
+                                   learners_y = c("SL.glm"),
+                                   cluster_opt = "FE.glm",
+                                   num_folds = 1)
+
+results2
+
+## FE.glm 
+
+abs(results2[results2$Effect == "DE", "Individual.Average_Estimate"] - data_list$effects$individual$tnde) / data_list$effects$individual$tnde
+abs(results2[results2$Effect == "IE", "Individual.Average_Estimate"] - data_list$effects$individual$pnie) / data_list$effects$individual$pnie
+
+# skipping because of following error: 
+# Error in make_folds(cluster_ids = data[[Sname]], fold_fun = folds_vfold,  : 
+#                         could not find function "make_folds"
+
+
+
+
+# ══════════════════════════════
+#    cwc with SL.glm & SL.nnet 
+# ══════════════════════════════
+
+# estimate with new function/package 
+results1 <- estimate_mediation(
+    data = data_list$data,
+    Sname = "school",
+    Wnames = NULL,
+    Xnames = names(data_list$data)[grep("^X", names(data_list$data))],
+    Aname = "A",
+    Mnames = "M",
+    Yname = "Y",
+    learners_a = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+    learners_m = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+    learners_y = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+    cluster_opt = "cwc", # "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
+    num_folds = 4
+)
+
+results1
+
+## SL.glm & SL.nnet with cwc 4 fold
+abs(results1[results1$Effect == "Direct Effect (DE)" & results1$EffectVersion == "Individual-Avg", ]$Estimate - data_list$effects$individual$tnde) / data_list$effects$individual$tnde
+abs(results1[results1$Effect == "Indirect Effect (IE)" & results1$EffectVersion == "Individual-Avg", ]$Estimate - data_list$effects$individual$pnie) / data_list$effects$individual$pnie
+# [1] 1.65641
+# [1] 0.5394522
+
+
+# ═══════════════════
+#    use Dr Liu package to be safe  
+# ═══════════════════
+devtools::load_all("Functions/MediatorCL")
+
+Sname = "school"
+results2 <- MediatorCL::MediatorCL(data = data_list$data, 
+                                   Sname = "school",
+                                   Wnames = NULL,
+                                   Xnames = names(data_list$data)[grep("^X", names(data_list$data))],
+                                   Aname = "A",
+                                   Mnames = "M",
+                                   Yname = "Y",
+                                   learners_a = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+                                   learners_m = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+                                   learners_y = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+                                   cluster_opt = "cwc", # "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
+                                   num_folds = 4)
+
+results2
+
+# SL.glm & SL.nnet with cwc 4 fold
+abs(results2[results2$Effect == "DE", "Individual.Average_Estimate"] - data_list$effects$individual$tnde) / data_list$effects$individual$tnde
+abs(results2[results2$Effect == "IE", "Individual.Average_Estimate"] - data_list$effects$individual$pnie) / data_list$effects$individual$pnie
+# [1] 1.65641
+# [1] 0.5394522
+
+
+
+
+# Test 2 ------------------------------------------------------------------
+
+# Here I simply changed J & njrange. However, nothing differed from prior: large relative error & only warning with FE.glm
+
+# Generate data 
+data_list <- generate_data2.0c(
+    J =  40,
+    njrange = c(50, 100),
+    Mfamily = "binomial", # "gaussian", 
+    Yfamily = "binomial", # "gaussian", 
+    seed = 8675309,
+    num_x = 3,
+    # include_overlapMsg = FALSE,
+    
+    m_on_a = 2, #2.5, #3, #5, #10, #15,
+    m_on_anj = 0.5,
+    m_on_az = 0.2,
+    y_on_a = 1, 
+    y_on_m = 2, #2.5, #3, #5, #10, #15,
+    y_on_am = 2, #3, #5,
+    y_on_az = 0.2,
+    y_on_mz = 0.2,
+    y_on_anj = 1, #5,
+    int.XZ = FALSE 
+)
+
+data_list$overlap$ps_summary
+# [1] "Number of PSs < 0.01: 0 (0%); Number of PSs > 0.99: 15 (0.48%)"
+data_list$effects$individual$tnde
+data_list$effects$individual$pnie
+# [1] 0.01639596
+# [1] 0.1046274
+data_list$effects$individual$pnde
+data_list$effects$individual$tnie
+# [1] 0.08960243
+# [1] 0.03142095
+
+
+
+
+# ══════════════════════════════
+#    FE.glm
+# ══════════════════════════════
+
+# estimate with new function/package 
+results1 <- estimate_mediation(
+    data = data_list$data,
+    Sname = "school",
+    Wnames = NULL,
+    Xnames = names(data_list$data)[grep("^X", names(data_list$data))],
+    Aname = "A",
+    Mnames = "M",
+    Yname = "Y",
+    learners_a = c("SL.glm"),
+    learners_m = c("SL.glm"),
+    learners_y = c("SL.glm"),
+    cluster_opt = "FE.glm", # "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
+    num_folds = 1
+)
+
+results1
+
+## FE.glm 
+# Warning message:
+#     glm.fit: fitted probabilities numerically 0 or 1 occurred 
+abs(results1[results1$Effect == "Direct Effect (DE)" & results1$EffectVersion == "Individual-Avg", ]$Estimate - data_list$effects$individual$tnde) / data_list$effects$individual$tnde
+abs(results1[results1$Effect == "Indirect Effect (IE)" & results1$EffectVersion == "Individual-Avg", ]$Estimate - data_list$effects$individual$pnie) / data_list$effects$individual$pnie
+# [1] 5.703511
+# [1] 0.834795
+
+
+# ═══════════════════
+#    use Dr Liu package to be safe  
+# ═══════════════════
+# devtools::load_all("Functions/MediatorCL")
+# 
+# Sname = "school"
+# results2 <- MediatorCL::MediatorCL(data = data_list$data, 
+#                                    Sname = "school",
+#                                    Wnames = NULL,
+#                                    Xnames = names(data_list$data)[grep("^X", names(data_list$data))],
+#                                    Aname = "A",
+#                                    Mnames = "M",
+#                                    Yname = "Y",
+#                                    learners_a = c("SL.glm"),
+#                                    learners_m = c("SL.glm"),
+#                                    learners_y = c("SL.glm"),
+#                                    cluster_opt = "FE.glm",
+#                                    num_folds = 1)
+# 
+# results2
+# 
+# # FE.glm 
+# (results2[results2$Effect == "DE", "Individual.Average_Estimate"] - data_list$effects$individual$tnde) / data_list$effects$individual$tnde
+# (results2[results2$Effect == "IE", "Individual.Average_Estimate"] - data_list$effects$individual$pnie) / data_list$effects$individual$pnie
+
+
+# ══════════════════════════════
+#    cwc with SL.glm & SL.nnet 
+# ══════════════════════════════
+
+# estimate with new function/package 
+results1 <- estimate_mediation(
+    data = data_list$data,
+    Sname = "school",
+    Wnames = NULL,
+    Xnames = names(data_list$data)[grep("^X", names(data_list$data))],
+    Aname = "A",
+    Mnames = "M",
+    Yname = "Y",
+    learners_a = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+    learners_m = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+    learners_y = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+    cluster_opt = "cwc", # "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
+    num_folds = 4
+)
+
+results1
+
+## SL.glm & SL.nnet with cwc 4 fold
+abs(results1[results1$Effect == "Direct Effect (DE)" & results1$EffectVersion == "Individual-Avg", ]$Estimate - data_list$effects$individual$tnde) / data_list$effects$individual$tnde
+abs(results1[results1$Effect == "Indirect Effect (IE)" & results1$EffectVersion == "Individual-Avg", ]$Estimate - data_list$effects$individual$pnie) / data_list$effects$individual$pnie
+# [1] 4.923132
+# [1] 0.8155262
+
+
+# ═══════════════════
+#    use Dr Liu package to be safe  
+# ═══════════════════
+devtools::load_all("Functions/MediatorCL")
+
+Sname = "school"
+results2 <- MediatorCL::MediatorCL(data = data_list$data, 
+                                   Sname = "school",
+                                   Wnames = NULL,
+                                   Xnames = names(data_list$data)[grep("^X", names(data_list$data))],
+                                   Aname = "A",
+                                   Mnames = "M",
+                                   Yname = "Y",
+                                   learners_a = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+                                   learners_m = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+                                   learners_y = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+                                   cluster_opt = "cwc", # "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
+                                   num_folds = 4)
+
+results2
+
+# SL.glm & SL.nnet with cwc 4 fold
+abs(results2[results2$Effect == "DE", "Individual.Average_Estimate"] - data_list$effects$individual$tnde) / data_list$effects$individual$tnde
+abs(results2[results2$Effect == "IE", "Individual.Average_Estimate"] - data_list$effects$individual$pnie) / data_list$effects$individual$pnie
+# [1] 4.923132
+# [1] 0.8155262
+
+
+
+# Test 3 ------------------------------------------------------------------
+
+# Here changing binomail M & Y to gaussian 
+## I am speculating that the true value calculation may be off 
+# Biases still seem large; no warning messages; package & new func did not differ
+
+# Generate data 
+data_list <- generate_data2.0c(
+    J =  40,
+    njrange = c(50, 100),
+    Mfamily = "gaussian", # "binomial", #
+    Yfamily = "gaussian", # "binomial", # 
+    seed = 8675309,
+    num_x = 3,
+    # include_overlapMsg = FALSE,
+    
+    m_on_a = 2, #2.5, #3, #5, #10, #15,
+    m_on_anj = 0.5,
+    m_on_az = 0.2,
+    y_on_a = 1, 
+    y_on_m = 2, #2.5, #3, #5, #10, #15,
+    y_on_am = 2, #3, #5,
+    y_on_az = 0.2,
+    y_on_mz = 0.2,
+    y_on_anj = 1, #5,
+    int.XZ = FALSE 
+)
+
+data_list$overlap$ps_summary
+# [1] "Number of PSs < 0.01: 0 (0%); Number of PSs > 0.99: 15 (0.48%)"
+data_list$effects$individual$tnde
+data_list$effects$individual$pnie
+# [1] 5.081349
+# [1] 4.025618
+data_list$effects$individual$pnde
+data_list$effects$individual$tnie
+# [1] 1.079575
+# [1] 8.027392
+
+
+
+# ══════════════════════════════
+#    FE.glm
+# ══════════════════════════════
+
+# estimate with new function/package 
+results1 <- estimate_mediation(
+    data = data_list$data,
+    Sname = "school",
+    Wnames = NULL,
+    Xnames = names(data_list$data)[grep("^X", names(data_list$data))],
+    Aname = "A",
+    Mnames = "M",
+    Yname = "Y",
+    learners_a = c("SL.glm"),
+    learners_m = c("SL.glm"),
+    learners_y = c("SL.glm"),
+    cluster_opt = "FE.glm", # "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
+    num_folds = 1
+)
+
+results1
+
+## FE.glm 
+abs(results1[results1$Effect == "Direct Effect (DE)" & results1$EffectVersion == "Individual-Avg", ]$Estimate - data_list$effects$individual$tnde) / data_list$effects$individual$tnde
+abs(results1[results1$Effect == "Indirect Effect (IE)" & results1$EffectVersion == "Individual-Avg", ]$Estimate - data_list$effects$individual$pnie) / data_list$effects$individual$pnie
+# [1] 0.807813
+# [1] 0.9732278
+
+
+# ═══════════════════
+#    use Dr Liu package to be safe  
+# ═══════════════════
+# devtools::load_all("Functions/MediatorCL")
+# 
+# Sname = "school"
+# results2 <- MediatorCL::MediatorCL(data = data_list$data,
+#                                    Sname = "school",
+#                                    Wnames = NULL,
+#                                    Xnames = names(data_list$data)[grep("^X", names(data_list$data))],
+#                                    Aname = "A",
+#                                    Mnames = "M",
+#                                    Yname = "Y",
+#                                    learners_a = c("SL.glm"),
+#                                    learners_m = c("SL.glm"),
+#                                    learners_y = c("SL.glm"),
+#                                    cluster_opt = "FE.glm",
+#                                    num_folds = 1)
+# 
+# results2
+# 
+# # FE.glm
+# (results2[results2$Effect == "DE", "Individual.Average_Estimate"] - data_list$effects$individual$tnde) / data_list$effects$individual$tnde
+# (results2[results2$Effect == "IE", "Individual.Average_Estimate"] - data_list$effects$individual$pnie) / data_list$effects$individual$pnie
+
+
+
+# ══════════════════════════════
+#    cwc with SL.glm & SL.nnet 
+# ══════════════════════════════
+
+# estimate with new function/package 
+results1 <- estimate_mediation(
+    data = data_list$data,
+    Sname = "school",
+    Wnames = NULL,
+    Xnames = names(data_list$data)[grep("^X", names(data_list$data))],
+    Aname = "A",
+    Mnames = "M",
+    Yname = "Y",
+    learners_a = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+    learners_m = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+    learners_y = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+    cluster_opt = "cwc", # "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
+    num_folds = 4
+)
+
+results1
+
+## SL.glm & SL.nnet with cwc 4 fold
+abs(results1[results1$Effect == "Direct Effect (DE)" & results1$EffectVersion == "Individual-Avg", ]$Estimate - data_list$effects$individual$tnde) / data_list$effects$individual$tnde
+abs(results1[results1$Effect == "Indirect Effect (IE)" & results1$EffectVersion == "Individual-Avg", ]$Estimate - data_list$effects$individual$pnie) / data_list$effects$individual$pnie
+# [1] 0.8052369
+# [1] 0.971213
+
+
+# ═══════════════════
+#    use Dr Liu package to be safe  
+# ═══════════════════
+devtools::load_all("Functions/MediatorCL")
+
+Sname = "school"
+results2 <- MediatorCL::MediatorCL(data = data_list$data, 
+                                   Sname = "school",
+                                   Wnames = NULL,
+                                   Xnames = names(data_list$data)[grep("^X", names(data_list$data))],
+                                   Aname = "A",
+                                   Mnames = "M",
+                                   Yname = "Y",
+                                   learners_a = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+                                   learners_m = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+                                   learners_y = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+                                   cluster_opt = "cwc", # "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
+                                   num_folds = 4)
+
+results2
+
+# SL.glm & SL.nnet with cwc 4 fold
+abs(results2[results2$Effect == "DE", "Individual.Average_Estimate"] - data_list$effects$individual$tnde) / data_list$effects$individual$tnde
+abs(results2[results2$Effect == "IE", "Individual.Average_Estimate"] - data_list$effects$individual$pnie) / data_list$effects$individual$pnie
+# [1] 0.8052369
+# [1] 0.971213
+
+
+
+
+
+
+
+
+
+
+################################### END ##############################################
+
+
+# look into warnings ------------------------------------------------------
+
+## heatmap -----------------------------------------------------------------
+
+# Heatmap of correlations between variables
+library(ggplot2)
+library(reshape2)
+corr_matrix <- cor(data_list$data[, -c(1, 2)], use = "complete.obs")  # Exclude ID and school
+melted_corr <- reshape2::melt(corr_matrix)
+
+ggplot(melted_corr, aes(Var1, Var2, fill = value)) +
+    # geom_tile() +
+    geom_tile(color = "white") +
+    
+    # scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0) +
+    theme_minimal() +
+    viridis::scale_fill_viridis(option = "C") +
+    scale_color_viridis_b() +
+    labs(title = "Correlation Heatmap",
+         fill = "Correlation")
+
+# looks like A & M are strongly correlated
+cor.test(data_list$data$A, data_list$data$M)
+
+
+## VIF (not sure if its okay for clustered data) ---------------------------
+
+library(car)
+fit <- lm(Y ~ Z + A + M + X1 + X2 + X3, data = data_list$data)
+vif(fit)
+
+
+# library(lme4)
+# model <- lmer(Y ~ Z + A + M + (1 | school), data = data_list$data)
+# summary(model)
+
+
+
+
+# check different data generation values ----------------------------------
+
+# using the following values based on the possible data generation values script for M binomial & Y binomial 
+## this is what ill use for now 
+#   m_on_a m_on_anj m_on_az y_on_a y_on_m y_on_am y_on_az y_on_mz y_on_anj       tnde      pnie       pnde       tnie
+# 3      2      0.5     0.2      1      2       3     0.2     0.2        1 0.02728740 0.1123586 0.09483227 0.04481371
+
+
+# Generate data 
+data_list <- generate_data2.0c(
+    J =  100,
+    njrange = c(5, 20), #c(50, 100),
+    Mfamily = "binomial", # "gaussian", 
+    Yfamily = "binomial", # "gaussian", 
+    seed = 8675309,
+    num_x = 3,
+    # include_overlapMsg = FALSE,
+    
+    m_on_a = 2, #2.5, #3, #5, #10, #15,
+    m_on_anj = 0.5,
+    m_on_az = 0.2,
+    y_on_a = 1, 
+    y_on_m = 2, #2.5, #3, #5, #10, #15,
+    y_on_am = 2, #3, #5,
+    y_on_az = 0.2,
+    y_on_mz = 0.2,
+    y_on_anj = 1, #5,
+    int.XZ = FALSE 
+)
+
+data_list$overlap$ps_summary
+data_list$effects$individual$tnde
+data_list$effects$individual$pnie
+
+data_list$effects$individual$pnde
+data_list$effects$individual$tnie
+
+# Use regex to capture the percentages within parentheses
+data.frame(pctPSbelow01 = as.numeric(str_match_all(data_list$overlap$ps_summary, "\\(([^)]+)%\\)")[[1]][, 2][1]), 
+           pctPSabove99 = as.numeric(str_match_all(data_list$overlap$ps_summary, "\\(([^)]+)%\\)")[[1]][, 2][2]))
+
+
+
+
+### heatmap -----------------------------------------------------------------
+
+corr_matrix <- cor(data_list$data[, -c(1, 2)], use = "complete.obs")  # Exclude ID and school
+melted_corr <- reshape2::melt(corr_matrix)
+
+ggplot(melted_corr, aes(Var1, Var2, fill = value)) +
+    # geom_tile() +
+    geom_tile(color = "white") +
+    
+    # scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0) +
+    theme_minimal() +
+    viridis::scale_fill_viridis(option = "C") +
+    scale_color_viridis_b() +
+    labs(title = "Correlation Heatmap",
+         fill = "Correlation")
+
+# looks like A & M are strongly correlated
+cor.test(data_list$data$A, data_list$data$M)
+
+
+
+### test FE glm -------------------------------------------------------------
+
+results1 <- estimate_mediation(
+    data = data_list$data,
+    Sname = "school",
+    Wnames = NULL,
+    Xnames = names(data_list$data)[grep("^X", names(data_list$data))],
+    Aname = "A",
+    Mnames = "M",
+    Yname = "Y",
+    learners_a = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+    learners_m = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+    learners_y = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+    cluster_opt = "cwc", # "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
+    num_folds = 4
+)
+
+results1
+
+
+# with M = binomial & Y = binomial 
+
+## "FE.glm"
+# Warning message:
+#     glm.fit: fitted probabilities numerically 0 or 1 occurred 
+(results1[results1$Effect == "Direct Effect (DE)" & results1$EffectVersion == "Individual-Avg", ]$Estimate - data_list$effects$individual$tnde) / data_list$effects$individual$tnde
+(results1[results1$Effect == "Indirect Effect (IE)" & results1$EffectVersion == "Individual-Avg", ]$Estimate - data_list$effects$individual$pnie) / data_list$effects$individual$pnie
+# [1] 0.8441782
+# [1] -0.3148084
+
+# SL.glm & SL.nnet with cwc 4 fold
+# [1] 1.65641
+# [1] -0.5394522
+
+## Kind of large bias
+
+# ═══════════════════
+#    use Dr Liu package to be safe  
+# ═══════════════════
+devtools::load_all("Functions/MediatorCL")
+
+Sname = "school"
+results2 <- MediatorCL::MediatorCL(data = data_list$data, 
+                                   Sname = "school",
+                                   Wnames = NULL,
+                                   Xnames = names(data_list$data)[grep("^X", names(data_list$data))],
+                                   Aname = "A",
+                                   Mnames = "M",
+                                   Yname = "Y",
+                                   learners_a = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+                                   learners_m = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+                                   learners_y = c("SL.glm", "SL.nnet"), # c("SL.glm"),
+                                   cluster_opt = "cwc", # "noncluster.glm", # "RE.glm", # "FE.glm", # "cwc.FE",
+                                   num_folds = 4)
+
+results2
+
+# with M = binomial & Y = binomial 
+
+# SL.glm & SL.nnet with cwc 4 fold
+# [1] 1.65641
+# [1] -0.5394522
+(results2[results2$Effect == "DE", "Individual.Average_Estimate"] - data_list$effects$individual$tnde) / data_list$effects$individual$tnde
+(results2[results2$Effect == "IE", "Individual.Average_Estimate"] - data_list$effects$individual$pnie) / data_list$effects$individual$pnie
+# [1] 1.65641
+# [1] -0.5394522
 
 
 

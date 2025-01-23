@@ -58,92 +58,144 @@
 #' \code{\link{generate_data2.0c}}
 #'
 #' @export
-trueVals2.0c <- function(data_list) {
+trueVals2.0c <- function(data_list, 
+                         from_GenData_2.0 = FALSE # added argument to easily change GenData_2.0() data to this func
+                         ) {
     
-    library(dplyr)
-    library(glue)
+    # library(dplyr)
+    # library(glue)
     
-    # -------------------------------------------------------------------------
-    # 1. EXTRACT COMPONENTS FROM data_list
-    # -------------------------------------------------------------------------
-    data <- data_list$data
-    nj_sizes <- data_list$nj_sizes
-    Mfamily <- data_list$Mfamily
-    Yfamily <- data_list$Yfamily
-    iccm <- data_list$iccm
-    iccy <- data_list$iccy
-    seed <- data_list$seed
-    iccx <- data_list$iccx
-    x_z <- data_list$x_z
-    num_x <- data_list$num_x
+
+    # 1. Extract components from data_list ------------------------------------
+    if (from_GenData_2.0 == TRUE) {
+        data <- data_list$datobs
+        # Change X headers 
+        colnames(data) <- gsub(pattern = "^X\\.", replacement = "X", colnames(data))
+        
+        nj_sizes <- data_list$nj_sizes
+        Mfamily <- "binomial"    # <- ADJUST LATER
+        Yfamily <- data_list$Yfamily
+        iccm <- data_list$iccm
+        iccy <- data_list$iccy
+        seed <- data_list$seedone
+        iccx <- data_list$iccx
+        x_z <- data_list$x_z
+        num_x <- data_list$num_x
+        
+        # Extract mediator parameters
+        gen_m <- list(
+            iccm = iccm,
+            m_on_a = data_list$gen_m$m1_on_a,
+            m_on_x = data_list$gen_m$m1_on_x,
+            m_on_z = data_list$gen_m$m1_on_z,
+            m_on_az = data_list$gen_m$m1_on_az,
+            m_on_anj = data_list$gen_m$m1_on_anj
+        )
+        
+        # Extract outcome parameters
+        gen_y <- list(
+            iccy = iccy,
+            yintercept = data_list$gen_y$yintercept,
+            y_on_a = data_list$gen_y$y_on_a,
+            y_on_m = data_list$gen_y$y_on_m1,
+            y_on_am = data_list$gen_y$y_on_am1,
+            y_on_az = data_list$gen_y$y_on_az,
+            y_on_mz = data_list$gen_y$y_on_m1z,
+            y_on_anj = data_list$gen_y$y_on_anj,
+            y_on_x = data_list$gen_y$y_on_x,
+            y_on_z = data_list$gen_y$y_on_z
+        )
+        
+        m_given <- data_list$m1_given
+        y_given <- data_list$y_given
+        
+        # # Attach cluster sizes to the data 
+        # data <- data |> dplyr::mutate(nj = nj_sizes[school])
+        # Use scaled version of cluster size (W_nj) instead of raw 
+        W_nj <- data_list$data$W_nj
+        
+    }
+    if (from_GenData_2.0 == FALSE) {
+        
+        data <- data_list$data
+        nj_sizes <- data_list$nj_sizes
+        Mfamily <- data_list$Mfamily
+        Yfamily <- data_list$Yfamily
+        iccm <- data_list$iccm
+        iccy <- data_list$iccy
+        seed <- data_list$seed
+        iccx <- data_list$iccx
+        x_z <- data_list$x_z
+        num_x <- data_list$num_x
+        
+        # Extract mediator parameters
+        gen_m <- list(
+            iccm = iccm,
+            m_on_a = data_list$m_on_a,
+            m_on_x = data_list$m_on_x,
+            m_on_z = data_list$m_on_z,
+            m_on_az = data_list$m_on_az,
+            m_on_anj = data_list$m_on_anj
+        )
+        
+        # Extract outcome parameters
+        gen_y <- list(
+            iccy = iccy,
+            yintercept = data_list$yintercept,
+            y_on_a = data_list$y_on_a,
+            y_on_m = data_list$y_on_m,
+            y_on_am = data_list$y_on_am,
+            y_on_az = data_list$y_on_az,
+            y_on_mz = data_list$y_on_mz,
+            y_on_anj = data_list$y_on_anj,
+            y_on_x = data_list$y_on_x,
+            y_on_z = data_list$y_on_z
+        )
+        
+        m_given <- data_list$m_given
+        y_given <- data_list$y_given
+        
+        # # Attach cluster sizes to the data 
+        # data <- data |> dplyr::mutate(nj = nj_sizes[school])
+        # Use scaled version of cluster size (W_nj) instead of raw 
+        W_nj <- data_list$data$W_nj
+    }
     
-    
-    # Extract mediator parameters
-    gen_m <- list(
-        iccm = iccm,
-        m_on_a = data_list$m_on_a,
-        m_on_x = data_list$m_on_x,
-        m_on_z = data_list$m_on_z,
-        m_on_az = data_list$m_on_az,
-        m_on_anj = data_list$m_on_anj
-    )
-    
-    # Extract outcome parameters
-    gen_y <- list(
-        iccy = iccy,
-        yintercept = data_list$yintercept,
-        y_on_a = data_list$y_on_a,
-        y_on_m = data_list$y_on_m,
-        y_on_am = data_list$y_on_am,
-        y_on_az = data_list$y_on_az,
-        y_on_mz = data_list$y_on_mz,
-        y_on_anj = data_list$y_on_anj,
-        y_on_x = data_list$y_on_x,
-        y_on_z = data_list$y_on_z
-    )
-    
-    m_given <- data_list$m_given
-    y_given <- data_list$y_given
-    
-    # Attach cluster sizes to the data 
-    data <- data |> mutate(nj = nj_sizes[school])
-    
-    # -------------------------------------------------------------------------
-    # 2. HELPER FUNCTIONS
-    # -------------------------------------------------------------------------
-    
+
+    # 2. Helper functions -----------------------------------------------------
+
     # Calculate latent mean for M
-    calc_m_latent <- function(a, z, nj, given) {
+    calc_m_latent <- function(a, z, W_nj, given) {
         latent_m <- gen_m$m_on_a * a +
             gen_m$m_on_az * a * z +
-            gen_m$m_on_anj * a * nj +
+            gen_m$m_on_anj * a * W_nj +
             given
         return(latent_m)
     }
     
     # Calculate latent outcome Y
-    calc_y_latent <- function(m, a, z, nj, given) {
+    calc_y_latent <- function(m, a, z, W_nj, given) {
         latent_y <- gen_y$y_on_m * m +
             gen_y$y_on_a * a +
             gen_y$y_on_am * a * m +
             gen_y$y_on_az * a * z +
             gen_y$y_on_mz * m * z +
-            gen_y$y_on_anj * a * nj +
+            gen_y$y_on_anj * a * W_nj +
             given
         return(latent_y)
     }
 
-    # -------------------------------------------------------------------------
-    # 3. FUNCTION TO COMPUTE E[Y(a0, gm(a1))] FOR EACH OBSERVATION
-    # -------------------------------------------------------------------------
+
+    # 3. Function to compute E[Y(a0, gm(a1))] for each observation ------------
     compute_expected_y <- function(a0_val, a1_val, data) {
         z <- data$Z
-        nj <- data$nj
+        W_nj <- data$W_nj
         given_m <- m_given
         given_y <- y_given
         
         # Compute mediator parameters
-        m_latent <- calc_m_latent(a = a1_val, z = z, nj = nj, given = given_m)
+        m_latent <- calc_m_latent(a = a1_val, z = z, W_nj = W_nj, given = given_m)
+        # add error term to m_latent for mediator 
         
         if (Mfamily == "binomial") {
             # ══════════════════════════════
@@ -156,8 +208,8 @@ trueVals2.0c <- function(data_list) {
             p_m0 <- 1 - p_m1
             
             # For each M = 0/1, compute latent Y
-            y_latent_m0 <- calc_y_latent(m = 0, a = a0_val, z = z, nj = nj, given = given_y)
-            y_latent_m1 <- calc_y_latent(m = 1, a = a0_val, z = z, nj = nj, given = given_y)
+            y_latent_m0 <- calc_y_latent(m = 0, a = a0_val, z = z, W_nj = W_nj, given = given_y)
+            y_latent_m1 <- calc_y_latent(m = 1, a = a0_val, z = z, W_nj = W_nj, given = given_y)
             
             # Then get E[Y|M=0], E[Y|M=1] depending on outcome family
             if (Yfamily == "binomial") {
@@ -177,13 +229,13 @@ trueVals2.0c <- function(data_list) {
             # M ~ Normal(m_latent, var=1 - iccm)
             # We must integrate or do a linear approximation
             # ══════════════════════════════
-            var_m <- 1 - iccm
-            mean_m <- m_latent
+            var_m <- 1 - iccm # delete if var_m is not used anywhere
+            Ma <- m_latent #+ rnorm(length(m_latent), sd = sqrt(1 - iccm)) # added error term 
             
             if (Yfamily == "gaussian") {
                 # Continuous M, continuous Y => linear 
                 # E[Y] = E[E[Y|M]] = E[y_latent(M)]
-                y_latent_mean_m <- calc_y_latent(m = mean_m, a = a0_val, z = z, nj = nj, given = given_y)
+                y_latent_mean_m <- calc_y_latent(m = Ma, a = a0_val, z = z, W_nj = W_nj, given = given_y)
                 E_y <- y_latent_mean_m
             } else {
                 # Continous M, binary Y => handled later (next step)
@@ -199,12 +251,12 @@ trueVals2.0c <- function(data_list) {
     # -------------------------------------------------------------------------
     a_vals <- expand.grid(a0 = c(0, 1), a1 = c(0, 1))
     truevals_individual <- list()
-    truevals_cluster    <- list()
+    truevals_cluster <- list()
 
     for (j in 1:nrow(a_vals)) {
         a0_val <- a_vals$a0[j]
         a1_val <- a_vals$a1[j]
-        label <- glue("Y(a0={a0_val}, gm(a1={a1_val}))")
+        label <- glue::glue("Y(a0={a0_val}, gm(a1={a1_val}))")
         
         # ══════════════════════════════
         # Continuous M, Binary Y => Monte Carlo approximation
@@ -253,15 +305,15 @@ trueVals2.0c <- function(data_list) {
                 iccy = data_list$iccy 
             )
             
-            # Add the cluster sizes to the newly generated dataset
-            pop_result$data <- pop_result$data |> 
-                mutate(nj = nj_sizes[school])
+            # # Add the cluster sizes to the newly generated dataset
+            # pop_result$data <- pop_result$data |> 
+            #     dplyr::mutate(nj = nj_sizes[school]) # I believe this is unnecessary since we are usin W_nj
             
             # Compute the mediator latent mean for M under (A=a1_val)
             m_mu <- calc_m_latent(
                 a = a1_val, 
                 z = pop_result$data$Z, 
-                nj = pop_result$data$nj, 
+                W_nj = pop_result$data$W_nj, 
                 given = pop_result$parameters$m_given
             )
             
@@ -270,7 +322,7 @@ trueVals2.0c <- function(data_list) {
                 m = m_mu,
                 a = a0_val,
                 z = pop_result$data$Z,
-                nj = pop_result$data$nj,
+                W_nj = pop_result$data$W_nj,
                 given = pop_result$parameters$y_given
             )
             
@@ -282,9 +334,9 @@ trueVals2.0c <- function(data_list) {
             
             # Cluster-level expected outcome:
             cluster_means <- pop_result$data  |>
-                mutate(E_y = E_y_each) |>
-                group_by(school) |>
-                summarize(cluster_avg = mean(E_y, na.rm = TRUE))
+                dplyr::mutate(E_y = E_y_each) |>
+                dplyr::group_by(school) |>
+                dplyr::summarize(cluster_avg = mean(E_y, na.rm = TRUE))
             truevals_cluster[[label]] <- mean(cluster_means$cluster_avg, na.rm = TRUE)
             
         } else {
@@ -299,9 +351,9 @@ trueVals2.0c <- function(data_list) {
             
             # Cluster-level average
             cluster_means <- data  |>
-                mutate(E_y = E_y_each) |>
-                group_by(school) |>
-                summarize(cluster_avg = mean(E_y, na.rm = TRUE))
+                dplyr::mutate(E_y = E_y_each) |>
+                dplyr::group_by(school) |>
+                dplyr::summarize(cluster_avg = mean(E_y, na.rm = TRUE))
             truevals_cluster[[label]] <- mean(cluster_means$cluster_avg, na.rm = TRUE)
         }
     }
@@ -477,14 +529,14 @@ trueVals2.0c <- function(data_list) {
 #'             # M is continuous
 #'             # M ~ Normal(m_latent, var=1 - iccm)
 #'             var_m <- 1 - iccm
-#'             mean_m <- m_latent
+#'             Ma <- m_latent
 #'             
 #'             if (Yfamily == "gaussian") {
 #'                 # Continuous M, continuous Y:
 #'                 # E[Y] = E[E[Y|M]] = E[y_latent(M)]
 #'                 # If linear, E[Y] = y_latent(E[M]) since it's linear in M.
-#'                 # Substitute M = mean_m directly:
-#'                 y_latent_mean_m <- calc_y_latent(m = mean_m, a = a0_val, z = z, nj = nj, given = given_y)
+#'                 # Substitute M = Ma directly:
+#'                 y_latent_mean_m <- calc_y_latent(m = Ma, a = a0_val, z = z, nj = nj, given = given_y)
 #'                 E_y <- y_latent_mean_m
 #'             } else {
 #'                 E_y <- NULL
