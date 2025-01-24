@@ -1040,6 +1040,128 @@ test_list$effects$individual$tnie
 
 
 
+# Find good true effect sizes (for binomial Y cases) -----------------------------------------
+
+# generate data
+test_list <- generate_data2.0c(
+    J = 40, # condition$J[cond], #1000, 
+    njrange = c(condition$Nj_low[cond], condition$Nj_high[cond]), 
+    Mfamily = "binomial", # condition$Mfamily[cond], 
+    Yfamily = "binomial", #condition$Yfamily[cond], 
+    seed = datseeds[iseed], 
+    num_x = 3, 
+    quadratic.A = condition$quadratic[cond], 
+    quadratic.M = condition$quadratic[cond], 
+    quadratic.Y = condition$quadratic[cond], 
+    iccx = condition$icc[cond], 
+    icca = condition$icc[cond], 
+    iccm = condition$icc[cond], 
+    iccy = condition$icc[cond], 
+    m_on_a = 3, #0.2, 
+    m_on_az = 0.2, 
+    m_on_anj = 0.2, 
+    m_on_x = sqrt(0.15 / 3), #num_x
+    m_on_z = sqrt(0.4), 
+    y_on_a = 0.5, #0.2, 
+    y_on_m = 3, #1, 
+    y_on_am = 0, 
+    y_on_az = 0.2, 
+    y_on_mz = 0.2, 
+    y_on_anj = 0.2, 
+    y_on_x = sqrt(0.15 / 3), #num_x
+    y_on_z = sqrt(0.4), 
+    yintercept = 1, 
+    x_z = 0, 
+    include_truevals = TRUE, # FALSE, 
+    include_overlapMsg = FALSE #TRUE
+)
+
+# estimate true effects 
+test_est <- estimate_mediation(
+    data = test_list$data,
+    Sname = "school",
+    Wnames = names(test_list$data)[grep("^W", names(test_list$data))],
+    Xnames = names(test_list$data)[grep("^X", names(test_list$data))],
+    Aname = "A",
+    Mnames = "M",
+    Yname = "Y",
+    learners_a = c("SL.nnet", "SL.gam"),
+    learners_m = c("SL.nnet", "SL.gam"),
+    learners_y = c("SL.nnet", "SL.gam"),
+    cluster_opt = methds$cluster_opt,
+    num_folds = 5 
+    # Yfamily = "gaussian"
+)
+
+
+
+# Binomial M & Y 
+## OG
+#                 Effect  EffectVersion    Estimate    StdError      CILower    CIUpper
+# 1   Direct Effect (DE) Individual-Avg 0.020364937 0.017272399 -0.015509570 0.05623944
+# 2 Indirect Effect (IE) Individual-Avg 0.007403764 0.004962891 -0.002904084 0.01771161
+# 3   Direct Effect (DE)    Cluster-Avg 0.016413784 0.018662088 -0.022347085 0.05517465
+# 4 Indirect Effect (IE)    Cluster-Avg 0.007764030 0.005047396 -0.002719334 0.01824739
+
+## m_on_a = 1; y_on_a = 0.2, y_on_m = 2
+test_est
+#               Effect  EffectVersion   Estimate    StdError    CILower    CIUpper
+# 1   Direct Effect (DE) Individual-Avg 0.04839861 0.015397638 0.01641795 0.08037926
+# 2 Indirect Effect (IE) Individual-Avg 0.05257806 0.009655345 0.03252406 0.07263206
+# 3   Direct Effect (DE)    Cluster-Avg 0.05191630 0.017740009 0.01507058 0.08876203
+# 4 Indirect Effect (IE)    Cluster-Avg 0.05562672 0.012204233 0.03027872 0.08097473
+## DE (PNDE)
+test_list$effects$individual$pnde
+# 0.02662902
+## IE (TNIE)
+test_list$effects$individual$tnie
+# 0.0581877
+
+## m_on_a = 3; y_on_a = 1, y_on_m = 3
+test_est
+#                 Effect  EffectVersion   Estimate   StdError    CILower    CIUpper
+# 1   Direct Effect (DE) Individual-Avg 0.12223303 0.01956252 0.08160197 0.16286409
+# 2 Indirect Effect (IE) Individual-Avg 0.03560799 0.01069439 0.01339591 0.05782006
+# 3   Direct Effect (DE)    Cluster-Avg 0.12628295 0.02038432 0.08394503 0.16862086
+# 4 Indirect Effect (IE)    Cluster-Avg 0.03971875 0.01220011 0.01437931 0.06505820
+## DE (PNDE)
+test_list$effects$individual$pnde
+# 0.110257
+## IE (TNIE)
+test_list$effects$individual$tnie
+# 0.0414448
+
+## m_on_a = 2; y_on_a = 1, y_on_m = 3
+test_est
+#                 Effect  EffectVersion   Estimate   StdError      CILower    CIUpper
+# 1   Direct Effect (DE) Individual-Avg 0.11494153 0.02371839  0.065678804 0.16420425
+# 2 Indirect Effect (IE) Individual-Avg 0.03979671 0.01932571 -0.000342479 0.07993591
+# 3   Direct Effect (DE)    Cluster-Avg 0.11547642 0.02406013  0.065503905 0.16544893
+# 4 Indirect Effect (IE)    Cluster-Avg 0.04445375 0.02226262 -0.001785378 0.09069287
+## DE (PNDE)
+test_list$effects$individual$pnde
+# 0.1078391
+## IE (TNIE)
+test_list$effects$individual$tnie
+# 0.04280788
+
+## m_on_a = 3; y_on_a = 0.5, y_on_m = 3
+test_est
+#                 Effect  EffectVersion    Estimate   StdError    CILower     CIUpper
+# 1   Direct Effect (DE) Individual-Avg -0.09845611 0.01931358 -0.1385701 -0.05834210
+# 2 Indirect Effect (IE) Individual-Avg  0.26128510 0.03558564  0.1873743  0.33519592
+# 3   Direct Effect (DE)    Cluster-Avg -0.10119117 0.01803229 -0.1386440 -0.06373837
+# 4 Indirect Effect (IE)    Cluster-Avg  0.26927977 0.03568529  0.1951620  0.34339756
+## DE (PNDE)
+test_list$effects$individual$pnde
+# 0.06229872
+## IE (TNIE)
+test_list$effects$individual$tnie
+# 0.09586237
+
+
+
+
 
 # test cwc.FE with mlr ----------------------------------------------------
 

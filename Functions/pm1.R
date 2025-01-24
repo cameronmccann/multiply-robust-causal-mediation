@@ -32,8 +32,8 @@ pm1 <- function(m, a, z, nj, given, gen_m) {
         gen_m[["m_on_anj"]] * a * nj +
         given
     prob1 <- pnorm(latent, mean = 0, sd = sqrt(1 - gen_m[["iccm"]]))
-    # m * prob1 + (1 - m) * (1 - prob1)
-    return(m * prob1 + (1 - m) * (1 - prob1))
+    m * prob1 + (1 - m) * (1 - prob1)
+    # return(m * prob1 + (1 - m) * (1 - prob1))
     
     # tried using nearly exact func below (did not work 2025-01-14)
         # latent <- gen_m[["m_on_a"]] * a + gen_m[["m_on_az"]] * a*z + gen_m[["m_on_anj"]] * a*nj + given

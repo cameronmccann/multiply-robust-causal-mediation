@@ -42,7 +42,7 @@ my <- function(m, a, z, nj, given, gen_y, binary = TRUE) {
         cond_mean <- latent
     }
     
-    return(cond_mean)
+    cond_mean
 }
 
 

@@ -98,7 +98,9 @@ generate_outcome <- function(data_list, iccy = 0.2, yintercept = 1,
         # condmy <- latent
         condmy <- my(m = data_list$data$M, a = data_list$data$A, z = data_list$data$Z, nj = data_list$data$W_nj, given = y_given, gen_y = gen_y, binary = FALSE)
         data_list$data$Y <- condmy + rnorm(N, sd = sqrt(1 - gen_y[["iccy"]]))
-    } else if (Yfamily == "binomial") {
+    } 
+    
+    if (Yfamily == "binomial") {
         # For binary outcome
         
         # latent_y <- my(m = data_list$data$M, a = data_list$data$A, z = data_list$data$Z, nj = data_list$data$W_nj, given = y_given, gen_y = gen_y, binary = TRUE)
@@ -122,14 +124,9 @@ generate_outcome <- function(data_list, iccy = 0.2, yintercept = 1,
         # my() already uses pnorm(), so I go straight to rbinom()
         data_list$data$Y <- rbinom(N, 1, condmy)
         
-        # Add individual-level residual?
-        # condmy <- my(m = data_list$data$M, a = data_list$data$A, z = data_list$data$Z, nj = data_list$data$W_nj, given = y_given, gen_y = gen_y, binary = FALSE)
-        # latent_y <- condmy + rnorm(N, sd = sqrt(1 - gen_y[["iccy"]]))
-        # data_list$data$Y <- rbinom(N, size = 1, prob = pnorm(latent_y))
-        
     }
     
-    return(modifyList(data_list, list(
+    modifyList(data_list, list(
         iccy = iccy, 
         yintercept = yintercept, 
         y_on_a = gen_y[["y_on_a"]],
@@ -144,6 +141,6 @@ generate_outcome <- function(data_list, iccy = 0.2, yintercept = 1,
         # int.XZ = int.XZ, 
         Yfamily = Yfamily, 
         y_given = y_given
-    )))
+    ))
     
 }

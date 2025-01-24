@@ -13,7 +13,7 @@
 #       Note: data generation creates pop data (when Mfamily & Yfamily meet "gaussian" &. "binomial") for every iteration but only saves first iteration into pop data folder. 
 #
 #
-# Last Updated: 2025-01-23
+# Last Updated: 2025-01-24
 #
 #
 # Notes:
@@ -40,9 +40,9 @@
 ################################################################################
 
 
-# This can potentially speed up code
-library(compiler)
-enableJIT(3)
+# # This can potentially speed up code
+# library(compiler)
+# enableJIT(3)
 
 # Load packages & functions ----------------------------------------------------
 
@@ -138,7 +138,7 @@ conditions <- conditions_all |>
     filter(if.null == F) |> 
     filter(J %in% c(40)) |> # c(20)) |> # c(70)) |>
     filter(Nj_low %in% c(50)) |>
-    filter(Mfamily %in% c("binomial", "gaussian"), Yfamily %in% c("binomial", "gaussian")) #, "gaussian")) # c("binomial")) #, Yfamily %in% c("gaussian"))
+    filter(Mfamily %in% c("binomial", "gaussian"), Yfamily %in% c("binomial")) #, "gaussian")) # c("binomial")) #, Yfamily %in% c("gaussian"))
 
 
 # ══════════════════════════════
@@ -166,7 +166,7 @@ methds_all <- data.frame(expand.grid(
 # (methds <- methds_all %>%
 #     filter(cluster_opt %in% c("cwc"), Fit %in% c("mlr") ))
 methds <- methds_all |> 
-    filter(cluster_opt %in% c("cwc", "cwc.FE"), Fit %in% c("mlr", "glm"))
+    filter(cluster_opt %in% c("cwc"), Fit %in% c("mlr")) #filter(cluster_opt %in% c("cwc", "cwc.FE"), Fit %in% c("mlr", "glm"))
 
 
 
@@ -180,11 +180,18 @@ methds <- methds_all |>
 # cond <- 1
 
 # Number of replications
-reps <- 2 #10 #100 # 10 # 200 # 1000
+reps <- 2 #15 #100 # 10 # 200 # 1000
 # reps <- 200 #100
 
 # Create parent output directory
 path <- "Output/S1_Simulation-Output"
+## Add subdirectory, if desired (e.g., for test runs)
+additional_folder <- "2025-01-23-test_15-reps_looking-into-binomial-outcome-low-null-reject-issue_with-no-res-and-larger-effects" # NULL
+## Check if additional_folder is not NULL to add to path
+if (!is.null(additional_folder)) {
+    path <- file.path(path, additional_folder)
+}
+## Create directory, if not already done
 if (!dir.exists(path)) dir.create(path, recursive = TRUE)
 
 # Create subfolder for pop_data
@@ -266,14 +273,15 @@ for (cond_idx in seq_len(total_conditions)) {
             quadratic.Y = isQuad,
             num_x = 3,
             include_overlapMsg = FALSE,
+            plot_PSdiagnostics = FALSE, 
             
-            m_on_a = 0.2, 
+            m_on_a = 9, #0.2, 
             m_on_az = 0.2, 
             m_on_anj = 0.2, 
             m_on_x = sqrt(0.15 / 3), #num_x
             m_on_z = sqrt(0.4), 
-            y_on_a = 0.2, 
-            y_on_m = 1, 
+            y_on_a = 9, #0.2, 
+            y_on_m = 10, #1, 
             y_on_am = 0, 
             y_on_az = 0.2, 
             y_on_mz = 0.2, 
@@ -511,7 +519,7 @@ for (cond_idx in seq_len(total_conditions)) {
     
     # clear space
     rm(result_list)
-    gc()
+    # gc()
     
     message(glue(
         "[{format(Sys.time(), '%Y-%m-%d %H:%M:%S')}] Condition {cond_idx_padded}/{total_conditions} ",

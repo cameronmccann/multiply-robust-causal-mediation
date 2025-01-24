@@ -456,8 +456,8 @@ crossfit <- function(train, valid.list, yname, xnames, varnames,
         }
 
         ##
-        print("Fitting CWC.FE...")
-        print(glue::glue("Columns in training data: {paste(colnames(df_cwc), collapse=', ')}"))
+        # print("Fitting CWC.FE...")
+        # print(glue::glue("Columns in training data: {paste(colnames(df_cwc), collapse=', ')}"))
         
         # Fit a SuperLearner model, now with cluster dummies + cwc columns
         fit <- SuperLearner::SuperLearner(
@@ -475,7 +475,7 @@ crossfit <- function(train, valid.list, yname, xnames, varnames,
         preds <- sapply(valid.list, function(validX) {
 
             ##
-            print(glue::glue("Validation fold size: {nrow(validX)}"))
+            # print(glue::glue("Validation fold size: {nrow(validX)}"))
             
             # Construct new data that includes xnames, cluster means, cluster dummies, etc.
             newX <- data.frame(

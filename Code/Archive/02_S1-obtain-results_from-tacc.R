@@ -14,7 +14,7 @@
 #       first simulation study (i.e., obtains performance measures). 
 #
 #
-# Last Updated: 2025-01-23
+# Last Updated: 2025-01-24
 #
 #
 # Notes:
@@ -75,8 +75,8 @@ icc = c(0.2))
 conditions <- conditions_all |> 
     filter(quadratic == F) |> 
     filter(if.null == F) |> 
-    filter(J %in% c(40)) |> # c(20)) |> # c(70)) |>
-    filter(Nj_low %in% c(50)) |>
+    # filter(J %in% c(40)) |> # c(20)) |> # c(70)) |>
+    # filter(Nj_low %in% c(50)) |>
     filter(Mfamily %in% c("binomial", "gaussian"), Yfamily %in% c("binomial", "gaussian")) #c("gaussian")) # c("binomial")) #, Yfamily %in% c("gaussian"))
 
 
@@ -111,15 +111,25 @@ methds <- methds_all |>
 # Set date, reps, & folders ----------------------------------------------
 
 # Date of simulation 
-sim_date <- Sys.Date() #"2025-01-18" 
+sim_date <- "2025-01-23" #Sys.Date() #"2025-01-18" 
 
 # Number of replications
-reps <- 2 #10 # 100 # 200 # 1000
+reps <- 100 # 100 # 200 # 1000
 # reps <- 200
 
 # Create directory to store results 
 ## Results folder 
 path <- "Output/S1_Results"
+if (!dir.exists(path)) {
+    dir.create(path)
+}
+### Add subdirectory, if desired (e.g., for test runs)
+additional_folder <- "2025-01-23-test_100-reps_all-linear-conditions-with-all-methods" # NULL
+### Check if additional_folder is not NULL to add to path
+if (!is.null(additional_folder)) {
+    path <- file.path(path, additional_folder)
+}
+### Create directory 
 if (!dir.exists(path)) {
     dir.create(path)
 }
@@ -132,6 +142,12 @@ if (!dir.exists(paste0(path, "/Figures"))) {
 }
 if (!dir.exists(paste0(path, "/Tables"))) {
     dir.create(paste0(path, "/Tables"))
+}
+# Simulation output path 
+sim_output_path <- "Output/S1_Simulation-Output"
+### Check if additional_folder is not NULL to add to path
+if (!is.null(additional_folder)) {
+    sim_output_path <- file.path(sim_output_path, additional_folder)
 }
 
 
@@ -170,7 +186,7 @@ sim1_data <- NULL  # Store all conditions' data
 for (cond in 1:nrow(conditions)) {
     
     rds_files <- list.files(
-        path = "Output/S1_Simulation-Output", 
+        path = sim_output_path, #path = "Output/S1_Simulation-Output", 
         pattern = paste0(sprintf("%02d", cond), "_reps-", reps, "_quad-", conditions[cond, "quadratic"], "_M-", conditions[cond, "Mfamily"], "_Y-", conditions[cond, "Yfamily"], ".*\\.rds$"),  # Only files with "reps-200" and ".rds"
         full.names = TRUE
     )
@@ -289,11 +305,11 @@ ind_summary <- as.data.frame(sim1_data) |>
               MSE_individual_PNDE = mean((individual_de_Estimate - true_PNDE)^2), 
               MSE_individual_TNIE = mean((individual_ie_Estimate - true_TNIE)^2), 
               rejectnull_individual_PNDE = mean((individual_de_CILower > (0)) | (individual_de_CIUpper < (0))), 
-              rejectnull_individual_TNIE = mean((individual_ie_CILower > (0)) | (individual_ie_CIUpper < (0)))
-    )
-    #           t1error_individual_PNDE = mean(!(if_cover_PNDE)), 
-    #           t1error_individual_TNIE = mean(!(if_cover_TNIE))) #|> 
-    # # filter(model == "FE.glm") 
+              rejectnull_individual_TNIE = mean((individual_ie_CILower > (0)) | (individual_ie_CIUpper < (0))),
+              true_PNDE = mean(true_PNDE), 
+              true_TNIE = mean(true_TNIE)
+    ) #|> 
+# view()
 
 ind_summary
 
@@ -311,18 +327,9 @@ ind_summary <- cbind(method = 1:nrow(methds),
 
 ind_summary
 
-saveRDS(ind_summary, file = paste0("Output/S1_Results/Tables/S1_performance-measures_", sim_date, ".rds"))
+saveRDS(ind_summary, file = paste0(path, "/Tables/S1_performance-measures_", sim_date, ".rds")) #paste0("Output/S1_Results/Tables/S1_performance-measures_", sim_date, ".rds"))
 
 
 
 
-#
-# method cluster_a cluster_m cluster_y Fit cluster_opt cluster_opt_a cluster_opt_m cluster_opt_y condition  J Nj_low Nj_high quadratic
-# 1      1        FE        FE        FE mlr         cwc           cwc           cwc           cwc         1 20     50     100     FALSE
-# 2      1        FE        FE        FE mlr         cwc           cwc           cwc           cwc         2 20     50     100     FALSE
-# Mfamily  Yfamily if.null icc cover_PNDE cover_TNIE bias_individual_PNDE bias_individual_TNIE MSE_individual_PNDE MSE_individual_TNIE
-# 1 gaussian binomial   FALSE 0.2        0.8          0          -0.03487090          -0.03248675         0.001741323          0.00108714
-# 2 gaussian gaussian   FALSE 0.2        0.9          0          -0.01804263          -0.32233804         0.006628566          0.10726389
-# rejectnull_individual_PNDE rejectnull_individual_TNIE
-# 1                        0.0                        0.1
-# 2                        0.9                        0.0
+

@@ -95,8 +95,8 @@ generate_mediator <- function(data_list, nj_sizes, iccm = 0.2, num_x = 3, m_on_a
         # data_list$data$M <- rbinom(N, size = 1, prob = prob1 + rnorm(N, 0, sd = sqrt(1 - gen_m[["iccm"]])))
 
         #
-        prob <- pm1(1, data_list$data$A, data_list$data$Z, data_list$data$W_nj, m_given, gen_m)
-        data_list$data$M <- rbinom(N, size = 1, prob = prob)
+        probm <- pm1(1, data_list$data$A, data_list$data$Z, data_list$data$W_nj, m_given, gen_m)
+        data_list$data$M <- rbinom(N, size = 1, prob = probm)
         
         # latent <- gen_m[["m_on_a"]] * data_list$data$A + gen_m[["m_on_az"]] * data_list$data$A*data_list$data$Z + gen_m[["m_on_anj"]] * data_list$data$A*data_list$data$W_nj + m_given
         # prob1 <- pnorm(latent, mean = 0, sd = sqrt(1 - gen_m[["iccm"]]))
@@ -106,13 +106,13 @@ generate_mediator <- function(data_list, nj_sizes, iccm = 0.2, num_x = 3, m_on_a
         # mean_m <- m_given # m_latent
         mean_m <- m_given + 
             gen_m[["m_on_a"]] * data_list$data$A +
-            gen_m[["m_on_az"]] * (data_list$data$A * data_list$data$Z) +
-            gen_m[["m_on_anj"]] * (data_list$data$A * data_list$data$W_nj)
+            gen_m[["m_on_az"]] * data_list$data$A * data_list$data$Z +
+            gen_m[["m_on_anj"]] * data_list$data$A * data_list$data$W_nj
         
         data_list$data$M <- rnorm(N, mean = mean_m, sd = sqrt(1 - gen_m$iccm))
     }
     
-    return(modifyList(data_list, list(
+    modifyList(data_list, list(
         iccm = iccm,
         m_on_a = gen_m[["m_on_a"]],
         m_on_x = gen_m[["m_on_x"]],
@@ -122,7 +122,7 @@ generate_mediator <- function(data_list, nj_sizes, iccm = 0.2, num_x = 3, m_on_a
         quadratic.M = quadratic.M,
         Mfamily = Mfamily,
         m_given = m_given
-    )))
+    ))
 }
 
 

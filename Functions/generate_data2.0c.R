@@ -133,7 +133,8 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
                               iccm = 0.2,                      # Intra-class correlation for 'M'
                               iccy = 0.2,                      # Intra-class correlation for 'Y'
                               include_truevals = TRUE,         # Whether or not to compute true values
-                              include_overlapMsg = TRUE        # Whether or not to display messages about PS overlap in console
+                              include_overlapMsg = TRUE,       # Whether or not to display messages about PS overlap in console
+                              plot_PSdiagnostics = FALSE
 ) {               
     # 1. Cluster generation  --------------------------------------------------
     set.seed(seed)  
@@ -163,31 +164,35 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
     )
     
     # 4. Diagnostic plots of the propensity scores ----------------------------
-    # Overlap plot (density of ps_true by treatment group)
-    overlap_plot <- ggplot(data_list$data, aes(x = ps_true, color = factor(A), fill = factor(A))) +
-        geom_density(alpha = 0.5) +
-        labs(
-            title = "Density Plot of ps_true by Treatment Group (A)",
-            x = "True Propensity Score (ps_true)",
-            y = "Density",
-            fill = "Treatment (A)"
-        ) +
-        theme_minimal() +
-        theme(
-            legend.position = "top",
-            plot.title = element_text(hjust = 0.5, face = "bold")
-        )
-    
-    # Overlap plot on the logit scale
-    overlap_plot_logit <- ggplot(data_list$data, aes(x = qlogis(ps_true), fill = factor(A))) +
-        geom_density(alpha = 0.5) +
-        labs(
-            title = "Density Plot of Logit(ps_true) by Treatment Group (A)",
-            x = "Logit of the True Propensity Score",
-            y = "Density",
-            fill = "Treatment (A)"
-        ) +
-        theme_minimal()
+    overlap_plot <- NULL
+    overlap_plot_logit <- NULL
+    if (plot_PSdiagnostics == TRUE) {
+        # Overlap plot (density of ps_true by treatment group)
+        overlap_plot <- ggplot(data_list$data, aes(x = ps_true, color = factor(A), fill = factor(A))) +
+            geom_density(alpha = 0.5) +
+            labs(
+                title = "Density Plot of ps_true by Treatment Group (A)",
+                x = "True Propensity Score (ps_true)",
+                y = "Density",
+                fill = "Treatment (A)"
+            ) +
+            theme_minimal() +
+            theme(
+                legend.position = "top",
+                plot.title = element_text(hjust = 0.5, face = "bold")
+            )
+        
+        # Overlap plot on the logit scale
+        overlap_plot_logit <- ggplot(data_list$data, aes(x = qlogis(ps_true), fill = factor(A))) +
+            geom_density(alpha = 0.5) +
+            labs(
+                title = "Density Plot of Logit(ps_true) by Treatment Group (A)",
+                x = "Logit of the True Propensity Score",
+                y = "Density",
+                fill = "Treatment (A)"
+            ) +
+            theme_minimal()
+    }
     
     # Summaries of extreme PS values (below 0.01 or above 0.99)
     n_ps_below_001 <- sum(data_list$data$ps_true < 0.01, na.rm = TRUE)

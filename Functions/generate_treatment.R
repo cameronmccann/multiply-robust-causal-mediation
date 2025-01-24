@@ -43,11 +43,15 @@ generate_treatment <- function(data_list, nj_sizes, icca, quadratic.A = FALSE, n
     
     # Compute the true propensity score 
     ps_true <- pnorm(a_given, mean = 0, sd = sqrt(1 - gen_a$icca))
+    # ps_true <- pnorm(a_given, mean = 0, sd = sqrt(1 - gen_a[["icca"]]))
+    # prob1 <- 1 * ps_true + (1 - 1) * (1 - ps_true) # make a=1: prob1 <- a * ps_true + (1 - a) * (1 - ps_true)
     
     # Note: check overlap assumption 
     
     # Generate binary treatment 'A' using the true propensity score 
     data_list$data$A <- rbinom(N, 1, ps_true)
+    # data_list$data$A <- rbinom(N, 1, prob1)
+    
     # prob1 <- pnorm(a_given, mean = 0, sd = sqrt(1 - gen_a$icca))
     # data_list$data$A <- rbinom(N, 1, prob1) #(a * prob1 + (1 - a) * (1 - prob1)))
     
