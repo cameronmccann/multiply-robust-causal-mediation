@@ -14,7 +14,7 @@
 #       first simulation study (i.e., obtains performance measures). 
 #
 #
-# Last Updated: 2025-01-24
+# Last Updated: 2025-01-27
 #
 #
 # Notes:
@@ -75,8 +75,8 @@ icc = c(0.2))
 conditions <- conditions_all |> 
     filter(quadratic == T) |> 
     filter(if.null == F) |> 
-    filter(J %in% c(40)) |> # c(20)) |> # c(70)) |>
-    filter(Nj_low %in% c(50)) |>
+    # filter(J %in% c(40)) |> # c(20)) |> # c(70)) |>
+    # filter(Nj_low %in% c(50)) |>
     filter(Mfamily %in% c("binomial", "gaussian"), Yfamily %in% c("binomial", "gaussian")) #c("gaussian")) # c("binomial")) #, Yfamily %in% c("gaussian"))
 
 
@@ -111,11 +111,11 @@ methds <- methds_all |>
 # Set date, reps, & folders ----------------------------------------------
 
 # Date of simulation 
-sim_date <- Sys.Date() #"2025-01-23" #"2025-01-18" 
+sim_date <- "2025-01-25" #Sys.Date() #"2025-01-23" #"2025-01-18" 
 
 # Number of replications
-reps <- 100 # 100 # 200 # 1000
-# reps <- 200
+# reps <- 100 # 100 # 200 # 1000
+reps <- 300
 
 # Create directory to store results 
 ## Results folder 
@@ -124,7 +124,7 @@ if (!dir.exists(path)) {
     dir.create(path)
 }
 ### Add subdirectory, if desired (e.g., for test runs)
-additional_folder <- "2025-01-24-test_100-rep_all-quad-conditions-with-all-methods" #additional_folder <- "2025-01-24-test_1-rep_quad" #additional_folder <- "2025-01-23-test_100-reps_all-linear-conditions-with-all-methods" # NULL
+additional_folder <- "from-tacc/2025-01-25-test_300-rep_all-quad-conditions-with-all-methods" #additional_folder <- "2025-01-24-test_1-rep_quad" #additional_folder <- "2025-01-23-test_100-reps_all-linear-conditions-with-all-methods" # NULL
 ### Check if additional_folder is not NULL to add to path
 if (!is.null(additional_folder)) {
     path <- file.path(path, additional_folder)
@@ -331,7 +331,135 @@ saveRDS(ind_summary, file = paste0(path, "/Tables/S1_performance-measures_", sim
 
 
 
-# reporting TACC 100 reps 2025-01-23 results ------------------------------
+
+# Report results (quad scenario) ------------------------------------------
+
+# import data & performance measures 
+quad_data <- readRDS(file = "Output/S1_Results/from-tacc/2025-01-25-test_300-rep_all-quad-conditions-with-all-methods/Data/S1_simulation-data_2025-01-25.rds")
+quad_perf_measures <- readRDS(file = "Output/S1_Results/from-tacc/2025-01-25-test_300-rep_all-quad-conditions-with-all-methods/Tables/S1_performance-measures_2025-01-25.rds")
+
+
+# all performance measures 
+quad_perf_measures |> 
+    # filter(cluster_opt == "cwc" & Fit == "mlr") |> 
+    # filter(Mfamily %in% c("gaussian", "binomial") & Yfamily %in% c("binomial")) |> 
+    select("Fit", "cluster_opt", "J":"Yfamily", ends_with("_PNDE"), ends_with("_TNIE")) |> 
+    view()
+
+# summary of true effects 
+quad_perf_measures |>
+    # filter(cluster_opt == "cwc" & Fit == "mlr") |>
+    select("Fit", "cluster_opt", "J":"Yfamily", "rejectnull_individual_PNDE":"true_TNIE") |>
+    group_by(Mfamily, Yfamily) |>
+    summarize(
+        mean_true_PNDE = mean(true_PNDE),
+        sd_true_PNDE = sd(true_PNDE),
+        median_true_PNDE = median(true_PNDE),
+        mean_true_TNIE = mean(true_TNIE),
+        sd_true_TNIE = sd(true_TNIE),
+        median_true_TNIE = median(true_TNIE),
+        .groups = "drop"
+    ) |>
+    tidyr::pivot_longer(
+        cols = c(starts_with("mean"), starts_with("sd"), starts_with("median")),
+        names_to = c(".value", "statistic"),
+        names_pattern = "(.+)_(.+)"
+    ) |>
+    arrange(Mfamily, Yfamily)
+
+
+
+# ══════════════════════════════
+#    visuals 
+# ══════════════════════════════
+
+# CI coverage rate for TNIE
+## U[5, 20]
+quad_perf_measures |> 
+    # filter(Yfamily == "gaussian" & Nj_low == 5) |> 
+    filter(Nj_low == 5) |>
+    ggplot(aes(x = factor(J), y = cover_TNIE, color = cluster_opt, shape = Fit, linetype = Fit)) +
+    ggplot2::geom_hline(yintercept = 1) +
+    geom_point() +
+    geom_line(aes(group = interaction(cluster_opt, Fit))) +
+    facet_grid(Yfamily ~ interaction(Nj_low, Mfamily)) +
+    labs(subtitle = "CI coverage rate by Mediator (horz) & Outcome (vert) type for small clusters [5, 20]") 
+theme_minimal()
+## U[50, 100]
+quad_perf_measures |> 
+    # filter(Yfamily == "gaussian" & Nj_low == 5) |> 
+    filter(Nj_low == 50) |>
+    ggplot(aes(x = factor(J), y = cover_TNIE, color = cluster_opt, shape = Fit, linetype = Fit)) +
+    ggplot2::geom_hline(yintercept = 1) +
+    geom_point() +
+    geom_line(aes(group = interaction(cluster_opt, Fit))) +
+    facet_grid(Yfamily ~ interaction(Nj_low, Mfamily)) +
+    labs(subtitle = "CI coverage rate by Mediator (horz) & Outcome (vert) type for small clusters [50, 100]") 
+theme_minimal()
+
+# Bias 
+## U[5, 20]
+quad_perf_measures |> 
+    # filter(Yfamily == "gaussian" & Nj_low == 5) |> 
+    filter(Nj_low == 5) |>
+    ggplot(aes(x = factor(J), y = bias_individual_TNIE, color = cluster_opt, shape = Fit, linetype = Fit)) +
+    ggplot2::geom_hline(yintercept = 0) +
+    geom_point() +
+    geom_line(aes(group = interaction(cluster_opt, Fit))) +
+    facet_grid(Yfamily ~ interaction(Nj_low, Mfamily)) +
+    labs(subtitle = "Bias for Individual-Average TNIE by Mediator (horz) & Outcome (vert) type for small clusters [5, 20]") +
+    theme_minimal() #+
+    # 
+    # guides(
+    #     color = guide_legend(
+    #         override.aes = list(
+    #             shape    = c(16, 17),        # match # of levels in color
+    #             linetype = c("solid","dashed")
+    #         )
+    #     ),
+    #     shape = "none",
+    #     linetype = "none"
+    # )
+## U[50, 100]
+quad_perf_measures |> 
+    # filter(Yfamily == "gaussian" & Nj_low == 5) |> 
+    filter(Nj_low == 50) |>
+    ggplot(aes(x = factor(J), y = bias_individual_TNIE, color = cluster_opt, shape = Fit, linetype = Fit)) +
+    ggplot2::geom_hline(yintercept = 0) +
+    geom_point() +
+    geom_line(aes(group = interaction(cluster_opt, Fit))) +
+    facet_grid(Yfamily ~ interaction(Nj_low, Mfamily)) +
+    labs(subtitle = "Bias for Individual-Average TNIE by Mediator (horz) & Outcome (vert) type for small clusters [50, 100]") +
+    theme_minimal()
+
+# MSE
+## U[5, 20]
+quad_perf_measures |> 
+    # filter(Yfamily == "gaussian" & Nj_low == 5) |> 
+    filter(Nj_low == 5) |>
+    ggplot(aes(x = factor(J), y = MSE_individual_TNIE, color = cluster_opt, shape = Fit, linetype = Fit)) +
+    # ggplot2::geom_hline(yintercept = 1) +
+    geom_point() +
+    geom_line(aes(group = interaction(cluster_opt, Fit))) +
+    facet_grid(Yfamily ~ interaction(Nj_low, Mfamily)) +
+    labs(subtitle = "MSE for Individual-Average TNIE by Mediator (horz) & Outcome (vert) type for small clusters [5, 20]") 
+## U[50, 100]
+quad_perf_measures |> 
+    # filter(Yfamily == "gaussian" & Nj_low == 5) |> 
+    filter(Nj_low == 50) |>
+    ggplot(aes(x = factor(J), y = MSE_individual_TNIE, color = cluster_opt, shape = Fit, linetype = Fit)) +
+    # ggplot2::geom_hline(yintercept = 1) +
+    geom_point() +
+    geom_line(aes(group = interaction(cluster_opt, Fit))) +
+    facet_grid(Yfamily ~ interaction(Nj_low, Mfamily)) +
+    labs(subtitle = "MSE for Individual-Average TNIE by Mediator (horz) & Outcome (vert) type for small clusters [50, 100]") 
+
+
+
+
+
+
+# reporting linear 100 reps 2025-01-23 results (from TACC) ------------------------------
 
 
 # import results 
@@ -491,6 +619,106 @@ table(tacc_data$warnings, tacc_data$model)
 # 3 = mlr         cwc 
 # 4 = glm         cwc
 
+
+
+
+
+# reporting quadratic 100 reps 2025-01-24 results (from TACC) -------------
+
+# import results 
+
+quad_data <- readRDS(file = "Output/S1_Results/from-tacc/2025-01-24-test_100-rep_all-quad-conditions-with-all-methods/Data/S1_simulation-data_2025-01-24.rds")
+quad_perf_measures <- readRDS(file = "Output/S1_Results/from-tacc/2025-01-24-test_100-rep_all-quad-conditions-with-all-methods/Tables/S1_performance-measures_2025-01-24.rds")
+
+# took about 49 mins to run 
+# readRDS(file = "Output/S1_Simulation-Output/from-tacc/2025-01-24-test_100-rep_all-quad-conditions-with-all-methods/S1_Computation-Time.rds") |>
+#     view()
+
+#     
+quad_perf_measures |> 
+    # filter(cluster_opt == "cwc" & Fit == "mlr") |> 
+    # filter(Mfamily %in% c("gaussian", "binomial") & Yfamily %in% c("binomial")) |> 
+    select("Fit", "cluster_opt", "J":"Yfamily", ends_with("_PNDE"), ends_with("_TNIE")) |> 
+    view()
+
+
+
+# summary of true effects 
+quad_perf_measures |>
+    # filter(cluster_opt == "cwc" & Fit == "mlr") |>
+    select("Fit", "cluster_opt", "J":"Yfamily", "rejectnull_individual_PNDE":"true_TNIE") |>
+    group_by(Mfamily, Yfamily) |>
+    summarize(
+        mean_true_PNDE = mean(true_PNDE),
+        sd_true_PNDE = sd(true_PNDE),
+        median_true_PNDE = median(true_PNDE),
+        mean_true_TNIE = mean(true_TNIE),
+        sd_true_TNIE = sd(true_TNIE),
+        median_true_TNIE = median(true_TNIE),
+        .groups = "drop"
+    ) |>
+    tidyr::pivot_longer(
+        cols = c(starts_with("mean"), starts_with("sd"), starts_with("median")),
+        names_to = c(".value", "statistic"),
+        names_pattern = "(.+)_(.+)"
+    ) |>
+    arrange(Mfamily, Yfamily)
+
+
+#
+quad_perf_measures |>
+    # filter(cluster_opt == "cwc" & Fit == "mlr") |>
+    select("Fit", "cluster_opt", "J":"Yfamily", "cover_PNDE":"true_TNIE") |>
+    group_by(J, Nj_low, Mfamily, Yfamily, cluster_opt, Fit) |>
+    # filter(Nj_low == 50) |> 
+    summarize(
+        min_coverage = min(cover_TNIE), 
+        mean_coverage = mean(cover_TNIE), 
+        max_coverage = max(cover_TNIE),
+              mean_bias = mean(bias_individual_TNIE), 
+              mean_MSE = mean(MSE_individual_TNIE)) |> 
+    print(n = 96)
+
+
+
+# Bias 
+quad_perf_measures |> 
+    # filter(Yfamily == "gaussian" & Nj_low == 5) |> 
+    # filter(Nj_low == 5) |> 
+    ggplot(aes(x = factor(J), y = bias_individual_TNIE, color = cluster_opt, shape = Fit, linetype = Fit)) +
+    ggplot2::geom_hline(yintercept = 0, ) +
+    geom_point() +
+    geom_line(aes(group = interaction(cluster_opt, Fit))) +
+    facet_grid(interaction(Nj_low, Yfamily) ~ Mfamily) +
+    labs(subtitle = "Bias by Mediator (horz) & Outcome (vert) type") +
+    theme_minimal()
+
+# Coverage 
+## U[5, 20]
+quad_perf_measures |> 
+    # filter(Yfamily == "gaussian" & Nj_low == 5) |> 
+    filter(Nj_low == 5) |>
+    ggplot(aes(x = factor(J), y = cover_TNIE, color = cluster_opt, shape = Fit, linetype = Fit)) +
+    ggplot2::geom_hline(yintercept = 1) +
+    geom_point() +
+    geom_line(aes(group = interaction(cluster_opt, Fit))) +
+    facet_grid(Yfamily ~ interaction(Nj_low, Mfamily)) +
+    labs(subtitle = "CI coverage rate by Mediator (horz) & Outcome (vert) type for small clusters [5, 20]") 
+    theme_minimal()
+## U[50, 100]
+quad_perf_measures |> 
+    # filter(Yfamily == "gaussian" & Nj_low == 5) |> 
+    filter(Nj_low == 50) |>
+    ggplot(aes(x = factor(J), y = cover_TNIE, color = cluster_opt, shape = Fit, linetype = Fit)) +
+    ggplot2::geom_hline(yintercept = 1) +
+    geom_point() +
+    geom_line(aes(group = interaction(cluster_opt, Fit))) +
+    facet_grid(Yfamily ~ interaction(Nj_low, Mfamily)) +
+    labs(subtitle = "CI coverage rate by Mediator (horz) & Outcome (vert) type for small clusters [50, 100]") 
+    theme_minimal()
+
+    
+names(quad_perf_measures)
 
 
 
