@@ -13,7 +13,7 @@
 #       Note: data generation creates pop data (when Mfamily & Yfamily meet "gaussian" &. "binomial") for every iteration but only saves first iteration into pop data folder. 
 #
 #
-# Last Updated: 2025-01-26
+# Last Updated: 2025-01-27
 #
 #
 # Notes:
@@ -45,7 +45,7 @@
 # enableJIT(3)
 
 # set directory 
-setwd("/home1/10384/cameronmccann/multiply-robust-causal-mediation") # temp-2025-01-23-test_multiply-robust-causal-mediation")
+# setwd("/home1/10384/cameronmccann/multiply-robust-causal-mediation") # temp-2025-01-23-test_multiply-robust-causal-mediation")
 
 # Load packages & functions ----------------------------------------------------
 
@@ -137,7 +137,7 @@ icc = c(0.2))
 
 # limit conditions for testing 
 conditions <- conditions_all |> 
-    filter(quadratic == T) |> 
+    filter(quadratic == F) |> 
     filter(if.null == F) |> 
     # filter(J %in% c(40)) |> # c(20)) |> # c(70)) |>
     # filter(Nj_low %in% c(50)) |>
@@ -145,10 +145,10 @@ conditions <- conditions_all |>
 # conditions
 
 # select starting condition 
-strting_cond <- 18
-if (is.null(strting_cond)) {
-    strting_cond <- 1
-}
+strting_cond <- 1 #18
+# if (!exists(strting_cond) || is.null(strting_cond)) {
+#     strting_cond <- 1
+# }
 
 # ══════════════════════════════
 #    Methods  
@@ -189,13 +189,13 @@ methds <- methds_all |>
 # cond <- 1
 
 # Number of replications
-# reps <- 100 #5 #10 #100 # 10 # 200 # 1000
-reps <- 300 #200 #100
+reps <- 200 #5 #10 #100 # 10 # 200 # 1000
+# reps <- 300 #200 #100
 
 # Create parent output directory
 path <- "Output/S1_Simulation-Output"
 ## Add subdirectory, if desired (e.g., for test runs)
-additional_folder <- "2025-01-25-test_300-rep_all-quad-conditions-with-all-methods" #additional_folder <- "2025-01-24-test_100-rep_all-quad-conditions-with-all-methods" # NULL additional_folder <- "2025-01-23-test_200-reps_all-linear-conditions-with-all-methods" # NULL
+additional_folder <- "2025-01-27_200-rep_all-linear-conditions-with-all-methods" #"2025-01-25-test_300-rep_all-quad-conditions-with-all-methods" #additional_folder <- "2025-01-24-test_100-rep_all-quad-conditions-with-all-methods" # NULL additional_folder <- "2025-01-23-test_200-reps_all-linear-conditions-with-all-methods" # NULL
 ## Check if additional_folder is not NULL to add to path
 if (!is.null(additional_folder)) {
     path <- file.path(path, additional_folder)
@@ -248,7 +248,7 @@ OverallPar_time <- data.frame(
 # ══════════════════════════════
 #     Main Loop Over Conditions
 # ══════════════════════════════
-total_conditions <- nrow(conditions)
+total_conditions <- nrow(conditions) #total_conditions <- 1 
 for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
     
     cond <- conditions[cond_idx, ]
