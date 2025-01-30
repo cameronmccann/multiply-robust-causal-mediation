@@ -14,7 +14,7 @@
 #       first simulation study (i.e., obtains performance measures). 
 #
 #
-# Last Updated: 2025-01-28
+# Last Updated: 2025-01-30
 #
 #
 # Notes:
@@ -123,31 +123,34 @@ path <- "Output/S1_Results"
 if (!dir.exists(path)) {
     dir.create(path)
 }
-### Add subdirectory, if desired (e.g., for test runs)
-additional_folder <- "from-tacc/2025-01-25-test_300-rep_all-linear-conditions-with-all-methods" #additional_folder <- "2025-01-24-test_1-rep_quad" #additional_folder <- "2025-01-23-test_100-reps_all-linear-conditions-with-all-methods" # NULL
+### Add subdirectory, if desired (e.g., for test runs): where do you want results stored
+additional_folder_results <- "2025-01-25-test_300-rep"
+# additional_folder <- "from-tacc/2025-01-25-test_300-rep_all-linear-conditions-with-all-methods" #additional_folder <- "2025-01-24-test_1-rep_quad" #additional_folder <- "2025-01-23-test_100-reps_all-linear-conditions-with-all-methods" # NULL
 ### Check if additional_folder is not NULL to add to path
-if (!is.null(additional_folder)) {
-    path <- file.path(path, additional_folder)
+if (!is.null(additional_folder_results)) {
+    results_path <- file.path(path, additional_folder_results)
 }
 ### Create directory 
-if (!dir.exists(path)) {
-    dir.create(path)
+if (!dir.exists(results_path)) {
+    dir.create(results_path)
 }
 ## Data, Figures, & Tables subfolders 
-if (!dir.exists(paste0(path, "/Data"))) {
-    dir.create(paste0(path, "/Data"))
+if (!dir.exists(paste0(results_path, "/Data"))) {
+    dir.create(paste0(results_path, "/Data"))
 }
-if (!dir.exists(paste0(path, "/Figures"))) {
-    dir.create(paste0(path, "/Figures"))
+if (!dir.exists(paste0(results_path, "/Figures"))) {
+    dir.create(paste0(results_path, "/Figures"))
 }
-if (!dir.exists(paste0(path, "/Tables"))) {
-    dir.create(paste0(path, "/Tables"))
+if (!dir.exists(paste0(results_path, "/Tables"))) {
+    dir.create(paste0(results_path, "/Tables"))
 }
 # Simulation output path 
 sim_output_path <- "Output/S1_Simulation-Output"
+### where to pull output from 
+additional_folder_output <- "from-tacc/2025-01-25-test_300-rep_all-quad-conditions-with-all-methods" #additional_folder <- "2025-01-24-test_1-rep_quad" #additional_folder <- "2025-01-23-test_100-reps_all-linear-conditions-with-all-methods" # NULL
 ### Check if additional_folder is not NULL to add to path
-if (!is.null(additional_folder)) {
-    sim_output_path <- file.path(sim_output_path, additional_folder)
+if (!is.null(additional_folder_output)) {
+    sim_output_path <- file.path(sim_output_path, additional_folder_output)
 }
 
 
@@ -179,7 +182,7 @@ if (!is.null(additional_folder)) {
 # str(rds_data_list)
 
 
-## Extract simulation data -------------------------------------------------
+## Extract simulation data (quadratic) -------------------------------------------------
 
 sim1_data <- NULL  # Store all conditions' data
 
@@ -278,11 +281,11 @@ for (cond in 1:nrow(conditions)) {
 }
 
 # Save data 
-saveRDS(sim1_data, file = paste0(path, "/Data/S1_simulation-data_", sim_date, ".rds"))
+saveRDS(sim1_data, file = paste0(results_path, "/Data/S1_simulation-data_quad_", sim_date, ".rds"))
 
 
 
-### Extract simulation data (when error with non-list elements are p --------
+## Extract simulation data (linear; with non-list elements error --------
 
 ## skipping condition 1 (since it has the error)
 
@@ -479,7 +482,7 @@ for (i in seq_along(temp_data)) {
 sim1_data <- bind_rows(sim1_data1, overall_models)
 
 # Save data 
-saveRDS(sim1_data, file = paste0(path, "/Data/S1_simulation-data_", sim_date, ".rds"))
+saveRDS(sim1_data, file = paste0(results_path, "/Data/S1_simulation-data_linear_", sim_date, ".rds"))
 
 
 
@@ -513,11 +516,101 @@ quad_perf_measures <- readRDS(file = "Output/S1_Results/from-tacc/2025-01-25-tes
 
 
 
+
+
+# Join quad & linear data -------------------------------------------------
+
+# ══════════════════════════════
+#    Simulation data 
+# ══════════════════════════════
+# import data 
+quad_data <- readRDS(file = paste0(results_path, "/Data/S1_simulation-data_", 
+                                   "quad_", 
+                                   sim_date, ".rds"))
+linear_data <- readRDS(file = paste0(results_path, "/Data/S1_simulation-data_", 
+                                     "linear_", 
+                                     sim_date, ".rds"))
+# Stack data 
+sim_data <- bind_rows(cbind(quadratic = TRUE, quad_data), 
+                      cbind(quadratic = FALSE, linear_data))
+# Add condition & method info to data
+## condition 
+sim_data <- sim_data |> 
+    left_join(
+        # conditions df in correct ordering 
+        rbind(
+            cbind(condition = 1:nrow(conditions_all[conditions_all$quadratic == FALSE & conditions_all$if.null == FALSE,]),
+                  conditions_all[conditions_all$quadratic == FALSE & conditions_all$if.null == FALSE,]),
+            cbind(condition = 1:nrow(conditions_all[conditions_all$ quadratic == TRUE & conditions_all$if.null == FALSE,]),
+                  conditions_all[conditions_all$quadratic == TRUE & conditions_all$if.null == FALSE,])
+        ), 
+        by = c("condition", "quadratic"))
+## methods
+sim_data <- sim_data |> 
+    left_join(cbind(model = 1:nrow(methds_all), 
+                    methds_all[, c("Fit", "cluster_opt")])) # check matching: table(sim_data_t$Fit, sim_data_t$num_folds) 
+# Save data 
+saveRDS(sim_data,
+        file = paste0(results_path, "/Data/S1_simulation-data_", sim_date, ".rds")) 
+
+
 # Compute Performance Measures --------------------------------------------
+# import data (with both quad & linear scenarios included)
+sim1_data <- readRDS(file = paste0(results_path, "/Data/S1_simulation-data_", #linear_", 
+                                   sim_date, #"2025-01-12", #sim_date, 
+                                   ".rds"))
+# Compute performance measures 
+perf_summary <- as.data.frame(sim1_data) |> 
+    group_by(quadratic, condition) |> # get one true value per condition 
+    mutate(true_individual_PNDE = mean(individual_pnde), 
+           true_individual_TNIE = mean(individual_tnie), 
+           true_cluster_PNDE = mean(cluster_pnde), 
+           true_cluster_TNIE = mean(cluster_tnie)) |>
+    group_by(quadratic, condition, model) |> 
+    mutate(if_cover_ind_PNDE = (individual_de_CILower < true_individual_PNDE) & (individual_de_CIUpper > true_individual_PNDE), 
+           if_cover_ind_TNIE = (individual_ie_CILower < true_individual_TNIE) & (individual_ie_CIUpper > true_individual_TNIE), 
+           if_cover_clust_PNDE = (cluster_de_CILower < true_cluster_PNDE) & (cluster_de_CIUpper > true_cluster_PNDE), 
+           if_cover_clust_TNIE = (cluster_ie_CILower < true_cluster_TNIE) & (cluster_ie_CIUpper > true_cluster_TNIE) ) |> 
+    summarize(cover_individual_PNDE = mean(if_cover_ind_PNDE), 
+              cover_individual_TNIE = mean(if_cover_ind_TNIE), 
+              bias_individual_PNDE = mean((individual_de_Estimate - true_individual_PNDE)), 
+              bias_individual_TNIE = mean((individual_ie_Estimate - true_individual_TNIE)), 
+              MSE_individual_PNDE = mean((individual_de_Estimate - true_individual_PNDE)^2), 
+              MSE_individual_TNIE = mean((individual_ie_Estimate - true_individual_TNIE)^2), 
+              rejectnull_individual_PNDE = mean((individual_de_CILower > (0)) | (individual_de_CIUpper < (0))), 
+              rejectnull_individual_TNIE = mean((individual_ie_CILower > (0)) | (individual_ie_CIUpper < (0))),
+              true_individual_PNDE = mean(true_individual_PNDE), 
+              true_individual_TNIE = mean(true_individual_TNIE), 
+              # cluster-avg
+              cover_cluster_PNDE = mean(if_cover_clust_PNDE), 
+              cover_cluster_TNIE = mean(if_cover_clust_TNIE), 
+              bias_cluster_PNDE = mean((cluster_de_Estimate - true_cluster_PNDE)), 
+              bias_cluster_TNIE = mean((cluster_ie_Estimate - true_cluster_TNIE)), 
+              MSE_cluster_PNDE = mean((cluster_de_Estimate - true_cluster_PNDE)^2), 
+              MSE_cluster_TNIE = mean((cluster_ie_Estimate - true_cluster_TNIE)^2), 
+              rejectnull_cluster_PNDE = mean((cluster_de_CILower > (0)) | (cluster_de_CIUpper < (0))), 
+              rejectnull_cluster_TNIE = mean((cluster_ie_CILower > (0)) | (cluster_ie_CIUpper < (0))),
+              true_cluster_PNDE = mean(true_cluster_PNDE), 
+              true_cluster_TNIE = mean(true_cluster_TNIE)
+    )
+# Add condition & method info back
+perf_summary <- perf_summary |> 
+    left_join(sim_data[, c("quadratic", "condition", "model", "J", "Nj_low", "Nj_high", "Mfamily", "Yfamily", 
+                           "if.null", "icc", "Fit", "cluster_opt")], 
+              by = c("quadratic", "condition", "model"))
+
+table(perf_summary$quadratic)
+
+perf_summary
+
+saveRDS(perf_summary, file = paste0(results_path, "/Tables/S1_performance-measures_", #linear_", 
+                                    sim_date, ".rds")) #paste0("Output/S1_Results/Tables/S1_performance-measures_", sim_date, ".rds"))
+
 
 ## Bias, Coverage, & MSE (need type I error) -----------------------------------------------------------
 
-sim1_data <- readRDS(file = paste0(path, "/Data/S1_simulation-data_", sim_date, #"2025-01-12", #sim_date, 
+sim1_data <- readRDS(file = paste0(results_path, "/Data/S1_simulation-data_quad_", #linear_", 
+                                   sim_date, #"2025-01-12", #sim_date, 
                                    ".rds"))
 
 # 
@@ -570,7 +663,8 @@ perf_summary <- cbind(method = 1:nrow(methds),
 
 perf_summary
 
-saveRDS(perf_summary, file = paste0(path, "/Tables/S1_performance-measures_", sim_date, ".rds")) #paste0("Output/S1_Results/Tables/S1_performance-measures_", sim_date, ".rds"))
+saveRDS(perf_summary, file = paste0(results_path, "/Tables/S1_performance-measures_quad_", #linear_", 
+                                    sim_date, ".rds")) #paste0("Output/S1_Results/Tables/S1_performance-measures_", sim_date, ".rds"))
 
 # # Individual-avg summary
 # ind_summary <- as.data.frame(sim1_data) |>
@@ -612,9 +706,65 @@ saveRDS(perf_summary, file = paste0(path, "/Tables/S1_performance-measures_", si
 # saveRDS(ind_summary, file = paste0(path, "/Tables/S1_performance-measures_", sim_date, ".rds")) #paste0("Output/S1_Results/Tables/S1_performance-measures_", sim_date, ".rds"))
 
 
+# Join quad & linear data -------------------------------------------------
 
-
-
+# # ══════════════════════════════
+# #    Simulation data 
+# # ══════════════════════════════
+# # import data 
+# quad_data <- readRDS(file = paste0(results_path, "/Data/S1_simulation-data_", 
+#                                    "quad_", 
+#                                    sim_date, ".rds"))
+# linear_data <- readRDS(file = paste0(results_path, "/Data/S1_simulation-data_", 
+#                                      "linear_", 
+#                                      sim_date, ".rds"))
+# # Stack data 
+# sim_data <- bind_rows(cbind(quadratic = TRUE, quad_data), 
+#                       cbind(quadratic = FALSE, linear_data))
+# # Add condition & method info to data
+# ## condition 
+# sim_data <- sim_data |> 
+#     left_join(
+#         # conditions df in correct ordering 
+#         rbind(
+#             cbind(condition = 1:nrow(conditions_all[conditions_all$quadratic == FALSE & conditions_all$if.null == FALSE,]),
+#                   conditions_all[conditions_all$quadratic == FALSE & conditions_all$if.null == FALSE,]),
+#             cbind(condition = 1:nrow(conditions_all[conditions_all$ quadratic == TRUE & conditions_all$if.null == FALSE,]),
+#                   conditions_all[conditions_all$quadratic == TRUE & conditions_all$if.null == FALSE,])
+#         ), 
+#         by = c("condition", "quadratic"))
+# ## methods
+# sim_data <- sim_data |> 
+#     left_join(cbind(model = 1:nrow(methds_all), 
+#                     methds_all[, c("Fit", "cluster_opt")])) # check matching: table(sim_data_t$Fit, sim_data_t$num_folds) 
+# # Save data 
+# saveRDS(sim_data,
+#         file = paste0(results_path, "/Data/S1_simulation-data_", sim_date, ".rds")) 
+# 
+# # ══════════════════════════════
+# #    Performance measures 
+# # ══════════════════════════════
+# # import & performance measures 
+# quad_perf_measures <- readRDS(file = paste0(results_path, "/Tables/", 
+#                                             "S1_performance-measures_",
+#                                             "quad_", 
+#                                             sim_date, ".rds"))
+# linear_perf_measures <- readRDS(file = paste0(results_path, "/Tables/", 
+#                                             "S1_performance-measures_",
+#                                             "linear_", 
+#                                             sim_date, ".rds"))
+# # Stack performance measures 
+# perf_measures <- bind_rows(quad_perf_measures, linear_perf_measures)
+# # Save performance measures 
+# saveRDS(perf_measures,
+#         file = paste0(results_path, "/Tables/S1_performance-measures_", sim_date, ".rds")) 
+# 
+# 
+# table(perf_measures$quadratic)
+# table(linear_perf_measures$quadratic)
+# table(quad_perf_measures$quadratic)
+# 
+# table(sim_data$quadratic)
 
 # Report results (quad scenario) ------------------------------------------
 
@@ -818,46 +968,36 @@ theme_minimal()
 
 # Report results (both quad & linear) -------------------------------------
 
-# import data if not done so 
-# import data & performance measures 
-quad_data <- readRDS(file = "Output/S1_Results/from-tacc/2025-01-25-test_300-rep_all-quad-conditions-with-all-methods/Data/S1_simulation-data_2025-01-25.rds")
-quad_perf_measures <- readRDS(file = "Output/S1_Results/from-tacc/2025-01-25-test_300-rep_all-quad-conditions-with-all-methods/Tables/S1_performance-measures_2025-01-25.rds")
-# import data & performance measures 
-linear_data <- readRDS(file = "Output/S1_Results/from-tacc/2025-01-25-test_300-rep_all-linear-conditions-with-all-methods/Data/S1_simulation-data_2025-01-25.rds")
-linear_perf_measures <- readRDS(file = "Output/S1_Results/from-tacc/2025-01-25-test_300-rep_all-linear-conditions-with-all-methods/Tables/S1_performance-measures_2025-01-25.rds")
+## Visuals -----------------------------------------------------------------
 
-# Stack data & performance measures 
-sim_data <- bind_rows(cbind(quadratic = TRUE, quad_data), 
-                      cbind(quadratic = FALSE, linear_data))
-perf_measures <- bind_rows(quad_perf_measures, linear_perf_measures)
-# Add condition & method info to data
-## condition 
-sim_data <- sim_data |> 
-    left_join(
-        # conditions df in correct ordering 
-        rbind(
-        cbind(condition = 1:nrow(conditions_all[conditions_all$quadratic == FALSE & conditions_all$if.null == FALSE,]),
-              conditions_all[conditions_all$quadratic == FALSE & conditions_all$if.null == FALSE,]),
-        cbind(condition = 1:nrow(conditions_all[conditions_all$ quadratic == TRUE & conditions_all$if.null == FALSE,]),
-              conditions_all[conditions_all$quadratic == TRUE & conditions_all$if.null == FALSE,])
-    ), 
-    by = c("condition", "quadratic"))
-## methods
-sim_data <- sim_data |> 
-    left_join(cbind(model = 1:nrow(methds_all), 
-                    methds_all[, c("Fit", "cluster_opt")])) # check matching: table(sim_data_t$Fit, sim_data_t$num_folds) 
-
-
-
-#
+# import data if needed 
+perf_measures <- readRDS(file = paste0(results_path, "/Tables/S1_performance-measures_", sim_date, ".rds")) 
 
 # ══════════════════════════════
 #    individual-average effects  
 # ══════════════════════════════
 
+# visual settings
+gglayer_theme <- list(theme_bw(),
+                      scale_fill_manual(values = c("#BF5700", #Fixed-effect
+                                                   "#A6CD57", #Random-effect
+                                                   "#333F48")), #Single-level
+                      #"#9CADB7" <-- light gray
+                      # Used following website with university colors: https://projects.susielu.com/viz-palette?
+                      theme(text = element_text(family = "Times New Roman", size = 12),
+                            axis.title = element_text(size = 12),  # Adjust axis title size
+                            axis.text = element_text(size = 10),  # Adjust axis text size
+                            legend.title = element_text(size = 12),  # Legend title size
+                            legend.text = element_text(size = 10),  # Legend text size
+                            strip.text = element_text(size = 12),  # Facet labels
+                            line = element_line(linewidth = 0.5),  # APA recommends thin lines
+                            legend.position = "top"
+                      ))
+
 # Bias for TNIE
+## gaussian 
 perf_measures |> 
-    # filter(Yfamily == "gaussian" & Mfamily == "binomial") |>
+    filter(Yfamily %in% c("gaussian")) |> 
     # filter(cluster_opt == "cwc.FE") |> 
     # filter(Nj_low == 5) |>
     mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
@@ -866,36 +1006,96 @@ perf_measures |>
     ggplot2::geom_hline(yintercept = 0) +
     geom_point() +
     geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
-    facet_grid(interaction(Mfamily, Yfamily) ~ interaction(quadratic, cluster_opt)) + #, labeller = labeller())
+    facet_grid(interaction(Mfamily, Yfamily) ~ interaction(cluster_opt, quadratic)) + #, labeller = labeller())
     labs(
-        title = "Bias for individual-average TNIE",
+        title = "Bias for individual-average TNIE with Gaussian outcome",
         x = "J",
         y = "Bias"
-    ) 
-
-# CI coverage rate for TNIE
+    ) #+
+    # gglayer_theme
+ggsave(filename = paste0(results_path, "/Figures/", 
+                         "S1_bias-individual-avg-TNIE-gaussian-outcome.png"), 
+       plot = last_plot())
+## binomial
 perf_measures |> 
-    # filter(Yfamily == "gaussian" & Mfamily == "binomial") |>
+    filter(Yfamily %in% c("binomial")) |> # & Mfamily == "binomial") |>
     # filter(cluster_opt == "cwc.FE") |> 
     # filter(Nj_low == 5) |>
     mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
            Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")) |> 
-    ggplot(aes(x = factor(J), y = cover_TNIE, color = Fit, shape = Nj_low, linetype = Fit)) +
+    ggplot(aes(x = factor(J), y = bias_individual_TNIE, color = Fit, shape = Nj_low, linetype = Fit)) +
+    ggplot2::geom_hline(yintercept = 0) +
+    geom_point() +
+    geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
+    facet_grid(interaction(Mfamily, Yfamily) ~ interaction(cluster_opt, quadratic)) + #, labeller = labeller())
+    labs(
+        title = "Bias for individual-average TNIE with binomial outcome",
+        x = "J",
+        y = "Bias"
+    ) 
+ggsave(filename = paste0(results_path, "/Figures/", 
+                         "S1_bias-individual-avg-TNIE-binomial-outcome.png"), 
+       plot = last_plot())
+# CI coverage rate for TNIE
+perf_measures |> 
+    # filter(Yfamily %in% c("gaussian")) |> # & Mfamily == "binomial") |>
+    # filter(cluster_opt == "cwc.FE") |> 
+    # filter(Nj_low == 5) |>
+    mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
+           Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")) |> 
+    ggplot(aes(x = factor(J), y = cover_individual_TNIE, color = Fit, shape = Nj_low, linetype = Fit)) +
     ggplot2::geom_hline(yintercept = 1) +
     geom_point() +
     geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
-    facet_grid(interaction(Mfamily, Yfamily) ~ interaction(quadratic, cluster_opt)) + #, labeller = labeller())
+    facet_grid(interaction(Mfamily, Yfamily) ~ interaction(cluster_opt, quadratic)) + #, labeller = labeller())
     labs(
         title = "CI coverage rate for individual-average TNIE",
         x = "J",
         y = "Coverage"
     ) 
-# theme_minimal()
+ggsave(filename = paste0(results_path, "/Figures/", 
+                         "S1_coverage-individual-avg-TNIE.png"), 
+       plot = last_plot())
+# ## gaussian
+# perf_measures |> 
+#     filter(Yfamily %in% c("gaussian")) |> # & Mfamily == "binomial") |>
+#     # filter(cluster_opt == "cwc.FE") |> 
+#     # filter(Nj_low == 5) |>
+#     mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
+#            Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")) |> 
+#     ggplot(aes(x = factor(J), y = cover_individual_TNIE, color = Fit, shape = Nj_low, linetype = Fit)) +
+#     ggplot2::geom_hline(yintercept = 1) +
+#     geom_point() +
+#     geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
+#     facet_grid(interaction(Mfamily, Yfamily) ~ interaction(cluster_opt, quadratic)) + #, labeller = labeller())
+#     labs(
+#         title = "CI coverage rate for individual-average TNIE with Gaussian outcome",
+#         x = "J",
+#         y = "Coverage"
+#     ) 
+# ## binomial 
+# perf_measures |> 
+#     filter(Yfamily %in% c("binomial")) |> # & Mfamily == "binomial") |>
+#     # filter(cluster_opt == "cwc.FE") |> 
+#     # filter(Nj_low == 5) |>
+#     mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
+#            Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")) |> 
+#     ggplot(aes(x = factor(J), y = cover_individual_TNIE, color = Fit, shape = Nj_low, linetype = Fit)) +
+#     ggplot2::geom_hline(yintercept = 1) +
+#     geom_point() +
+#     geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
+#     facet_grid(interaction(Mfamily, Yfamily) ~ interaction(cluster_opt, quadratic)) + #, labeller = labeller())
+#     labs(
+#         title = "CI coverage rate for individual-average TNIE with binomial outcome",
+#         x = "J",
+#         y = "Coverage"
+#     ) 
 
 
 # MSE for TNIE
+## gaussian
 perf_measures |> 
-    # filter(Yfamily == "gaussian" & Mfamily == "binomial") |>
+    filter(Yfamily %in% c("gaussian")) |> # & Mfamily == "binomial") |>
     # filter(cluster_opt == "cwc.FE") |> 
     # filter(Nj_low == 5) |>
     mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
@@ -904,77 +1104,292 @@ perf_measures |>
     ggplot2::geom_hline(yintercept = 0) +
     geom_point() +
     geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
-    facet_grid(interaction(Mfamily, Yfamily) ~ interaction(quadratic, cluster_opt)) + #, labeller = labeller())
+    facet_grid(interaction(Mfamily, Yfamily) ~ interaction(cluster_opt, quadratic)) + #, labeller = labeller())
     labs(
-        title = "MSE for individual-average TNIE",
+        title = "MSE for individual-average TNIE with Gaussian outcome",
+        x = "J",
+        y = "MSE"
+    ) 
+ggsave(filename = paste0(results_path, "/Figures/", 
+                         "S1_MSE-individual-avg-TNIE-gaussian-outcome.png"), 
+       plot = last_plot())
+## binomial
+perf_measures |> 
+    filter(Yfamily %in% c("binomial")) |> # & Mfamily == "binomial") |>
+    # filter(cluster_opt == "cwc.FE") |> 
+    # filter(Nj_low == 5) |>
+    mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
+           Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")) |> 
+    ggplot(aes(x = factor(J), y = MSE_individual_TNIE, color = Fit, shape = Nj_low, linetype = Fit)) +
+    ggplot2::geom_hline(yintercept = 0) +
+    geom_point() +
+    geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
+    facet_grid(interaction(Mfamily, Yfamily) ~ interaction(cluster_opt, quadratic)) + #, labeller = labeller())
+    labs(
+        title = "MSE for individual-average TNIE with binomial outcome",
+        x = "J",
+        y = "MSE"
+    ) 
+ggsave(filename = paste0(results_path, "/Figures/", 
+                         "S1_MSE-individual-avg-TNIE-binomial-outcome.png"), 
+       plot = last_plot())
+# ══════════════════════════════
+#    cluster-average effects  
+# ══════════════════════════════
+# Bias for TNIE
+## gaussian 
+perf_measures |> 
+    filter(Yfamily %in% c("gaussian")) |> # & Mfamily == "binomial") |>
+    # filter(cluster_opt == "cwc.FE") |> 
+    # filter(Nj_low == 5) |>
+    mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
+           Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")) |> 
+    ggplot(aes(x = factor(J), y = bias_cluster_TNIE, color = Fit, shape = Nj_low, linetype = Fit)) +
+    ggplot2::geom_hline(yintercept = 0) +
+    geom_point() +
+    geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
+    facet_grid(interaction(Mfamily, Yfamily) ~ interaction(cluster_opt, quadratic)) + #, labeller = labeller())
+    labs(
+        title = "Bias for cluster-average TNIE with Gaussian outcome",
+        x = "J",
+        y = "Bias"
+    ) 
+ggsave(filename = paste0(results_path, "/Figures/", 
+                         "S1_bias-cluster-avg-TNIE-gaussian-outcome.png"), 
+       plot = last_plot())
+## binomial
+perf_measures |> 
+    filter(Yfamily %in% c("binomial")) |> # & Mfamily == "binomial") |>
+    # filter(cluster_opt == "cwc.FE") |> 
+    # filter(Nj_low == 5) |>
+    mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
+           Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")) |> 
+    ggplot(aes(x = factor(J), y = bias_cluster_TNIE, color = Fit, shape = Nj_low, linetype = Fit)) +
+    ggplot2::geom_hline(yintercept = 0) +
+    geom_point() +
+    geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
+    facet_grid(interaction(Mfamily, Yfamily) ~ interaction(cluster_opt, quadratic)) + #, labeller = labeller())
+    labs(
+        title = "Bias for cluster-average TNIE with binomial outcome",
+        x = "J",
+        y = "Bias"
+    ) 
+ggsave(filename = paste0(results_path, "/Figures/", 
+                         "S1_bias-cluster-avg-TNIE-binomial-outcome.png"), 
+       plot = last_plot())
+
+# CI coverage rate for TNIE
+perf_measures |> 
+    # filter(Yfamily %in% c("gaussian")) |> # & Mfamily == "binomial") |>
+    # filter(cluster_opt == "cwc.FE") |> 
+    # filter(Nj_low == 5) |>
+    mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
+           Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")) |> 
+    ggplot(aes(x = factor(J), y = cover_cluster_TNIE, color = Fit, shape = Nj_low, linetype = Fit)) +
+    ggplot2::geom_hline(yintercept = 1) +
+    geom_point() +
+    geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
+    facet_grid(interaction(Mfamily, Yfamily) ~ interaction(cluster_opt, quadratic)) + #, labeller = labeller())
+    labs(
+        title = "CI coverage rate for cluster-average TNIE",
+        x = "J",
+        y = "Coverage"
+    ) 
+ggsave(filename = paste0(results_path, "/Figures/", 
+                         "S1_coverage-cluster-avg-TNIE.png"), 
+       plot = last_plot())
+# ## gaussian
+# perf_measures |> 
+#     filter(Yfamily %in% c("gaussian")) |> # & Mfamily == "binomial") |>
+#     # filter(cluster_opt == "cwc.FE") |> 
+#     # filter(Nj_low == 5) |>
+#     mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
+#            Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")) |> 
+#     ggplot(aes(x = factor(J), y = cover_cluster_TNIE, color = Fit, shape = Nj_low, linetype = Fit)) +
+#     ggplot2::geom_hline(yintercept = 1) +
+#     geom_point() +
+#     geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
+#     facet_grid(interaction(Mfamily, Yfamily) ~ interaction(cluster_opt, quadratic)) + #, labeller = labeller())
+#     labs(
+#         title = "CI coverage rate for cluster-average TNIE with Gaussian outcome",
+#         x = "J",
+#         y = "Coverage"
+#     ) 
+# ## binomial 
+# perf_measures |> 
+#     filter(Yfamily %in% c("binomial")) |> # & Mfamily == "binomial") |>
+#     # filter(cluster_opt == "cwc.FE") |> 
+#     # filter(Nj_low == 5) |>
+#     mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
+#            Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")) |> 
+#     ggplot(aes(x = factor(J), y = cover_cluster_TNIE, color = Fit, shape = Nj_low, linetype = Fit)) +
+#     ggplot2::geom_hline(yintercept = 1) +
+#     geom_point() +
+#     geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
+#     facet_grid(interaction(Mfamily, Yfamily) ~ interaction(cluster_opt, quadratic)) + #, labeller = labeller())
+#     labs(
+#         title = "CI coverage rate for cluster-average TNIE with binomial outcome",
+#         x = "J",
+#         y = "Coverage"
+#     ) 
+
+
+# MSE for TNIE
+## gaussian
+perf_measures |> 
+    filter(Yfamily %in% c("gaussian")) |> # & Mfamily == "binomial") |>
+    # filter(cluster_opt == "cwc.FE") |> 
+    # filter(Nj_low == 5) |>
+    mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
+           Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")) |> 
+    ggplot(aes(x = factor(J), y = MSE_cluster_TNIE, color = Fit, shape = Nj_low, linetype = Fit)) +
+    ggplot2::geom_hline(yintercept = 0) +
+    geom_point() +
+    geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
+    facet_grid(interaction(Mfamily, Yfamily) ~ interaction(cluster_opt, quadratic)) + #, labeller = labeller())
+    labs(
+        title = "MSE for cluster-average TNIE with Gaussian outcome",
+        x = "J",
+        y = "MSE"
+    ) 
+ggsave(filename = paste0(results_path, "/Figures/", 
+                         "S1_MSE-cluster-avg-TNIE-gaussian-outcome.png"), 
+       plot = last_plot())
+## binomial
+perf_measures |> 
+    filter(Yfamily %in% c("binomial")) |> # & Mfamily == "binomial") |>
+    # filter(cluster_opt == "cwc.FE") |> 
+    # filter(Nj_low == 5) |>
+    mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
+           Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")) |> 
+    ggplot(aes(x = factor(J), y = MSE_cluster_TNIE, color = Fit, shape = Nj_low, linetype = Fit)) +
+    ggplot2::geom_hline(yintercept = 0) +
+    geom_point() +
+    geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
+    facet_grid(interaction(Mfamily, Yfamily) ~ interaction(cluster_opt, quadratic)) + #, labeller = labeller())
+    labs(
+        title = "MSE for cluster-average TNIE with binomial outcome",
+        x = "J",
+        y = "MSE"
+    ) 
+ggsave(filename = paste0(results_path, "/Figures/", 
+                         "S1_MSE-cluster-avg-TNIE-binomial-outcome.png"), 
+       plot = last_plot())
+
+## Tables ------------------------------------------------------------------
+
+# Bias individual-average TNIE
+perf_measures %>%
+    filter(Yfamily %in% c("gaussian", "binomial")) %>%
+    mutate(
+        quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"),
+        Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")
+    ) %>%
+    group_by(Yfamily, Mfamily, quadratic, cluster_opt, J, Nj_low, Fit) %>%
+    summarise(
+        avg_bias = mean(bias_individual_TNIE, na.rm = TRUE),
+        .groups = "drop"
+    ) %>%
+    pivot_wider(
+        names_from = c(Fit, Nj_low),
+        values_from = avg_bias,
+        names_prefix = "bias_"
+    ) %>%
+    arrange(Yfamily, Mfamily, quadratic, cluster_opt, J) |> 
+    print(n = Inf)
+
+# CI coverage individual-average TNIE
+perf_measures %>%
+    filter(Yfamily %in% c("gaussian", "binomial")) %>%
+    mutate(
+        quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"),
+        Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")
+    ) %>%
+    group_by(Yfamily, Mfamily, quadratic, cluster_opt, J, Nj_low, Fit) %>%
+    summarise(
+        avg_coverage = mean(cover_individual_TNIE, na.rm = TRUE),
+        .groups = "drop"
+    ) %>%
+    pivot_wider(
+        names_from = c(Fit, Nj_low),
+        values_from = avg_coverage,
+        names_prefix = "coverage_"
+    ) %>%
+    arrange(Yfamily, Mfamily, quadratic, cluster_opt, J) |> 
+    print(n = Inf)
+# MSE individual-average TNIE
+perf_measures %>%
+    filter(Yfamily %in% c("gaussian", "binomial")) %>%
+    mutate(
+        quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"),
+        Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")
+    ) %>%
+    group_by(Yfamily, Mfamily, quadratic, cluster_opt, J, Nj_low, Fit) %>%
+    summarise(
+        avg_MSE = mean(MSE_individual_TNIE, na.rm = TRUE),
+        .groups = "drop"
+    ) %>%
+    pivot_wider(
+        names_from = c(Fit, Nj_low),
+        values_from = avg_MSE,
+        names_prefix = "MSE_"
+    ) %>%
+    arrange(Yfamily, Mfamily, quadratic, cluster_opt, J) |> 
+    # view()
+    print(n = Inf)
+
+perf_measures |> 
+    filter(quadratic == "TRUE" & J == 40 & Nj_low == 5) |> 
+    group_by(Yfamily, Mfamily, quadratic, cluster_opt, J, Nj_low, Fit) |> 
+    summarise(
+        min_MSE = min(MSE_individual_TNIE), 
+        avg_MSE = mean(MSE_individual_TNIE, na.rm = TRUE),
+        med_MSE = median(MSE_individual_TNIE), 
+        max = max(MSE_individual_TNIE),
+        .groups = "drop"
+    ) 
+
+perf_measures$MSE_individual_TNIE
+
+# Checking extreme MSE values 
+perf_measures |> 
+    filter(Yfamily %in% c("binomial")) |> # & Mfamily == "binomial") |>
+    filter(Mfamily %in% c("gaussian") & quadratic == TRUE & cluster_opt == "cwc") |> 
+    # filter(cluster_opt == "cwc.FE") |> 
+    # filter(Nj_low == 5) |>
+    mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
+           Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")) |> 
+    ggplot(aes(x = factor(J), y = MSE_individual_TNIE, color = Fit, shape = Nj_low, linetype = Fit)) +
+    ggplot2::geom_hline(yintercept = 0) +
+    geom_point() +
+    geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
+    # facet_grid(interaction(Mfamily, Yfamily) ~ interaction(cluster_opt, quadratic)) + #, labeller = labeller())
+    labs(
+        title = "MSE for individual-average TNIE with binomial outcome",
         x = "J",
         y = "MSE"
     ) 
 
 
+perf_measures |> 
+    filter(Yfamily %in% c("binomial")) |> # & Mfamily == "binomial") |>
+    # filter(cluster_opt == "cwc.FE") |> 
+    # filter(Nj_low == 5) |>
+    mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
+           Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")) |> 
+    ungroup() |> 
+    filter(cluster_opt == "cwc" & Mfamily == "binomial" & quadratic == "nonlinear" & Nj_low == "U[50, 100]") |> 
+    select(quadratic, J, Nj_low, Mfamily, Yfamily, Fit, cluster_opt, "MSE_individual_TNIE") |> # starts_with("MSE_"))
+    # view()
+    group_by(Fit) |> 
+    summarize(min_MSE = min(MSE_individual_TNIE), 
+              avg_MSE = mean(MSE_individual_TNIE, na.rm = TRUE),
+              med_MSE = median(MSE_individual_TNIE), 
+              max = max(MSE_individual_TNIE))
+
 # ══════════════════════════════
-#    cluster-average effects  
+#    check overlap 
 # ══════════════════════════════
-
-# # Bias for TNIE
-# perf_measures |> 
-#     # filter(Yfamily == "gaussian" & Mfamily == "binomial") |>
-#     # filter(cluster_opt == "cwc.FE") |> 
-#     # filter(Nj_low == 5) |>
-#     mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
-#            Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")) |> 
-#     ggplot(aes(x = factor(J), y = bias_individual_TNIE, color = Fit, shape = Nj_low, linetype = Fit)) +
-#     ggplot2::geom_hline(yintercept = 0) +
-#     geom_point() +
-#     geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
-#     facet_grid(interaction(Mfamily, Yfamily) ~ interaction(quadratic, cluster_opt)) + #, labeller = labeller())
-#     labs(
-#         title = "Bias for individual-average TNIE",
-#         x = "J",
-#         y = "Bias"
-#     ) 
-# 
-# # CI coverage rate for TNIE
-# perf_measures |> 
-#     # filter(Yfamily == "gaussian" & Mfamily == "binomial") |>
-#     # filter(cluster_opt == "cwc.FE") |> 
-#     # filter(Nj_low == 5) |>
-#     mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
-#            Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")) |> 
-#     ggplot(aes(x = factor(J), y = cover_TNIE, color = Fit, shape = Nj_low, linetype = Fit)) +
-#     ggplot2::geom_hline(yintercept = 1) +
-#     geom_point() +
-#     geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
-#     facet_grid(interaction(Mfamily, Yfamily) ~ interaction(quadratic, cluster_opt)) + #, labeller = labeller())
-#     labs(
-#         title = "CI coverage rate for individual-average TNIE",
-#         x = "J",
-#         y = "Coverage"
-#     ) 
-# # theme_minimal()
-# 
-# 
-# # MSE for TNIE
-# perf_measures |> 
-#     # filter(Yfamily == "gaussian" & Mfamily == "binomial") |>
-#     # filter(cluster_opt == "cwc.FE") |> 
-#     # filter(Nj_low == 5) |>
-#     mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
-#            Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")) |> 
-#     ggplot(aes(x = factor(J), y = MSE_individual_TNIE, color = Fit, shape = Nj_low, linetype = Fit)) +
-#     ggplot2::geom_hline(yintercept = 0) +
-#     geom_point() +
-#     geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
-#     facet_grid(interaction(Mfamily, Yfamily) ~ interaction(quadratic, cluster_opt)) + #, labeller = labeller())
-#     labs(
-#         title = "MSE for individual-average TNIE",
-#         x = "J",
-#         y = "MSE"
-#     ) 
-
-
-
-
 # check overlap 
 ## function to extract percentages
 extract_psnum <- function(text, pattern) {
