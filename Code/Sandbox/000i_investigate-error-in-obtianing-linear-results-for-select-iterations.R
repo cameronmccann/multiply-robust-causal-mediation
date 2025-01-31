@@ -1,51 +1,34 @@
 ################################################################################
-############################## Simulation(s) ###################################
+##################### Testing Data Generation Functions ####################
 ################################################################################
+
 ############################ Script Description ################################
 #
-# Author: Cameron McCann
+# Author: Your Name
 # 
-# Date Created: 2025-01-01
+# Date Created: 2025-01-30
 #
 #
 # Script Description: 
+#   I am using this script to figure out what is causing the error(s) in 
+# linear scenario for select iterations (4, 132, 260 for condition 1 only; 
+# J=10, nj=[50,100] with binomial medaitor & outcome). 
 # 
-#       Note: data generation creates pop data (when Mfamily & Yfamily meet "gaussian" &. "binomial") for every iteration but only saves first iteration into pop data folder. 
-#
-#
-# Last Updated: 2025-01-31
+# 
+# ══════════════════════════════
+#    RESOLVED: since I am not getting this issue again after running the simulation (100 reps or less) mulitple times, I am considering it resolved.  
+# ══════════════════════════════
+# 
+# Last Updated: 2025-01-30  
 #
 #
 # Notes:
-#   To-Do: 
-#       - {Still need to Finish updating anlaysis functions (helper and overall)} 
-#       - test run parametric analysis, then generate nonlinear data & test parameteric analysis 
-# 
-#       - update functions to handle: 
-#           + varing cluster size, using uniform distribution? 
-#           + nonlinear relations between z & xs with t, m, & y
-#       - first test parametric model before using machine learning models 
-#           + we will test 2 (dich./contin. mediator) x 2 (dich./contin. outcome) scenario 
-#           + performance criteria: power, coverage, bias, RMSE, etc
-#           + test 100 reps, 200, 500, and then 1,000 reps for final 
+#   To-Do:
 #
 #   Done: 
-
-# Note:
-#   code used for seeds in Dr Liu's code: 
-        # set.seed(12)
-        # datseeds <- c(sample(1:1e6, 3000), sample(1:1e6+1e6, 200))
-
 #
 ################################################################################
 
-
-# # This can potentially speed up code
-# library(compiler)
-# enableJIT(3)
-
-# set directory 
-# setwd("/home1/10384/cameronmccann/multiply-robust-causal-mediation") # temp-2025-01-23-test_multiply-robust-causal-mediation")
 
 # Load packages & functions ----------------------------------------------------
 
@@ -137,8 +120,8 @@ icc = c(0.2))
 
 # limit conditions for testing 
 conditions <- conditions_all |> 
-    filter(quadratic == T) |> 
-    filter(if.null == T) |> 
+    filter(quadratic == F) |> 
+    filter(if.null == F) |> 
     # filter(J %in% c(40)) |> # c(20)) |> # c(70)) |>
     # filter(Nj_low %in% c(50)) |>
     filter(Mfamily %in% c("binomial", "gaussian"), Yfamily %in% c("binomial", "gaussian")) #, "gaussian")) # c("binomial")) #, Yfamily %in% c("gaussian"))
@@ -179,25 +162,37 @@ methds <- methds_all |>
 
 
 
-# Set seeds, reps, & folders ----------------------------------------------
+# Set seeds & cond --------------------------------------------------------
 
-# # Set seed & condition 
-# set.seed(12)
-# datseeds <- c(sample(1:1e6, 3000), sample(1:1e6+1e6, 200))
-# 
-# iseed <- 9
-# cond <- 1
+# Set seed & condition 
+set.seed(12)
+datseeds <- c(sample(1:1e6, 3000), sample(1:1e6+1e6, 200))
+
+conditions
+
+datseeds[c(4, 132, 260)]
+# [1] 721442 814237 814286
+
+# load simulation output to look at list
+linear_c1 <- readRDS("Output/S1_Simulation-Output/from-tacc/2025-01-25-test_300-rep_all-linear-conditions-with-all-methods/S1_condition-01_reps-300_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-10.rds")
+
+# Below is there error I get for each of the 3 iterations 
+# Error in internal function `v.ac()`: no applicable method for 'predict' applied to an object of class \"NULL\"\n"
+
+
+
+
+# Sim code ----------------------------------------------------------------
+
 
 # Number of replications
-# reps <- 3 #200 # #10 #100 # 10 # 200 # 1000
-reps <- 300 #200 #
+reps <- 2#200 #5 #10 #100 # 10 # 200 # 1000
+# reps <- 300 #200 #100
 
 # Create parent output directory
 path <- "Output/S1_Simulation-Output"
 ## Add subdirectory, if desired (e.g., for test runs)
 # additional_folder <- "2025-01-27_200-rep_all-linear-conditions-with-all-methods" #"2025-01-25-test_300-rep_all-quad-conditions-with-all-methods" #additional_folder <- "2025-01-24-test_100-rep_all-quad-conditions-with-all-methods" # NULL additional_folder <- "2025-01-23-test_200-reps_all-linear-conditions-with-all-methods" # NULL
-additional_folder <- "2025-01-31-test_null-quad-scenario"
-# additional_folder <- "2025-01-30-test_null-linear-scenario"
 ## Check if additional_folder is not NULL to add to path
 if (!exists("additional_folder") || !is.null(additional_folder)) {
     path <- file.path(path, additional_folder)
@@ -215,15 +210,16 @@ if (!dir.exists(pop_data_folder)) dir.create(pop_data_folder)
 # ══════════════════════════════
 #     Set Up Parallel 
 # ══════════════════════════════
-Sys.setenv(OPENBLAS_NUM_THREADS = 1, OMP_NUM_THREADS = 1, MKL_NUM_THREADS = 1)  # Avoid nested threads
-
-# Detect available cores and dynamically allocate
-min_cores <- 10  # Minimum cores to use
-preferred_cores <- 150 #20  # Preferred minimum if available
-available_cores <- parallel::detectCores(logical = TRUE)  # Detect all logical cores
-
-n_cores <- max(min_cores, min(preferred_cores, available_cores))  # Use a reasonable number of cores
-message(glue("Detected {available_cores} cores. Using {n_cores} cores for parallel computing."))
+# Sys.setenv(OPENBLAS_NUM_THREADS = 1, OMP_NUM_THREADS = 1, MKL_NUM_THREADS = 1)  # Avoid nested threads
+# 
+# # Detect available cores and dynamically allocate
+# min_cores <- 10  # Minimum cores to use
+# preferred_cores <- 150 #20  # Preferred minimum if available
+# available_cores <- parallel::detectCores(logical = TRUE)  # Detect all logical cores
+# 
+# n_cores <- max(min_cores, min(preferred_cores, available_cores))  # Use a reasonable number of cores
+# message(glue("Detected {available_cores} cores. Using {n_cores} cores for parallel computing."))
+n_cores <- parallel::detectCores()-1
 
 # n_cores <- 4#0 # parallel::detectCores(logical = TRUE) - 1
 # cl <- parallel::makeCluster(n_cores)
@@ -245,13 +241,14 @@ OverallPar_time <- data.frame(
 )
 
 
+
+
 ### main loop ---------------------------------------------------------------
 
 # ══════════════════════════════
 #     Main Loop Over Conditions
 # ══════════════════════════════
-# n_cores <- 1
-total_conditions <- nrow(conditions) #total_conditions <- 1 
+total_conditions <- 1 #total_conditions <- nrow(conditions) #
 for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
     
     cond <- conditions[cond_idx, ]
@@ -266,33 +263,26 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
         "quad={isQuad}, M={Mfamily}, Y={Yfamily}, nj=[{Nj_low},{Nj_high}], J={Jval}"
     )
     
-
+    
     ### Start timing for condition ----------------------------------------------
     start_time_cond <- Sys.time()
     set.seed(12)
     seeds <- c(sample(1:1e6, 3000), sample(1:1e6+1e6, 200)) #datseeds <- c(sample(1:1e6, 3000), sample(1:1e6+1e6, 200))
     # seeds <- sample.int(1e7, reps)
-    # seeds <- seeds[131:133] #[259:261]
-    # seeds <- c(721442, 814237, 814286) #problematic seed nums
     
-    result_list <- parallel::mclapply(seq_len(reps), function(rep_idx) {
-        # catching error 
-        tryCatch({
-            
+    result_list <- parallel::mclapply(seq_len(reps)+3, function(rep_idx) {      # ADD 4 TO GET 4TH SEED
         Sys.setenv(OPENBLAS_NUM_THREADS = 1, OMP_NUM_THREADS = 1)  # Ensure settings per worker
         start_time_iter <- Sys.time()
-        set.seed(seeds[rep_idx])
+        set.seed(seeds[rep_idx]) 
         
-        # message 
-        cat("Starting rep_idx =", rep_idx, "...\n")
-    # result_list <- foreach(
-    #     rep_idx = seq_len(reps),
-    #     .packages = c("dplyr", "ggplot2", "glue", "purrr"), 
-    #     # .export = c("cond_idx")
-    #     .export = c("get_inference") #, "internal_estimate_mediation")  # Explicitly include your custom functions
-    # ) %dopar% {
-    #     start_time_iter <- Sys.time()
-    #     set.seed(seeds[rep_idx])
+        # result_list <- foreach(
+        #     rep_idx = seq_len(reps),
+        #     .packages = c("dplyr", "ggplot2", "glue", "purrr"), 
+        #     # .export = c("cond_idx")
+        #     .export = c("get_inference") #, "internal_estimate_mediation")  # Explicitly include your custom functions
+        # ) %dopar% {
+        #     start_time_iter <- Sys.time()
+        #     set.seed(seeds[rep_idx])
         
         # tryCatch({#
         ### Generate data -----------------------------------------------------------
@@ -370,7 +360,7 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
         
         ########################################################################
         # INSERT ESTIMATION CODE HERE 
-
+        
         ### Estimate effects --------------------------------------------------------
         results <- list()
         for (meth in 1:nrow(methds)) {
@@ -425,49 +415,10 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
         }
         
         
-        ###
-        # clust_opt <- c("noncluster.glm", "FE.glm", "RE.glm") # "cwc", "cwc.FE"
-        # results <- list()
-        # 
-        # for (opt in clust_opt) {
-        #     warnings_list <- character(0)  # Reset warnings for each iteration
-        #     
-        #     estimates <- withCallingHandlers(
-        #         {
-        #             estimate_mediation(
-        #                 data = sim_data$data,
-        #                 Sname = "school",
-        #                 Wnames = NULL,
-        #                 Xnames = names(sim_data$data)[grep("^X", names(sim_data$data))],
-        #                 Aname = "A",
-        #                 Mnames = "M",
-        #                 Yname = "Y",
-        #                 learners_a = c("SL.glm"),
-        #                 learners_m = c("SL.glm"),
-        #                 learners_y = c("SL.glm"),
-        #                 cluster_opt = opt,  
-        #                 num_folds = 1
-        #             )
-        #         },
-        #         warning = function(w) {
-        #             warnings_list <<- c(warnings_list, conditionMessage(w))  # Append warning message
-        #             invokeRestart("muffleWarning")  # Muffle warning to continue
-        #         }
-        #     )
-        #     
-        #     # Store results and warnings in the list for this iteration
-        #     results[[opt]] <- list(
-        #         estimates = estimates,
-        #         warnings = warnings_list, 
-        #         num_folds = 1           # change later
-        #     )
-        # }
-        
         ########################################################################
         
         end_time_iter <- Sys.time()
         iter_duration <- as.numeric(difftime(end_time_iter, start_time_iter, units = "mins"))
-        
         
         ########################################################################
         # Prep data for export (update code that follows this)
@@ -500,16 +451,9 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
         # # clear up space
         # rm(sim_data, results, estimates, warnings_list)
         # 
-        # message 
-        cat("Finished rep_idx =", rep_idx, "...\n")
-        # Return the iteration data
-        return(iteration_data)
-        }, error = function(e) {
-            list(iteration = rep_idx, 
-                 error = TRUE, 
-                 message = conditionMessage(e))
-        })
-    # })# 
+        # # Return the iteration data
+        # iteration_data
+        # })# 
     }, mc.cores = n_cores)# End of mclapply
     
     # # Validate structure of result_list #
@@ -529,12 +473,6 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
     #         iter_time_sec = .x$iter_time_sec
     #     )
     # })
-    
-    # Check structure
-    str(result_list)
-    purrr::map(result_list, names)
-    
-    
     # Safely extract fields for the summary
     iteration_summary_df <- purrr::map_dfr(result_list, function(res) {
         if (is.null(res$iteration) || is.null(res$seed) || is.null(res$cond_idx)) {
@@ -606,49 +544,141 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
     ))
 }
 
-# ══════════════════════════════
-#     Save Overall Timing and Total Time
-# ══════════════════════════════
-# total_time_sum <- sum(as.numeric(gsub(" min.*", "", OverallPar_time$total_time)) * 60 + as.numeric(sub(".*min ", "", gsub(" s", "", OverallPar_time$total_time_min))))
-# message(glue("Total computation time: {floor(total_time_sum / 60)} min {round(total_time_sum %% 60)} s"))
-# saveRDS(OverallPar_time, file.path(path, "S1_Computation-Time.rds"))
 
-total_seconds <- sum(
-    OverallPar_time %>%
-        mutate(
-            minutes = as.numeric(str_extract(total_time, "\\d+(?= min)")),
-            seconds = as.numeric(str_extract(total_time, "\\d+(?= s)"))
-        ) %>%
-        mutate(minutes = ifelse(is.na(minutes), 0, minutes),  # Handle cases with only seconds
-               seconds = ifelse(is.na(seconds), 0, seconds)) %>%
-        summarise(total_seconds = sum(minutes * 60 + seconds)) %>%
-        pull(total_seconds)
+# Running the 4th iteration (with the same seed: 721442) completes with no error &, as seen below, results in estimates
+# So there is no issue with the data generation or estimation processes. 
+# look at result 
+test1 <- readRDS(file = "Output/S1_Simulation-Output/S1_condition-01_reps-1_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-10.rds") 
+
+view(test1)
+
+
+# ran 5 reps for condition 1 in conduct sim script 
+simtest2 <- readRDS(file = "Output/S1_Simulation-Output/testing-2025-01-30/S1_condition-01_reps-5_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-10.rds") 
+
+# ran 100 reps for condition 1 in conduct sim script 
+simtest3 <- readRDS(file = "Output/S1_Simulation-Output/testing-2025-01-30/S1_condition-01_reps-100_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-10.rds") 
+
+
+# Test on 1 dataset -------------------------------------------------------
+
+# problematic iteration 
+seed132 <- datseeds[132] #datseeds[c(4, 132, 260)]
+
+# select condition 1 (problematic condition) #conditions
+cond_idx <- 1
+
+cond <- conditions[cond_idx, ]
+isQuad <- cond[["quadratic"]]
+Mfamily <- cond[["Mfamily"]]
+Yfamily <- cond[["Yfamily"]]
+Nj_low <- cond[["Nj_low"]]
+Nj_high <- cond[["Nj_high"]]
+Jval <- cond[["J"]]
+
+
+sim_data <- generate_data2.0c(
+    J = Jval, 
+    njrange = c(Nj_low, Nj_high), 
+    Mfamily = Mfamily,
+    Yfamily = Yfamily,
+    seed = seed132, # seeds[rep_idx],
+    quadratic.A = isQuad,
+    quadratic.M = isQuad,
+    quadratic.Y = isQuad,
+    num_x = 3,
+    include_overlapMsg = TRUE, # FALSE,
+    plot_PSdiagnostics = FALSE, 
+    
+    m_on_a = 0.2, 
+    m_on_az = 0.2, 
+    m_on_anj = 0.2, 
+    m_on_x = sqrt(0.15 / 3), #num_x
+    m_on_z = sqrt(0.4), 
+    y_on_a = 0.2, 
+    y_on_m = 1, 
+    y_on_am = 0, 
+    y_on_az = 0.2, 
+    y_on_mz = 0.2, 
+    y_on_anj = 0.2, 
+    y_on_x = sqrt(0.15 / 3), #num_x
+    y_on_z = sqrt(0.4), 
+    yintercept = 1, 
+    x_z = 0 
+    # include_truevals = TRUE, # FALSE, 
+    
+    # m_on_a = 2, 
+    # m_on_anj = 0.5,
+    # m_on_az = 0.2,
+    # y_on_a = 1, 
+    # y_on_m = 2, 
+    # y_on_am = 2, 
+    # y_on_az = 0.2,
+    # y_on_mz = 0.2,
+    # y_on_anj = 1
+    
+    # m_on_a = 15,
+    # m_on_anj = 0.5,
+    # m_on_az = 0.2,
+    # y_on_a = 2,
+    # y_on_m = 15,
+    # y_on_am = 5,
+    # y_on_az = 0.2,
+    # y_on_mz = 0.2,
+    # y_on_anj = 5,
+    # int.XZ = FALSE 
 )
 
-# Convert total seconds to minutes and seconds
-total_minutes <- floor(total_seconds / 60)
-remaining_seconds <- total_seconds %% 60
 
-message(glue("Total computation time: {total_minutes} min {remaining_seconds} s"))
+for (meth in 1:nrow(methds)) {
+    Fit <- as.character(methds$Fit[meth])
+    
+    if (Fit == "glm") {
+        learners_a <- learners_m <- learners_y <- c("SL.glm")
+        num_folds <- 1
+    }
+    
+    if (Fit == "mlr") {
+        learners_a <- learners_m <- learners_y <- c("SL.nnet", "SL.gam")
+        num_folds <- 5
+    }
+    
+    cluster_opt <- methds$cluster_opt[meth]
+    
+    warnings_list <- character(0)  # Reset warnings for each iteration
+    
+    estimates <- withCallingHandlers(
+        {
+            estimate_mediation(
+                data = sim_data$data,
+                Sname = "school",
+                Wnames = NULL,
+                Xnames = names(sim_data$data)[grep("^X", names(sim_data$data))],
+                Aname = "A",
+                Mnames = "M",
+                Yname = "Y",
+                learners_a = learners_a,
+                learners_m = learners_m,
+                learners_y = learners_y,
+                cluster_opt = cluster_opt,  
+                num_folds = num_folds
+            )
+        },
+        warning = function(w) {
+            warnings_list <<- c(warnings_list, conditionMessage(w))  # Append warning message
+            invokeRestart("muffleWarning")  # Muffle warning to continue
+        }
+    )
+    
+    # Store results and warnings in the list for this iteration
+    results[[glue::glue("{methds$Fit[meth]}-{methds$cluster_opt[meth]}")]] <- list(
+        Fit = methds$Fit[[meth]], 
+        cluster_opt = methds$cluster_opt[[meth]], 
+        # methds[1, ], 
+        num_folds = num_folds, 
+        estimates = estimates,
+        warnings = warnings_list
+    )
+}
 
-# Add total time to Computation time file & save 
-OverallPar_time <- rbind(OverallPar_time,
-                         c(
-                             NA,
-                             NA,
-                             sum(OverallPar_time$n_reps),
-                             glue("{total_minutes} min {remaining_seconds} s"),
-                             NA
-                         ))
-saveRDS(OverallPar_time, file.path(path, "S1_Computation-Time.rds"))
-
-# ══════════════════════════════
-#     Shutdown Parallel 
-# ══════════════════════════════
-# stopCluster(cl)
-
-
-# END OF SCRIPT MESSAGE
-# BRRR::skrrrahh_list()
-# BRRR::skrrrahh("biggie")
-# BRRR::skrrrahh("kendrick")
+# Test Generate data  -----------------------------------------------------

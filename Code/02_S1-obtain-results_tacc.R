@@ -14,7 +14,7 @@
 #       first simulation study (i.e., obtains performance measures). 
 #
 #
-# Last Updated: 2025-01-30
+# Last Updated: 2025-01-31
 #
 #
 # Notes:
@@ -973,10 +973,6 @@ theme_minimal()
 # import data if needed 
 perf_measures <- readRDS(file = paste0(results_path, "/Tables/S1_performance-measures_", sim_date, ".rds")) 
 
-# ══════════════════════════════
-#    individual-average effects  
-# ══════════════════════════════
-
 # visual settings
 gglayer_theme <- list(theme_bw(),
                       scale_fill_manual(values = c("#BF5700", #Fixed-effect
@@ -994,6 +990,11 @@ gglayer_theme <- list(theme_bw(),
                             legend.position = "top"
                       ))
 
+### TNIE --------------------------------------------------------------------
+
+# ══════════════════════════════
+#    individual-average effects  
+# ══════════════════════════════
 # Bias for TNIE
 ## gaussian 
 perf_measures |> 
@@ -1133,6 +1134,26 @@ perf_measures |>
 ggsave(filename = paste0(results_path, "/Figures/", 
                          "S1_MSE-individual-avg-TNIE-binomial-outcome.png"), 
        plot = last_plot())
+
+# Power for TNIE
+perf_measures |> 
+    mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
+           Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")) |> 
+    ggplot(aes(x = factor(J), y = rejectnull_individual_TNIE, color = Fit, shape = Nj_low, linetype = Fit)) +
+    ggplot2::geom_hline(yintercept = 1) +
+    geom_point() +
+    geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
+    facet_grid(interaction(Mfamily, Yfamily) ~ interaction(cluster_opt, quadratic)) + #, labeller = labeller())
+    labs(
+        title = "Power for individual-average TNIE",
+        x = "J",
+        y = "Power"
+    ) 
+ggsave(filename = paste0(results_path, "/Figures/", 
+                         "S1_power-individual-avg-TNIE.png"), 
+       plot = last_plot())
+
+
 # ══════════════════════════════
 #    cluster-average effects  
 # ══════════════════════════════
@@ -1276,6 +1297,79 @@ ggsave(filename = paste0(results_path, "/Figures/",
                          "S1_MSE-cluster-avg-TNIE-binomial-outcome.png"), 
        plot = last_plot())
 
+# Power for TNIE
+perf_measures |> 
+    mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
+           Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")) |> 
+    ggplot(aes(x = factor(J), y = rejectnull_cluster_TNIE, color = Fit, shape = Nj_low, linetype = Fit)) +
+    ggplot2::geom_hline(yintercept = 1) +
+    geom_point() +
+    geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
+    facet_grid(interaction(Mfamily, Yfamily) ~ interaction(cluster_opt, quadratic)) + #, labeller = labeller())
+    labs(
+        title = "Power for cluster-average TNIE",
+        x = "J",
+        y = "Power"
+    ) 
+ggsave(filename = paste0(results_path, "/Figures/", 
+                         "S1_power-cluster-avg-TNIE.png"), 
+       plot = last_plot())
+
+
+
+### PNDE --------------------------------------------------------------------
+
+# ══════════════════════════════
+#    individual-average effects  
+# ══════════════════════════════
+# Bias for PNDE
+## gaussian 
+perf_measures |> 
+    filter(Yfamily %in% c("gaussian")) |> 
+    # filter(cluster_opt == "cwc.FE") |> 
+    # filter(Nj_low == 5) |>
+    mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
+           Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")) |> 
+    ggplot(aes(x = factor(J), y = bias_individual_PNDE, color = Fit, shape = Nj_low, linetype = Fit)) +
+    ggplot2::geom_hline(yintercept = 0) +
+    geom_point() +
+    geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
+    facet_grid(interaction(Mfamily, Yfamily) ~ interaction(cluster_opt, quadratic)) + #, labeller = labeller())
+    labs(
+        title = "Bias for individual-average PNDE with Gaussian outcome",
+        x = "J",
+        y = "Bias"
+    ) #+
+# gglayer_theme
+ggsave(filename = paste0(results_path, "/Figures/", 
+                         "S1_bias-individual-avg-PNDE-gaussian-outcome.png"), 
+       plot = last_plot())
+## binomial
+perf_measures |> 
+    filter(Yfamily %in% c("binomial")) |> # & Mfamily == "binomial") |>
+    # filter(cluster_opt == "cwc.FE") |> 
+    # filter(Nj_low == 5) |>
+    mutate(quadratic = ifelse(quadratic == TRUE, "nonlinear", "linear"), 
+           Nj_low = ifelse(Nj_low == 5, "U[5, 20]", "U[50, 100]")) |> 
+    ggplot(aes(x = factor(J), y = bias_individual_PNDE, color = Fit, shape = Nj_low, linetype = Fit)) +
+    ggplot2::geom_hline(yintercept = 0) +
+    geom_point() +
+    geom_line(aes(group = interaction(cluster_opt, Fit, Nj_low))) +
+    facet_grid(interaction(Mfamily, Yfamily) ~ interaction(cluster_opt, quadratic)) + #, labeller = labeller())
+    labs(
+        title = "Bias for individual-average PNDE with binomial outcome",
+        x = "J",
+        y = "Bias"
+    ) 
+ggsave(filename = paste0(results_path, "/Figures/", 
+                         "S1_bias-individual-avg-PNDE-binomial-outcome.png"), 
+       plot = last_plot())
+
+
+
+
+
+
 ## Tables ------------------------------------------------------------------
 
 # Bias individual-average TNIE
@@ -1387,6 +1481,13 @@ perf_measures |>
               med_MSE = median(MSE_individual_TNIE), 
               max = max(MSE_individual_TNIE))
 
+
+
+
+# Overlap  ----------------------------------------------------------------
+
+sim_data <- readRDS(file = paste0(results_path, "/Data/S1_simulation-data_2025-01-25.rds"))
+
 # ══════════════════════════════
 #    check overlap 
 # ══════════════════════════════
@@ -1400,14 +1501,116 @@ extract_psnum <- function(text, pattern) {
 sim_data$psLowPct <- sapply(sim_data$ps_overlap, extract_psnum, pattern = "\\d+\\.?\\d*%\\)")
 sim_data$psHighPct <- sapply(sim_data$ps_overlap, extract_psnum, pattern = "\\d+\\.?\\d*%\\)$")
 
+# sim_data |> 
+#     ggplot(aes(y = psLowPct, x = J)) +
+#     geom_jitter(alpha = 0.5) +
+#     geom_boxplot(aes(fill = factor(J))) +
+#     # geom_violin() +
+#     facet_grid(interaction(Mfamily, Yfamily) ~ interaction(Nj_low))
+
+
+# 
 sim_data |> 
-    ggplot(aes(y = psLowPct, x = J)) +
-    geom_jitter(alpha = 0.5) +
-    geom_boxplot(aes(fill = factor(J))) +
-    # geom_violin() +
-    facet_grid(interaction(Mfamily, Yfamily) ~ interaction(Nj_low))
+    filter(model == 1 & quadratic == FALSE & Mfamily == "binomial" & Yfamily == "binomial") |> 
+    # filter(Mfamily == "binomial", Yfamily == "binomial", Nj_low == 50) |> 
+    ggplot(aes(x = psLowPct, color = condition)) +
+    geom_histogram() +
+    facet_grid(interaction(Mfamily, Yfamily) ~ interaction(J, Nj_low))
 
 
+# ═══════════════════
+#    disply extreme PSs for replications  
+# ═══════════════════
+# Calculate counts & pct of extremely low PSs for each facet
+threshold <- 1
+threshold2 <- 2
+facet_counts <- sim_data |>
+    filter(model == 1 & quadratic == FALSE & Mfamily == "binomial" & Yfamily == "binomial") |> 
+    group_by(Mfamily, Yfamily, J, Nj_low) |>
+    summarize(count = sum(psLowPct > threshold), 
+              pct = (sum(psLowPct > threshold) / sum(length(psLowPct)))*100, 
+              count2 = sum(psLowPct > threshold2), 
+              pct2 = (sum(psLowPct > threshold2) / sum(length(psLowPct)))*100)
+# Extreme low PSs viz 
+low_ps_plot <- sim_data |> 
+    filter(model == 1 & quadratic == FALSE & Mfamily == "binomial" & Yfamily == "binomial") |> 
+    # & psLowPct >= threshold) |>
+    ggplot(aes(x = psLowPct, fill = factor(psLowPct > threshold))) +
+    geom_histogram() +
+    facet_grid(~ interaction(J, Nj_low)) + #facet_grid(interaction(Mfamily, Yfamily) ~ interaction(J, Nj_low)) +
+    geom_text(
+        data = facet_counts,
+        aes(x = Inf, y = Inf, label = paste(count, "\n (", round(pct), "%) >", threshold, 
+                                            "\n", count2, "\n (", round(pct2), "%) >", threshold2)),
+        hjust = 1, vjust = 1.5, size = 3, color = "black",
+        inherit.aes = FALSE
+    ) +
+    theme(legend.position = "none") +
+    labs(y = "# of reps")
+
+# Calculate counts & pct of extremely high PSs for each facet
+facet_counts <- sim_data |>
+    filter(model == 1 & quadratic == FALSE & Mfamily == "binomial" & Yfamily == "binomial") |> 
+    group_by(Mfamily, Yfamily, J, Nj_low) |>
+    summarize(count = sum(psHighPct > threshold), 
+              pct = (sum(psHighPct > threshold) / sum(length(psHighPct)))*100, 
+              count2 = sum(psHighPct > threshold2), 
+              pct2 = (sum(psHighPct > threshold2) / sum(length(psHighPct)))*100)
+# Extreme high PSs viz 
+high_ps_plot <- sim_data |> 
+    filter(model == 1 & quadratic == FALSE & Mfamily == "binomial" & Yfamily == "binomial") |> 
+           # & psHighPct >= threshold) |>
+    ggplot(aes(x = psHighPct, fill = factor(psHighPct>threshold))) +
+    geom_histogram() +
+    facet_grid(~ interaction(J, Nj_low)) + #facet_grid(interaction(Mfamily, Yfamily) ~ interaction(J, Nj_low)) +
+    geom_text(
+        data = facet_counts,
+        aes(x = Inf, y = Inf, label = paste(count, "\n (", round(pct), "%) >", threshold, 
+                                            "\n", count2, "\n (", round(pct2), "%) >", threshold2)),
+        hjust = 1, vjust = 1.5, size = 3, color = "black",
+        inherit.aes = FALSE
+    ) +
+    theme(legend.position = "none") +
+    labs(y = "# of reps")
+
+# Plot visual 
+high_ps_plot / low_ps_plot +
+    patchwork::plot_annotation(title = "# of reps w/ % of PSs more extreme than < .01 or > .99", 
+                               theme = theme(plot.title = element_text(hjust = 0.5, size = 16, face = "bold"))) +
+    patchwork::plot_annotation(caption = "Note: only reps with > 1% of PSs being extreme are displayed \n Ex: (36%)>1 = 36% of reps in that facet had 1% or more extreme PSs")
+    # patchwork::plot_layout(guides = "collect") +
+    # theme(legend.position = "bottom")
+# Save plot 
+ggsave(filename = paste0(results_path, "/Figures/", 
+                         "S1_overlap_extreme-PSs-by-cluster-size-and-number.png"), 
+       plot = last_plot())
+
+
+# ═══════════════════
+#    Extreme PSs tables  
+# ═══════════════════
+# Summary of percent under 0.01 PS 
+sim_data |> 
+    group_by(Mfamily, Yfamily, Nj_low, J) |> 
+    summarize(min = min(psLowPct),
+              q25 = quantile(psLowPct, 0.25),
+              median = median(psLowPct),
+              mean = mean(psLowPct),
+              q75 = quantile(psLowPct, 0.75),
+              max = max(psLowPct)
+              ) |> 
+    print(n = Inf)
+# Summary of percent over 0.99 PS 
+sim_data |> 
+    group_by(Mfamily, Yfamily, Nj_low, J) |> 
+    summarize(min = min(psHighPct),
+              q25 = quantile(psHighPct, 0.25),
+              median = median(psHighPct),
+              mean = mean(psHighPct),
+              q75 = quantile(psHighPct, 0.75),
+              max = max(psHighPct)
+    ) |> 
+    print(n = Inf)
 
 
 
