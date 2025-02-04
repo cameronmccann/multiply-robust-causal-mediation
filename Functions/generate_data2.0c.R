@@ -134,7 +134,8 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
                               iccy = 0.2,                      # Intra-class correlation for 'Y'
                               include_truevals = TRUE,         # Whether or not to compute true values
                               include_overlapMsg = TRUE,       # Whether or not to display messages about PS overlap in console
-                              plot_PSdiagnostics = FALSE
+                              plot_PSdiagnostics = FALSE, 
+                              randomize = FALSE
 ) {               
     # 1. Cluster generation  --------------------------------------------------
     set.seed(seed)  
@@ -158,7 +159,8 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
         nj_sizes = data_list$nj_sizes,
         icca = icca,
         quadratic.A = quadratic.A,
-        num_x = num_x# , 
+        num_x = num_x, 
+        randomize = randomize# , 
         # a_x = data_list$a_x,
         # a_z = a_z, 
     )

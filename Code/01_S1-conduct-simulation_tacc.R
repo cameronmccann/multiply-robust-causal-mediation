@@ -13,7 +13,7 @@
 #       Note: data generation creates pop data (when Mfamily & Yfamily meet "gaussian" &. "binomial") for every iteration but only saves first iteration into pop data folder. 
 #
 #
-# Last Updated: 2025-01-31
+# Last Updated: 2025-02-02
 #
 #
 # Notes:
@@ -45,7 +45,7 @@
 # enableJIT(3)
 
 # set directory 
-# setwd("/home1/10384/cameronmccann/multiply-robust-causal-mediation") # temp-2025-01-23-test_multiply-robust-causal-mediation")
+setwd("/home1/10384/cameronmccann/multiply-robust-causal-mediation copy") # temp-2025-01-23-test_multiply-robust-causal-mediation")
 
 # Load packages & functions ----------------------------------------------------
 
@@ -137,11 +137,12 @@ icc = c(0.2))
 
 # limit conditions for testing 
 conditions <- conditions_all |> 
-    filter(quadratic == T) |> 
-    filter(if.null == T) |> 
-    # filter(J %in% c(40)) |> # c(20)) |> # c(70)) |>
+    filter(quadratic == F) |> 
+    filter(if.null == F) |> 
+    filter(J %in% c(100)) |> # c(20)) |> # c(70)) |>
     # filter(Nj_low %in% c(50)) |>
-    filter(Mfamily %in% c("binomial", "gaussian"), Yfamily %in% c("binomial", "gaussian")) #, "gaussian")) # c("binomial")) #, Yfamily %in% c("gaussian"))
+    filter(Mfamily %in% c("gaussian") & Yfamily %in% c("gaussian"))
+    # filter(Mfamily %in% c("binomial", "gaussian"), Yfamily %in% c("binomial", "gaussian")) #, "gaussian")) # c("binomial")) #, Yfamily %in% c("gaussian"))
 # conditions
 
 # select starting condition 
@@ -160,7 +161,7 @@ methds_all <- data.frame(expand.grid(
     # interact_fitm2 =  c(T), # NULL, #
     # interact_fity = c(T), # NULL, #
     # Morder = c("21", "12"),
-    Fit = c("mlr","glm"), # 
+    Fit = c("mlr3", "mlr2", "mlr","glm"), # 
     # cluster_opt_a = c("sufficient_stats",  "cwc.FE"), # "FE.glm", #  
     # cluster_opt_m = c("sufficient_stats",  "cwc.FE"),  #"FE.glm", # 
     # cluster_opt_y = c("sufficient_stats",  "cwc.FE") # "cwc.FE"#c("sufficient_stats") #, 
@@ -175,7 +176,8 @@ methds_all <- data.frame(expand.grid(
 # (methds <- methds_all %>%
 #     filter(cluster_opt %in% c("cwc"), Fit %in% c("mlr") ))
 methds <- methds_all |> 
-    filter(cluster_opt %in% c("cwc", "cwc.FE"), Fit %in% c("mlr", "glm"))
+    filter(cluster_opt %in% c("cwc", "cwc.FE"), Fit %in% c("mlr", "mlr2", "mlr3")) #, "glm")) 
+    
 
 
 
@@ -189,14 +191,14 @@ methds <- methds_all |>
 # cond <- 1
 
 # Number of replications
-# reps <- 3 #200 # #10 #100 # 10 # 200 # 1000
-reps <- 300 #200 #
+# reps <- 20 # #10 #100 # 10 # 200 # 1000
+reps <- 200 #300 #200 #
 
 # Create parent output directory
 path <- "Output/S1_Simulation-Output"
 ## Add subdirectory, if desired (e.g., for test runs)
 # additional_folder <- "2025-01-27_200-rep_all-linear-conditions-with-all-methods" #"2025-01-25-test_300-rep_all-quad-conditions-with-all-methods" #additional_folder <- "2025-01-24-test_100-rep_all-quad-conditions-with-all-methods" # NULL additional_folder <- "2025-01-23-test_200-reps_all-linear-conditions-with-all-methods" # NULL
-additional_folder <- "2025-01-31-test_null-quad-scenario"
+additional_folder <- "2025-02-02-test_current-ensemble-in-randomized-trial"
 # additional_folder <- "2025-01-30-test_null-linear-scenario"
 ## Check if additional_folder is not NULL to add to path
 if (!exists("additional_folder") || !is.null(additional_folder)) {
@@ -218,8 +220,8 @@ if (!dir.exists(pop_data_folder)) dir.create(pop_data_folder)
 Sys.setenv(OPENBLAS_NUM_THREADS = 1, OMP_NUM_THREADS = 1, MKL_NUM_THREADS = 1)  # Avoid nested threads
 
 # Detect available cores and dynamically allocate
-min_cores <- 10  # Minimum cores to use
-preferred_cores <- 150 #20  # Preferred minimum if available
+min_cores <- 2#10  # Minimum cores to use
+preferred_cores <- 15 #20  #150 # Preferred minimum if available
 available_cores <- parallel::detectCores(logical = TRUE)  # Detect all logical cores
 
 n_cores <- max(min_cores, min(preferred_cores, available_cores))  # Use a reasonable number of cores
@@ -261,9 +263,10 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
     Nj_low <- cond[["Nj_low"]]
     Nj_high <- cond[["Nj_high"]]
     Jval <- cond[["J"]]
+    isNull <- cond[["if.null"]]
     
     cond_label <- glue(
-        "quad={isQuad}, M={Mfamily}, Y={Yfamily}, nj=[{Nj_low},{Nj_high}], J={Jval}"
+        "null={isNull}, quad={isQuad}, M={Mfamily}, Y={Yfamily}, nj=[{Nj_low},{Nj_high}], J={Jval}"
     )
     
 
@@ -308,6 +311,7 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
             num_x = 3,
             include_overlapMsg = FALSE,
             plot_PSdiagnostics = FALSE, 
+            randomize = TRUE, 
             
             m_on_a = 0.2, 
             m_on_az = 0.2, 
@@ -360,10 +364,7 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
             # pop_data_file <- file.path(pop_data_folder, glue::glue("S1_pop-data-condition-{cond_idx_padded}-rep-{rep_idx}.rds"))
             pop_data_file <- file.path(pop_data_folder, glue::glue("S1_pop-data-condition-{cond_idx_padded}_quad-{isQuad}_M-{Mfamily}_Y-{Yfamily}_nj-[{Nj_low}-{Nj_high}]_J-{Jval}.rds"))
             saveRDS(sim_data$truevals$pop_data, pop_data_file)
-            
-            # free up space 
-            # rm(sim_data$truevals$pop_data)
-            # gc()
+
         }
         
         
@@ -383,6 +384,17 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
             
             if (Fit == "mlr") {
                 learners_a <- learners_m <- learners_y <- c("SL.nnet", "SL.gam")
+                num_folds <- 5
+            }
+            
+            # More complex model 
+            if (Fit == "mlr2") {
+                learners_a <- learners_m <- learners_y <- c("SL.nnet", "SL.gam", "SL.ranger")
+                num_folds <- 5
+            }
+            
+            if (Fit == "mlr3") {
+                learners_a <- learners_m <- learners_y <- c("SL.nnet", "SL.gam", "SL.glmnet")
                 num_folds <- 5
             }
             
@@ -531,8 +543,8 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
     # })
     
     # Check structure
-    str(result_list)
-    purrr::map(result_list, names)
+    # str(result_list)
+    # purrr::map(result_list, names)
     
     
     # Safely extract fields for the summary
@@ -587,7 +599,7 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
     saveRDS(result_list, file.path(
         path,
         glue(
-            "S1_condition-{cond_idx_padded}_reps-{reps}_quad-{isQuad}_M-{Mfamily}_Y-{Yfamily}_nj-[{Nj_low}-{Nj_high}]_J-{Jval}.rds"
+            "S1_condition-{cond_idx_padded}_reps-{reps}_null-{isNull}_quad-{isQuad}_M-{Mfamily}_Y-{Yfamily}_nj-[{Nj_low}-{Nj_high}]_J-{Jval}.rds"
         )
     ))
     
