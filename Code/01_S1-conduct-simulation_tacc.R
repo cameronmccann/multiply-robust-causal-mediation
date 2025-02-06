@@ -13,7 +13,7 @@
 #       Note: data generation creates pop data (when Mfamily & Yfamily meet "gaussian" &. "binomial") for every iteration but only saves first iteration into pop data folder. 
 #
 #
-# Last Updated: 2025-02-02
+# Last Updated: 2025-02-05
 #
 #
 # Notes:
@@ -137,13 +137,14 @@ icc = c(0.2))
 
 # limit conditions for testing 
 conditions <- conditions_all |> 
-    filter(quadratic == F) |> 
+    # filter(quadratic == F) |> 
     filter(if.null == F) |> 
-    filter(J %in% c(100)) |> # c(20)) |> # c(70)) |>
+    filter(J %in% c(100, 70)) |> # c(20)) |> # c(70)) |>
     # filter(Nj_low %in% c(50)) |>
-    filter(Mfamily %in% c("gaussian") & Yfamily %in% c("gaussian"))
+    filter(!c(Mfamily == "gaussian" & Yfamily == "gaussian"))
+    # filter(Mfamily %in% c("gaussian") & Yfamily %in% c("gaussian"))
     # filter(Mfamily %in% c("binomial", "gaussian"), Yfamily %in% c("binomial", "gaussian")) #, "gaussian")) # c("binomial")) #, Yfamily %in% c("gaussian"))
-# conditions
+conditions
 
 # select starting condition 
 strting_cond <- 1 #18
@@ -176,7 +177,7 @@ methds_all <- data.frame(expand.grid(
 # (methds <- methds_all %>%
 #     filter(cluster_opt %in% c("cwc"), Fit %in% c("mlr") ))
 methds <- methds_all |> 
-    filter(cluster_opt %in% c("cwc", "cwc.FE"), Fit %in% c("mlr", "mlr2", "mlr3")) #, "glm")) 
+    filter(cluster_opt %in% c("cwc", "cwc.FE"), Fit %in% c("glm", "mlr")) #, "mlr2", "mlr3")) #, "glm")) 
     
 
 
@@ -191,14 +192,14 @@ methds <- methds_all |>
 # cond <- 1
 
 # Number of replications
-# reps <- 20 # #10 #100 # 10 # 200 # 1000
-reps <- 200 #300 #200 #
+reps <- 200 # 10 # 200 # 1000
+# reps <- 200 #300 #200 #
 
 # Create parent output directory
 path <- "Output/S1_Simulation-Output"
 ## Add subdirectory, if desired (e.g., for test runs)
 # additional_folder <- "2025-01-27_200-rep_all-linear-conditions-with-all-methods" #"2025-01-25-test_300-rep_all-quad-conditions-with-all-methods" #additional_folder <- "2025-01-24-test_100-rep_all-quad-conditions-with-all-methods" # NULL additional_folder <- "2025-01-23-test_200-reps_all-linear-conditions-with-all-methods" # NULL
-additional_folder <- "2025-02-02-test_current-ensemble-in-randomized-trial"
+additional_folder <- "2025-02-05-test_200-reps-lowered-relationship-with-A_2"
 # additional_folder <- "2025-01-30-test_null-linear-scenario"
 ## Check if additional_folder is not NULL to add to path
 if (!exists("additional_folder") || !is.null(additional_folder)) {
@@ -311,7 +312,7 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
             num_x = 3,
             include_overlapMsg = FALSE,
             plot_PSdiagnostics = FALSE, 
-            randomize = TRUE, 
+            randomize = FALSE, # TRUE, 
             
             m_on_a = 0.2, 
             m_on_az = 0.2, 

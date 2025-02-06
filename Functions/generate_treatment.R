@@ -68,8 +68,8 @@ generate_treatment <- function(data_list,
         # Store generation parameters
         gen_a <- list(
             icca = icca, 
-            a_x = sqrt(0.15 * 1 / num_x), 
-            a_z = sqrt(0.4 / 1)
+            a_x = sqrt(0.05625 * 1 / num_x), #sqrt(0.075 * 1 / num_x), #sqrt(0.15 * 1 / num_x),
+            a_z = sqrt(0.15 / 1) #sqrt(0.2 / 1) #sqrt(0.4 / 1)
         )
         
         J <- length(unique(data_list$data$school))
