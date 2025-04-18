@@ -122,7 +122,6 @@ To conduct the simulation and obtain results, follow these steps:
 3. Run the simulation scripts in the following order:
     - `01_S1-conduct-simulation_tacc.R`: Runs the first simulation and stores output (e.g., direct & indirect estimates) for each run under each simulation condition in the `Output/S1_Simulation-Output` folder.
     - `02_S1-obtain-results_tacc.R`: Processes output from the first simulation by computing performance metrics and generating visuals and tables (stored in `Output/S1_Results`).
-    # - Repeat the process for the second simulation (`S2`) and the Supplemental Simulations (`S1_Supp1`, `S1_Supp2`, and `S1_Supp3`).
         
         
 ### Running the Empirical Application
