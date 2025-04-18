@@ -13,7 +13,7 @@
 #       Note: data generation creates pop data (when Mfamily & Yfamily meet "gaussian" &. "binomial") for every iteration but only saves first iteration into pop data folder. 
 #
 #
-# Last Updated: 2025-02-05
+# Last Updated: 2025-02-07
 #
 #
 # Notes:
@@ -138,10 +138,10 @@ icc = c(0.2))
 # limit conditions for testing 
 conditions <- conditions_all |> 
     # filter(quadratic == F) |> 
-    filter(if.null == F) |> 
-    filter(J %in% c(100, 70)) |> # c(20)) |> # c(70)) |>
+    filter(if.null == T) |> 
+    filter(J %in% c(100, 70)) #|> # c(20)) |> # c(70)) |>
     # filter(Nj_low %in% c(50)) |>
-    filter(!c(Mfamily == "gaussian" & Yfamily == "gaussian"))
+    # filter(!c(Mfamily == "gaussian" & Yfamily == "gaussian"))
     # filter(Mfamily %in% c("gaussian") & Yfamily %in% c("gaussian"))
     # filter(Mfamily %in% c("binomial", "gaussian"), Yfamily %in% c("binomial", "gaussian")) #, "gaussian")) # c("binomial")) #, Yfamily %in% c("gaussian"))
 conditions
@@ -162,7 +162,7 @@ methds_all <- data.frame(expand.grid(
     # interact_fitm2 =  c(T), # NULL, #
     # interact_fity = c(T), # NULL, #
     # Morder = c("21", "12"),
-    Fit = c("mlr3", "mlr2", "mlr","glm"), # 
+    Fit = c("mlr","glm"), #Fit = c("mlr3", "mlr2", "mlr","glm"), #
     # cluster_opt_a = c("sufficient_stats",  "cwc.FE"), # "FE.glm", #  
     # cluster_opt_m = c("sufficient_stats",  "cwc.FE"),  #"FE.glm", # 
     # cluster_opt_y = c("sufficient_stats",  "cwc.FE") # "cwc.FE"#c("sufficient_stats") #, 
@@ -192,14 +192,14 @@ methds <- methds_all |>
 # cond <- 1
 
 # Number of replications
-reps <- 200 # 10 # 200 # 1000
-# reps <- 200 #300 #200 #
+# reps <- 2#00 # 10 # 200 # 1000
+reps <- 600 #300 #200 #
 
 # Create parent output directory
 path <- "Output/S1_Simulation-Output"
 ## Add subdirectory, if desired (e.g., for test runs)
 # additional_folder <- "2025-01-27_200-rep_all-linear-conditions-with-all-methods" #"2025-01-25-test_300-rep_all-quad-conditions-with-all-methods" #additional_folder <- "2025-01-24-test_100-rep_all-quad-conditions-with-all-methods" # NULL additional_folder <- "2025-01-23-test_200-reps_all-linear-conditions-with-all-methods" # NULL
-additional_folder <- "2025-02-05-test_200-reps-lowered-relationship-with-A_2"
+additional_folder <- "2025-02-08-test_600-reps"
 # additional_folder <- "2025-01-30-test_null-linear-scenario"
 ## Check if additional_folder is not NULL to add to path
 if (!exists("additional_folder") || !is.null(additional_folder)) {
@@ -222,7 +222,7 @@ Sys.setenv(OPENBLAS_NUM_THREADS = 1, OMP_NUM_THREADS = 1, MKL_NUM_THREADS = 1)  
 
 # Detect available cores and dynamically allocate
 min_cores <- 2#10  # Minimum cores to use
-preferred_cores <- 15 #20  #150 # Preferred minimum if available
+preferred_cores <- 50 #15 #20  #150 # Preferred minimum if available
 available_cores <- parallel::detectCores(logical = TRUE)  # Detect all logical cores
 
 n_cores <- max(min_cores, min(preferred_cores, available_cores))  # Use a reasonable number of cores
