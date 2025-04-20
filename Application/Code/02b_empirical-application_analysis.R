@@ -18,7 +18,7 @@
 #   intervals. Covariate balance is visualized. Finally, it visualizes the 
 # estimated effects to facilitate interpretation of the results.
 # 
-# Last Updated: 2025-04-14
+# Last Updated: 2025-04-19
 #
 #
 # Notes:
@@ -43,7 +43,8 @@ pacman::p_load(
     utils, 
     lme4, 
     WeMix, 
-    parallel
+    parallel, 
+    kable
 )
 
 library(glue)
@@ -246,20 +247,53 @@ print(cluster_summary)
 
 # Estimate Effects --------------------------------------------------------
 
+# set depth constraint for xgboost
+xgb_depth2 <- create.Learner(
+    "SL.xgboost",
+    tune = list(max_depth = 2), 
+    detailed_names = TRUE, 
+    name_prefix = "xgb_d2"
+)
+
 # Define the four sets of parameters for the mediation analysis.
 param_list <- list(
-    # Setup 1: learners = c("SL.nnet", "SL.gam"), num_folds = 5, cluster_opt = "cwc"
-    list(learners = c("SL.nnet", "SL.gam"), num_folds = 5, cluster_opt = "cwc"),
     
-    # Setup 2: learners = c("SL.nnet", "SL.gam"), num_folds = 5, cluster_opt = "cwc.FE"
-    list(learners = c("SL.nnet", "SL.gam"), num_folds = 5, cluster_opt = "cwc.FE"),
+    list(learners = c("SL.mean", "SL.glm",
+                      "SL.glmnet", # lasso/elastic-net
+                      "SL.gam", # non-linearity
+                      "SL.ranger", # random forest
+                      xgb_depth2$names), # boosted trees with max depth of 2
+         num_folds = 20,
+         cluster_opt = "cwc.FE"),
     
-    # Setup 3: learners = c("SL.glm"), num_folds = 1, cluster_opt = "cwc"
-    list(learners = c("SL.glm"), num_folds = 1, cluster_opt = "cwc"),
+    list(learners = c(xgb_depth2$names), #c("SL.glm", "SL.glmnet", "SL.mean"), 
+         num_folds = 5, #
+         cluster_opt = "cwc.FE"),
+    
+    list(learners = c("SL.glm", "SL.gam", "SL.nnet"), #"SL.earth", 
+                      # "SL.xgboost", "SL.ranger", "SL.caret", "SL.gbm", "SL.svm"), 
+         num_folds = 4, #9, #20, 
+         cluster_opt = "cwc.FE"),
+    
+    # list(learners = c("SL.glm", "SL.gam", "SL.nnet", "SL.earth", 
+    #                   "SL.xgboost", "SL.ranger", "SL.caret", "SL.gbm", "SL.svm"), 
+    #      num_folds = 5, 
+    #      cluster_opt = "cwc.FE"),
+    # 
+    # # Setup 1: learners = c("SL.nnet", "SL.gam"), num_folds = 5, cluster_opt = "cwc"
+    # list(learners = c("SL.nnet", "SL.gam"), num_folds = 5, cluster_opt = "cwc"),
+    # 
+    # # Setup 2: learners = c("SL.nnet", "SL.gam"), num_folds = 5, cluster_opt = "cwc.FE"
+    # list(learners = c("SL.nnet", "SL.gam"), num_folds = 5, cluster_opt = "cwc.FE"),
+    # 
+    # # Setup 3: learners = c("SL.glm"), num_folds = 1, cluster_opt = "cwc"
+    # list(learners = c("SL.glm"), num_folds = 1, cluster_opt = "cwc"),
     
     # Setup 4: learners = c("SL.glm"), num_folds = 1, cluster_opt = "cwc.FE"
     list(learners = c("SL.glm"), num_folds = 1, cluster_opt = "cwc.FE")
 )
+
+param_list <- param_list[1]
 
 # Prepare a list to hold the results for each run
 results_list <- list()
@@ -271,6 +305,9 @@ for (i in seq_along(param_list)) {
     params <- param_list[[i]]
     
     # Run the mediation analysis
+    set.seed(5897)
+    start_time <- Sys.time()
+    
     tmp <- estimate_mediation(
         data = data,
         Sname = "CLUSTER2",
@@ -295,6 +332,9 @@ for (i in seq_along(param_list)) {
         num_folds = params$num_folds
     )
     
+    end_time <- Sys.time()
+    tmp$duration_secs <- as.numeric(difftime(end_time, start_time, units = "secs"))
+    
     # Attach the parameters as extra columns to the output data frame.
     tmp$learners <- paste(params$learners, collapse = ", ")
     tmp$num_folds <- params$num_folds
@@ -307,9 +347,9 @@ for (i in seq_along(param_list)) {
 
 # Option 1: Save each output as separate objects:
 result1 <- results_list[[1]]
-result2 <- results_list[[2]]
-result3 <- results_list[[3]]
-result4 <- results_list[[4]]
+# result2 <- results_list[[2]]
+# result3 <- results_list[[3]]
+# result4 <- results_list[[4]]
 
 # Option 2: Combine them into one large data frame 
 # by adding a 'setup' indicator to each result.
@@ -319,15 +359,29 @@ combined_results <- do.call(rbind, lapply(seq_along(results_list), function(i) {
     df
 }))
 
-combined_results <- combined_results |> 
-    mutate(Method = ifelse(learners == "SL.glm", "Parametric", "Nonparametric"))
+# combined_results <- combined_results |> 
+#     mutate(Method = ifelse(learners == "SL.glm", "Parametric", "Nonparametric"))
 
 # If you want to view the combined results:
 print(combined_results)
 
 
 # library(BRRR)
+# BRRR::skrrrahh("waka")
 BRRR::skrrrahh("biggie") #BRRR::skrrrahh_list()
+
+#                 Effect  EffectVersion    Estimate   StdError     CILower   CIUpper                   learners num_folds cluster_opt   setup
+# 1   Direct Effect (DE) Individual-Avg -0.22860414 0.17275589 -0.57359483 0.1163866 SL.glm, SL.glmnet, SL.mean        20      cwc.FE Setup_1
+# 2 Indirect Effect (IE) Individual-Avg -0.01764828 0.03591641 -0.08937277 0.0540762 SL.glm, SL.glmnet, SL.mean        20      cwc.FE Setup_1
+# 3   Direct Effect (DE)    Cluster-Avg -0.06761288 0.21341031 -0.49378980 0.3585640 SL.glm, SL.glmnet, SL.mean        20      cwc.FE Setup_1
+# 4 Indirect Effect (IE)    Cluster-Avg -0.04292013 0.04167111 -0.12613666 0.0402964 SL.glm, SL.glmnet, SL.mean        20      cwc.FE Setup_1
+
+#                 Effect  EffectVersion    Estimate   StdError     CILower    CIUpper duration_secs                                               learners      num_folds cluster_opt
+# 1   Direct Effect (DE) Individual-Avg -0.22783624 0.17280766 -0.57293031 0.11725784      7623.395   SL.mean, SL.glm, SL.glmnet, SL.gam, SL.ranger, xgb_d2_2        20      cwc.FE
+# 2 Indirect Effect (IE) Individual-Avg -0.01773872 0.03568100 -0.08899311 0.05351566      7623.395   SL.mean, SL.glm, SL.glmnet, SL.gam, SL.ranger, xgb_d2_2        20      cwc.FE
+# 3   Direct Effect (DE)    Cluster-Avg -0.06675852 0.21300744 -0.49213091 0.35861387      7623.395   SL.mean, SL.glm, SL.glmnet, SL.gam, SL.ranger, xgb_d2_2        20      cwc.FE
+# 4 Indirect Effect (IE)    Cluster-Avg -0.04320476 0.04126664 -0.12561356 0.03920405      7623.395   SL.mean, SL.glm, SL.glmnet, SL.gam, SL.ranger, xgb_d2_2        20      cwc.FE
+
 
 # Display results ---------------------------------------------------------
 
@@ -350,6 +404,25 @@ gglayer_theme <- list(theme_bw(),
                             line = element_line(linewidth = 0.5),  # APA recommends thin lines
                             legend.position = "top" #"bottom" #"right"
                       ))
+
+
+combined_results |> 
+    # filter(EffectVersion == "Individual-Avg") |>
+    # filter(Effect == "Indirect Effect (IE)") |>
+    ggplot(aes(x = Estimate, 
+               y = EffectVersion, #y = reorder(Effect, Estimate), 
+               color = setup)) +
+    geom_vline(xintercept = 0) +
+    geom_point(position = position_dodge(width = 0.2)) +
+    geom_errorbarh(aes(xmin = CILower, xmax = CIUpper), height = 0.1, 
+                   position = position_dodge(width = 0.2)) +
+    facet_grid(~Effect, scales = "free_x") +
+    # facet_wrap(~Effect, scales = "free_y") +  # separate panels by Method
+    theme_minimal() +
+    # coord_flip() +
+    gglayer_theme 
+
+
 
 combined_results |> 
     # filter(EffectVersion == "Individual-Avg") |>
@@ -422,7 +495,8 @@ table_df <- combined_results %>%
     mutate(`95% CI` = paste0("[", round(CILower, 3), ", ", round(CIUpper, 3), "]")) %>%
     
     # Select the columns that matter
-    select(Effect, cluster_opt, Method, EffectVersion, Estimate, `95% CI`) %>%
+    select(Effect, #cluster_opt, Method, 
+           EffectVersion, Estimate, `95% CI`) %>%
     
     # Pivot from long to wide; Individual-Avg and Cluster-Avg go into columns
     pivot_wider(
@@ -431,13 +505,13 @@ table_df <- combined_results %>%
     ) %>%
     
     # Arrange rows by Effect, cluster_opt, Method
-    arrange(Effect, cluster_opt, Method) %>%
+    # arrange(Effect, cluster_opt, Method) %>%
     
     # For repeated Effects, show it only on the first row (others blank)
     group_by(Effect) %>%
-    mutate(Effect = ifelse(row_number() == 1, Effect, ""), 
-           cluster_opt = ifelse(row_number() %in% c(1, 5), "cluster means", 
-                                ifelse(row_number() %in% c(3, 7), "cluster means + dummies", ""))) %>%
+    mutate(Effect = ifelse(row_number() == 1, Effect, "")) |> #, 
+           # cluster_opt = ifelse(row_number() %in% c(1, 5), "cluster means", 
+           #                      ifelse(row_number() %in% c(3, 7), "cluster means + dummies", ""))) %>%
     ungroup() %>%
     mutate(`Estimate_Individual-Avg` = round(`Estimate_Individual-Avg`, 3), 
            `Estimate_Cluster-Avg` = round(`Estimate_Cluster-Avg`, 3), 
@@ -447,7 +521,7 @@ table_df <- combined_results %>%
            "Estimate_Cluster-Avg", "95% CI_Cluster-Avg") |> 
     # Rename columns for clarity before we build the table
     rename(
-        `Cluster-level adjustment` = `cluster_opt`,
+        # `Cluster-level adjustment` = `cluster_opt`,
         `Estimate` = `Estimate_Individual-Avg`,
         `95% CI`   = `95% CI_Individual-Avg`,
         `Estimate `= `Estimate_Cluster-Avg`,
@@ -458,10 +532,10 @@ table_df <- combined_results %>%
 estimate_table <- kable(table_df,
           caption = "Table 2. Effect Estimates for Empirical Application",
           align    = "l",
-          booktabs = TRUE) %>%
+          booktabs = TRUE)  |> 
     # Add "Individual-Average" spanning 2 columns, "Cluster-Average" spanning 2 columns
-    add_header_above(c(
-        " " = 3,
+    kableExtra::add_header_above(c(
+        " " = 1, #3,
         "Individual-Average" = 2,
         "Cluster-Average" = 2
     )) |>
@@ -485,6 +559,38 @@ kableExtra::save_kable(estimate_table,
 
 
 
+# check corr
+data |> 
+    group_by(CLUSTER2) |> 
+    summarise(
+        n            = n(),
+        correlation  = cor(sportPartic_w1, depress_w4, use = "complete.obs"),
+        .groups      = "drop"
+    ) |> 
+    arrange(n) |> 
+    print(n = 120) |> 
+    mutate(
+        n_quartile = ntile(n, 4),
+        quartile_lbl = case_when(
+            n_quartile == 1 ~ "bottom 25%",
+            n_quartile == 2 ~ "25–50%",
+            n_quartile == 3 ~ "50–75%",
+            n_quartile == 4 ~ "top 25%"
+        )
+    ) |> 
+    group_by(quartile_lbl) %>%
+    summarise(
+        clusters      = n(),          
+        min_n         = min(n),
+        max_n         = max(n),
+        mean_n        = mean(n),
+        mean_corr     = mean(correlation),
+        sd_corr       = sd(correlation),
+        median_corr   = median(correlation),
+        .groups       = "drop"
+    ) %>%
+    arrange(match(quartile_lbl,
+                  c("bottom 25%", "25–50%", "50–75%", "top 25%")))
 
 # Test analysis functions -------------------------------------------------
 

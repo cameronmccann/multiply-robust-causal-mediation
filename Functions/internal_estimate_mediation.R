@@ -1,5 +1,5 @@
 # {UPDATE DOCUMENTATION AT SOMEPOINT} 
-# As of 2025-01-07: only modified comments in code; did not modify code yet; come back and add error messages 
+# As of 2025-01-07 (updated 2025-04-19): only modified comments in code; did not modify code yet; come back and add error messages 
 # internal_estimate_mediation <= oneMcl.R
 
 
@@ -148,8 +148,14 @@ internal_estimate_mediation <- function( # replaced: compute_eifs_for_mediation
     # 3. CREATE FOLDS FOR CROSS-FITTING
     # --------------------------------------------------------------------------
     if (num_folds > 1) {
-        # For multi-fold cross-fitting
-        folds <- make_fold_K(data_in, Sname, cv_folds = num_folds)
+        # # For multi-fold cross-fitting
+        # folds <- make_fold_K(data_in, Sname, cv_folds = num_folds)
+        # 2025-04-19: modifications to meet Philips et al. recommendation on number of folds
+        folds <- origami::make_folds(
+            cluster_ids = data_in[[Sname]],
+            fold_fun = origami::folds_vfold,
+            V = num_folds
+        )
     } else {
         # For single-fold (non-cross-fitting) -- typically a "train=valid" scenario
         folds <- origami::make_folds( #make_folds(
