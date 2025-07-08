@@ -370,6 +370,13 @@ print(combined_results)
 # BRRR::skrrrahh("waka")
 BRRR::skrrrahh("biggie") #BRRR::skrrrahh_list()
 
+# Save
+readr::write_csv(
+    combined_results, 
+    file = c("Application/Output/Effect-Estimates.csv"), 
+    col_names = TRUE
+)
+
 #                 Effect  EffectVersion    Estimate   StdError     CILower   CIUpper                   learners num_folds cluster_opt   setup
 # 1   Direct Effect (DE) Individual-Avg -0.22860414 0.17275589 -0.57359483 0.1163866 SL.glm, SL.glmnet, SL.mean        20      cwc.FE Setup_1
 # 2 Indirect Effect (IE) Individual-Avg -0.01764828 0.03591641 -0.08937277 0.0540762 SL.glm, SL.glmnet, SL.mean        20      cwc.FE Setup_1

@@ -13,7 +13,7 @@
 #       Note: data generation creates pop data (when Mfamily & Yfamily meet "gaussian" &. "binomial") for every iteration but only saves first iteration into pop data folder. 
 #
 #
-# Last Updated: 2025-02-07
+# Last Updated: 2025-07-06
 #
 #
 # Notes:
@@ -138,16 +138,19 @@ icc = c(0.2))
 # limit conditions for testing 
 conditions <- conditions_all |> 
     # filter(quadratic == F) |> 
-    filter(if.null == T) |> 
-    filter(J %in% c(100, 70)) #|> # c(20)) |> # c(70)) |>
-    # filter(Nj_low %in% c(50)) |>
+    # filter(if.null == T) |> 
+    filter((J %in% c(10) & Nj_low %in% c(50)) | 
+               J %in% c(40) & Nj_low %in% c(5)) %>% 
+    filter(!(J == 10 & Mfamily == "binomial" & Yfamily == "binomial" & if.null == TRUE)) # drop 2 rows we already ran
+    # filter(J %in% c(10, 40)) #|> #c(100, 70)) |> # c(20)) |> # c(70)) |>
+    # filter(Nj_low %in% c(50)) #|>
     # filter(!c(Mfamily == "gaussian" & Yfamily == "gaussian"))
     # filter(Mfamily %in% c("gaussian") & Yfamily %in% c("gaussian"))
     # filter(Mfamily %in% c("binomial", "gaussian"), Yfamily %in% c("binomial", "gaussian")) #, "gaussian")) # c("binomial")) #, Yfamily %in% c("gaussian"))
 conditions
 
 # select starting condition 
-strting_cond <- 1 #18
+strting_cond <- 1#6#1 #18              # <------------------------- SELECT ROW AS STARTING CONDITION HERE
 # if (!exists(strting_cond) || is.null(strting_cond)) {
 #     strting_cond <- 1
 # }
@@ -199,7 +202,7 @@ reps <- 600 #300 #200 #
 path <- "Output/S1_Simulation-Output"
 ## Add subdirectory, if desired (e.g., for test runs)
 # additional_folder <- "2025-01-27_200-rep_all-linear-conditions-with-all-methods" #"2025-01-25-test_300-rep_all-quad-conditions-with-all-methods" #additional_folder <- "2025-01-24-test_100-rep_all-quad-conditions-with-all-methods" # NULL additional_folder <- "2025-01-23-test_200-reps_all-linear-conditions-with-all-methods" # NULL
-additional_folder <- "2025-02-08-test_600-reps"
+additional_folder <- "2025-05-05-test-large-clusters_600-reps" #"2025-02-08-test_600-reps"
 # additional_folder <- "2025-01-30-test_null-linear-scenario"
 ## Check if additional_folder is not NULL to add to path
 if (!exists("additional_folder") || !is.null(additional_folder)) {
@@ -222,7 +225,7 @@ Sys.setenv(OPENBLAS_NUM_THREADS = 1, OMP_NUM_THREADS = 1, MKL_NUM_THREADS = 1)  
 
 # Detect available cores and dynamically allocate
 min_cores <- 2#10  # Minimum cores to use
-preferred_cores <- 50 #15 #20  #150 # Preferred minimum if available
+preferred_cores <- 25#0#50 #15 #20  #150 # Preferred minimum if available
 available_cores <- parallel::detectCores(logical = TRUE)  # Detect all logical cores
 
 n_cores <- max(min_cores, min(preferred_cores, available_cores))  # Use a reasonable number of cores
@@ -288,7 +291,7 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
         set.seed(seeds[rep_idx])
         
         # message 
-        cat("Starting rep_idx =", rep_idx, "...\n")
+        cat("Starting rep_idx =", rep_idx, "... @", format(Sys.time(), "%H:%M:%S"), "\n") #cat("Starting rep_idx =", rep_idx, "...\n")
     # result_list <- foreach(
     #     rep_idx = seq_len(reps),
     #     .packages = c("dplyr", "ggplot2", "glue", "purrr"), 
@@ -514,7 +517,7 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
         # rm(sim_data, results, estimates, warnings_list)
         # 
         # message 
-        cat("Finished rep_idx =", rep_idx, "...\n")
+        cat("Finished rep_idx =", rep_idx, "... @", format(Sys.time(), "%H:%M:%S"), "\n") #cat("Finished rep_idx =", rep_idx, "...\n")
         # Return the iteration data
         return(iteration_data)
         }, error = function(e) {
@@ -612,7 +615,7 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
     rm(result_list)
     # gc()
     
-    message(glue(
+    cat(glue(
         "[{format(Sys.time(), '%Y-%m-%d %H:%M:%S')}] Condition {cond_idx_padded}/{total_conditions} ",
         "({round((cond_idx / total_conditions) * 100)}%) completed. ({cond_label}) ",
         "Time: {cond_time_formatted}"
