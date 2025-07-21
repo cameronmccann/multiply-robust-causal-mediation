@@ -1,8 +1,9 @@
 # {UPDATE DOCUMENTATION AT SOMEPOINT}
 # As of 2024-12-19: only modified messaging output 
+# On 2025-07-21: added arguments (like random_slope_vars) to be past to other crossfit function so users can set random slopes for specific variables & source_label argument for warning messages
 
 mu.mac <- function(data_in, varnames, Yfamily = "gaussian", ipw = NULL, cluster_opt = "FE.glm", interaction = c("AM"),
-                   folds, learners, bounded = FALSE) {
+                   folds, learners, bounded = FALSE, random_slope_vars, source_label = "mu.mac") {
     # Ensure required functions are available
     if (!exists("crossfit")) {
         stop("Missing required functions: 'crossfit'. Ensure these are properly defined or loaded.")
@@ -58,7 +59,9 @@ mu.mac <- function(data_in, varnames, Yfamily = "gaussian", ipw = NULL, cluster_
                      ipw,
                      cluster_opt,
                      type = Yfamily,
-                     learners, bounded)
+                     learners, bounded, 
+                     random_slope_vars = random_slope_vars,
+                     source_label = source_label)
         }, error = function(e) {
             stop(sprintf("Error in 'crossfit' for fold %d: %s", v, e$message))
         })

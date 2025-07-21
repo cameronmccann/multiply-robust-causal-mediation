@@ -1,6 +1,7 @@
 # {UPDATE DOCUMENTATION AT SOMEPOINT} 
 # As of 2025-01-07 (updated 2025-04-19): only modified comments in code; did not modify code yet; come back and add error messages 
 # internal_estimate_mediation <= oneMcl.R
+# On 2025-07-21: added arguments (like random_slope_vars_a) to be past to othere functions so users can set random slopes for specific variables
 
 
 #' @title Compute Mediation Effects (Internal Function)
@@ -74,7 +75,10 @@ internal_estimate_mediation <- function( # replaced: compute_eifs_for_mediation
         learners_a = c("SL.glm"),
         learners_m = c("SL.glm"),
         learners_y = c("SL.glm"),
-        contrast_a = c(a = 1, astar = 0)
+        contrast_a = c(a = 1, astar = 0), 
+        random_slope_vars_a = NULL,
+        random_slope_vars_m = NULL,
+        random_slope_vars_y = NULL
 ) {
     # --------------------------------------------------------------------------
     # 0. INITIAL SETUP & CHECKS
@@ -174,7 +178,7 @@ internal_estimate_mediation <- function( # replaced: compute_eifs_for_mediation
     # a.c() -> predicted P(A=1|X,...)
     a_c <- tryCatch({
         a.c(
-            data_in, varnames, cluster_opt_a, folds, learners_a, bounded = FALSE
+            data_in, varnames, cluster_opt_a, folds, learners_a, bounded = FALSE, random_slope_vars = random_slope_vars_a
         )
     }, error = function(e) {
         stop(sprintf("Error in internal function `a.c()`: %s", e$message))
@@ -184,7 +188,7 @@ internal_estimate_mediation <- function( # replaced: compute_eifs_for_mediation
     # a.mc() -> predicted probabilities that incorporate mediators?
     a_mc <- tryCatch({
         a.mc(
-            data_in, varnames, cluster_opt_a, folds, learners_a, bounded = FALSE
+            data_in, varnames, cluster_opt_a, folds, learners_a, bounded = FALSE, random_slope_vars = random_slope_vars_a
         )
     }, error = function(e) {
         stop(sprintf("Error in internal function `a.mc()`: %s", e$message))
@@ -200,7 +204,8 @@ internal_estimate_mediation <- function( # replaced: compute_eifs_for_mediation
             interaction = interaction_fity,
             folds = folds, 
             learners = learners_y, 
-            bounded = FALSE
+            bounded = FALSE, 
+            random_slope_vars = random_slope_vars_y
         )
     }, error = function(e) {
         stop(sprintf("Error in internal function `mu.mac()`: %s", e$message))
@@ -220,7 +225,8 @@ internal_estimate_mediation <- function( # replaced: compute_eifs_for_mediation
             folds = folds, 
             learners = learners_y, 
             bounded = FALSE,
-            full.sample = FALSE
+            full.sample = FALSE, 
+            random_slope_vars = random_slope_vars_y
         )
     }, error = function(e) {
         stop(sprintf("Error in internal function `v.ac()`: %s", e$message))
@@ -235,7 +241,8 @@ internal_estimate_mediation <- function( # replaced: compute_eifs_for_mediation
             cluster_opt = cluster_opt_y,
             folds = folds, 
             learners = learners_y, 
-            bounded = FALSE
+            bounded = FALSE, 
+            random_slope_vars = random_slope_vars_y
         )
     }, error = function(e) {
         stop(sprintf("Error in internal function `mu.ac()`: %s", e$message))

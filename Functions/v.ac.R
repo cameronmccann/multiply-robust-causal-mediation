@@ -1,11 +1,12 @@
 
 # {UPDATE DOCUMENTATION AT SOMEPOINT}
 # As of 2025-01-09: ony modified `type` argument in crossfit() to take on `Yfamily` instead of "gaussian"; did not modify anything else yet  
+# On 2025-07-21: added arguments (like random_slope_vars) to be past to other crossfit function so users can set random slopes for specific variables & source_label argument for warning messages
 
 
 v.ac <- function(a=1, astar=0, mu_mac, data_in, varnames, Yfamily = "gaussian", ipw = NULL, cluster_opt = "FE.glm",
                  folds, learners, bounded = FALSE,
-                 full.sample = FALSE) {
+                 full.sample = FALSE, random_slope_vars = random_slope_vars, source_label = "v.ac") {
     
     # data_in[["mu"]] <- mu_mac[, glue("mu(m,a{a},c)")]
     col_name <- glue::glue("mu(m,a{a},c)")
@@ -87,7 +88,9 @@ v.ac <- function(a=1, astar=0, mu_mac, data_in, varnames, Yfamily = "gaussian", 
                               cluster_opt,
                               # type = "gaussian",
                               type = Yfamily,
-                              learners, bounded)
+                              learners, bounded, 
+                              random_slope_vars = random_slope_vars, 
+                              source_label = source_label)
         }
 
 
@@ -118,7 +121,8 @@ v.ac <- function(a=1, astar=0, mu_mac, data_in, varnames, Yfamily = "gaussian", 
                               ipw,
                               cluster_opt,
                               type = "gaussian",
-                              learners, bounded)
+                              learners, bounded, 
+                              random_slope_vars = random_slope_vars)
         }
 
         # ADD DEBUGGING

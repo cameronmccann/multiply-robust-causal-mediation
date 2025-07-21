@@ -1,9 +1,5 @@
-# CURRENTLY UPDATING: 2025-07-10
-# # Might need to update:
-#   # documentation
-#   # output of a_x & a_z to a_on_x & a_on_z
-# #
-
+# This is the version prior to 2025-07-10 
+# 
 #' Generate Treatment Assignments
 #'
 #' This function generates treatment assignments in a clustered setting either 
@@ -42,8 +38,6 @@ generate_treatment <- function(data_list,
                                nj_sizes, 
                                icca, 
                                quadratic.A = FALSE, 
-                               a_on_x = sqrt(0.05625 / 3), #a_x = sqrt(0.05625 / 3), 
-                               a_on_z = sqrt(0.15 / 1), #a_z = sqrt(0.15 / 1), 
                                num_x = 3, 
                                randomize = FALSE) {
     
@@ -62,8 +56,8 @@ generate_treatment <- function(data_list,
         # Here we just store NA since they're not used.
         return(
             modifyList(data_list, list(
-                a_on_x = NA_real_, #a_x = NA_real_,
-                a_on_z = NA_real_, #a_z = NA_real_,
+                a_x = NA_real_,
+                a_z = NA_real_,
                 icca = icca,
                 quadratic.A = quadratic.A
             ))
@@ -76,11 +70,8 @@ generate_treatment <- function(data_list,
         # Store generation parameters
         gen_a <- list(
             icca = icca, 
-            
-            a_on_x = a_on_x, #a_x = a_x, 
-            a_on_z = a_on_z #a_z = a_z 
-            # a_x = sqrt(0.05625 * 1 / num_x), #sqrt(0.075 * 1 / num_x), #sqrt(0.15 * 1 / num_x),
-            # a_z = sqrt(0.15 / 1) #sqrt(0.2 / 1) #sqrt(0.4 / 1)
+            a_x = sqrt(0.05625 * 1 / num_x), #sqrt(0.075 * 1 / num_x), #sqrt(0.15 * 1 / num_x),
+            a_z = sqrt(0.15 / 1) #sqrt(0.2 / 1) #sqrt(0.4 / 1)
         )
         
         J <- length(unique(data_list$data$school))
@@ -94,12 +85,12 @@ generate_treatment <- function(data_list,
         
         # Compute the linear predictor for 'A'
         if (!quadratic.A) {
-            Xlinear <- as.matrix(data_list$data$X) #Xlinear <- data_list$data$X
-            a_given <- ab + gen_a[["a_on_x"]] * rowSums(Xlinear) + gen_a[["a_on_z"]] * data_list$data$Z
+            Xlinear <- data_list$data$X
+            a_given <- ab + gen_a[["a_x"]] * rowSums(Xlinear) + gen_a[["a_z"]] * data_list$data$Z
         } else {
             # Include quadratic terms if specified
-            Xquad <- (as.matrix(data_list$data$X)^2 - 1) / sqrt(4) #Xquad <- (data_list$data$X^2 - 1) / sqrt(4)
-            a_given <- ab + gen_a[["a_on_x"]] * rowSums(Xquad) + gen_a[["a_on_z"]] * data_list$data$Z
+            Xquad <- (data_list$data$X^2 - 1) / sqrt(4)
+            a_given <- ab + gen_a[["a_x"]] * rowSums(Xquad) + gen_a[["a_z"]] * data_list$data$Z
         }
         
         # Compute the true propensity score
@@ -114,11 +105,10 @@ generate_treatment <- function(data_list,
         # Return updated data_list with parameters used
         return(
             modifyList(data_list, list(
-                a_on_x = gen_a[["a_on_x"]], 
-                a_on_z = gen_a[["a_on_z"]], 
+                a_x = gen_a[["a_x"]], 
+                a_z = gen_a[["a_z"]], 
                 icca = icca, 
-                quadratic.A = quadratic.A, 
-                clust_trt_prop = tapply(data_list$data$A, data_list$data$school, mean, na.rm = TRUE)
+                quadratic.A = quadratic.A
             ))
         )
     }

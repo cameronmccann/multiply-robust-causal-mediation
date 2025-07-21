@@ -1,5 +1,6 @@
 # {UPDATE DOCUMENTATION AT SOMEPOINT} 
 # As of 2025-01-02: only modified comments in code; did not modify code yet
+# On 2025-07-21: added arguments & code so users can set random slopes for specific variables  & source_label argument for warning messages
 
 
 #' @title crossfit
@@ -113,7 +114,8 @@
 crossfit <- function(train, valid.list, yname, xnames, varnames,
                      ipw = NULL,
                      cluster_opt = "FE.glm",
-                     type, learners, bounded = FALSE) {
+                     type, learners, bounded = FALSE, 
+                     random_slope_vars = NULL, source_label = NULL) {
     
     # --------------------------------------------------------------------------
     # 1. SET UP VARIABLE NAMES AND FAMILIES
@@ -189,6 +191,71 @@ crossfit <- function(train, valid.list, yname, xnames, varnames,
         }, simplify = TRUE)
         
     }
+    
+    
+    # --------------------------------------------------------------------------
+    # 3b. RANDOM EFFECTS GLM (RE.glm.rs) — random intercepts + random slopes
+    # --------------------------------------------------------------------------
+    if (cluster_opt == "RE.glm.rs") {
+        
+        # Build random effects formula
+        # (B) Determine slope structure and emit informative warning if needed
+        if (!is.null(random_slope_vars) && length(random_slope_vars) > 0) {
+            slope_formula <- paste("1 +", paste(random_slope_vars, collapse = " + "))
+            if (!is.null(source_label)) {
+                message(paste0("In ", source_label, "(): Using random slopes for: ", paste(random_slope_vars, collapse = ", ")))
+            }
+        } else {
+            msg <- "RE.glm.rs specified but no random_slope_vars provided; using random intercept only (RE.glm)."
+            if (!is.null(source_label)) {
+                msg <- paste0("In ", source_label, "(): ", msg)
+            }
+            warning(msg)
+            slope_formula <- "1"
+        }
+        # if (!is.null(random_slope_vars) && length(random_slope_vars) > 0) {
+        #     slope_formula <- paste("1 +", paste(random_slope_vars, collapse = " + "))
+        # } else {
+        #     warning("RE.glm.rs specified but no random_slope_vars provided; using random intercept only (RE.glm).")
+        #     slope_formula <- "1"
+        # }
+        
+        # Construct formula 
+        REformula <- paste("Y ~", paste(c(xnames, varnames$W), collapse = " + "),
+                           "+ (", slope_formula, "| S)")
+        
+        # Fit either a linear mixed model (gaussian) or a generalized linear mixed model (binomial)
+        if (family[[1]] == "gaussian") {
+            fit <- lme4::lmer(
+                formula = as.formula(REformula),
+                weights = df_lm$wreg,
+                data = df_lm
+            )
+        } else {
+            fit <- lme4::glmer(
+                formula = as.formula(REformula),
+                weights = df_lm$wreg,
+                data = df_lm,
+                family = family[[1]]
+            )
+        }
+        
+        # Generate predictions
+        preds <- sapply(valid.list, function(validX) {
+            # Construct a new data frame with the same columns used in the model
+            newX <- data.frame(
+                validX[, c(xnames, varnames$W), drop = FALSE],
+                S = validX[[Sname]]
+            )
+            # Predict on this new data
+            preds <- stats::predict(fit, newdata = newX, type = "response") #, allow.new.levels = TRUE)
+            # If bounded = TRUE, constrain predictions to [0,1]
+            if (!bounded) return(preds)
+            bound(preds)
+        }, simplify = TRUE)
+        
+    }
+    
     
     # fixed effects ----
     

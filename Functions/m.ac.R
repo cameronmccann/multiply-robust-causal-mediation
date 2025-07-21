@@ -1,8 +1,10 @@
 # {UPDATE DOCUMENTATION AT SOMEPOINT}
+# On 2025-07-21: added arguments (like random_slope_vars) to be past to other crossfit function so users can set random slopes for specific variables & source_label argument for warning messages
 
 # for one, binary mediator p(M=1|a,C)
 
-m.ac <- function(data_in, varnames, ipw = NULL, cluster_opt = "FE.glm", folds, learners, bounded = FALSE, Mfamily = "binomial") {
+m.ac <- function(data_in, varnames, ipw = NULL, cluster_opt = "FE.glm", folds, learners, bounded = FALSE, Mfamily = "binomial", 
+                 random_slope_vars = random_slope_vars, source_label = "m.ac") {
     
     # Check for required functions
     if (!exists("crossfit")) {
@@ -48,7 +50,9 @@ m.ac <- function(data_in, varnames, ipw = NULL, cluster_opt = "FE.glm", folds, l
                      cluster_opt, 
                      type = Mfamily, # c("binomial"), 
                      learners, 
-                     bounded = FALSE)
+                     bounded = FALSE, 
+                     random_slope_vars = random_slope_vars, 
+                     source_label = source_label)
             preds <- alist$preds
             # }
         }, error = function(e) {

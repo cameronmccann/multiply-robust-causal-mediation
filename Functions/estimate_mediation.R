@@ -1,5 +1,6 @@
 # {UPDATE DOCUMENTATION AT SOMEPOINT} 
 # As of 2025-01-08: only updated documentation (old documentation is at bottom of script) & comments within function 
+# On 2025-07-21: added arguments (like random_slope_vars_a) to be past to other functions so users can set random slopes for specific variables
 
 # NEED TO DOUBLE CHECK DOCUMENTATION (start with older documentation at bottom of script)
 # estimate_mediation <= MediatorCL.R
@@ -72,7 +73,10 @@ estimate_mediation <- function(data,
                                learners_m = c("SL.glm"),
                                learners_y = c("SL.glm"),
                                cluster_opt = "cwc.FE",
-                               num_folds = 1) {
+                               num_folds = 1, 
+                               random_slope_vars_a = NULL,
+                               random_slope_vars_m = NULL,
+                               random_slope_vars_y = NULL) {
     set.seed(12345)
     
     # Set the family of the outcome variable (binary or continuous)
@@ -97,7 +101,10 @@ estimate_mediation <- function(data,
         learners_a = learners_a,
         learners_m = learners_m,
         learners_y = learners_y,
-        contrast_a = c(a = 1, astar = 0)
+        contrast_a = c(a = 1, astar = 0), 
+        random_slope_vars_a = random_slope_vars_a,
+        random_slope_vars_m = random_slope_vars_m,
+        random_slope_vars_y = random_slope_vars_y
     )
     
     # Extract results for individual- and cluster-average effects

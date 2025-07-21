@@ -1,9 +1,5 @@
-# CURRENTLY UPDATING: 2025-07-10
-# # Might need to update:
-#   # documentation
-#   # output of a_x & a_z to a_on_x & a_on_z
-
-
+# This is the version prior to 2025-07-10 
+# 
 #' @title generate_data2.0c
 #'
 #' @description
@@ -113,8 +109,8 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
                               if.null = FALSE, 
                               seed = 123456,                   # Seed for reproducibility
                               num_x = 3,                       # Number of individual-level confounders
-                              a_on_x = sqrt(0.05625 / 3), # a_x = 0.15, # sqrt(0.15 * 1 / num_x)
-                              a_on_z = sqrt(0.15 / 1), # a_z = sqrt(0.4 / 1), 
+                              # a_x = 0.15, # sqrt(0.15 * 1 / num_x)
+                              # a_z = sqrt(0.4 / 1), 
                               x_z = 0,                         # Correlation between 'X' and 'Z'
                               m_on_a = 0.2,                    # Effect of 'A' on 'M'
                               m_on_az = 0.2,                   # Interaction: 'A' x 'Z' on 'M'
@@ -141,8 +137,7 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
                               include_truevals = TRUE,         # Whether or not to compute true values
                               include_overlapMsg = TRUE,       # Whether or not to display messages about PS overlap in console
                               plot_PSdiagnostics = FALSE, 
-                              randomize = FALSE, 
-                              ensure_cluster_positivity = TRUE
+                              randomize = FALSE
 ) {               
     # 1. Cluster generation  --------------------------------------------------
     set.seed(seed)  
@@ -167,19 +162,10 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
         icca = icca,
         quadratic.A = quadratic.A,
         num_x = num_x, 
-        randomize = randomize,
-        a_on_x = a_on_x, # a_x = data_list$a_x,
-        a_on_z = a_on_z # a_z = a_z, 
+        randomize = randomize# , 
+        # a_x = data_list$a_x,
+        # a_z = a_z, 
     )
-    
-    # 3b. Check for Positivity Assumption  
-    if (ensure_cluster_positivity) {
-        var_by_cluster <- tapply(data_list$data$A, data_list$data$school, var)
-        if (any(var_by_cluster == 0, na.rm = TRUE)) {
-            return(NULL)
-        }
-    }
-    
     
     # 4. Diagnostic plots of the propensity scores ----------------------------
     overlap_plot <- NULL
@@ -405,8 +391,7 @@ generate_data2.0c <- function(J = 100,                        # Number of cluste
             quadratic.Y = quadratic.Y,
             Yfamily = Yfamily,
             Mfamily = Mfamily,
-            if.null = if.null, 
-            clust_trt_prop = data_list$clust_trt_prop
+            if.null = if.null
         )
     )
     

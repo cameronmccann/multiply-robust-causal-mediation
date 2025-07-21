@@ -1,10 +1,11 @@
 # {UPDATE DOCUMENTATION AT SOMEPOINT}
 # [eventually maybe change function to a_c, if it won't interfere with output being labeled a_c]
 # As of 2024-12-19: only modified messaging output 
+# On 2025-07-21: added arguments (like random_slope_vars) to be past to other crossfit function so users can set random slopes for specific variables & source_label argument for warning messages
 
 
 
-a.mc <- function(data_in, varnames, cluster_opt = "FE.glm", folds, learners, bounded = TRUE) {
+a.mc <- function(data_in, varnames, cluster_opt = "FE.glm", folds, learners, bounded = TRUE, random_slope_vars, source_label = "a.mc") {
     # Ensure required functions are available
     if (!exists("crossfit")) {
         stop("Missing required functions: 'crossfit'. Ensure these are properly defined or loaded.")
@@ -40,7 +41,9 @@ a.mc <- function(data_in, varnames, cluster_opt = "FE.glm", folds, learners, bou
             crossfit(train, list(valid), varnames$A, c(varnames$M, varnames$X), varnames,
                      ipw = NULL,
                      cluster_opt,
-                     type = c("binomial"), learners, bounded)
+                     type = c("binomial"), learners, bounded, 
+                     random_slope_vars = random_slope_vars, 
+                     source_label = source_label)
         }, error = function(e) {
             stop(sprintf("Error in 'crossfit' for fold %d: %s", v, e$message))
         })
