@@ -13,7 +13,7 @@
 #       Note: data generation creates pop data (when Mfamily & Yfamily meet "gaussian" &. "binomial") for every iteration but only saves first iteration into pop data folder. 
 #
 #
-# Last Updated: 2025-09-06
+# Last Updated: 2025-09-03
 #
 #
 # Notes:
@@ -157,18 +157,12 @@ conditions <- conditions_all |>
 # conditions <- conditions[c(1, 18), ] #conditions[c(1:2, 17:18), ] #
 conditions <- conditions_all |> #[c(58, 61, 64, 67, 70,  55, 56, 57, 60), , drop = FALSE] |> #c(1:2, 49:72) #1, 3, 6, 7, 9, 12, 13, 18, 19, 21, 24, 49, 51, 52, 54, 55, 56, 57, 58, 60, 67, 69, 70, 72, 61:66 #1, 7, 13, 19, 4, 10, 16, 22, 3, 9, 15, 21, 6, 12, 18, 24
     tibble::rownames_to_column("condition_number") |>
-    # filter(Nj_low == 50) |> 
-    # slice(c(1:48))
-    slice(c(49:96))
-    # # arrange(if.null) |>
-    # # filter(if.null == T) |>
-    # filter(Nj_low == 50) %>% 
-    # # slice(-c(1:33))
-    # slice(c(9, 30, 1:8, 10:29, 31:48)) #slice(c(6, 12, 27))
-
-    # slice(-c(1:37))
-    # slice(-c(1:25)) %>%
+    # slice(1)
+    filter(Nj_low == 50) |> 
+    slice(c(3, 9, 30, 1:2, 4:8, 10:29))
     # slice(-c(1:85))
+    # arrange(if.null) |>
+    # slice(-c(1:25)) 
     
 conditions
 
@@ -230,7 +224,7 @@ methds <- methds |>
 # set.seed(12)
 # datseeds <- c(sample(1:1e6, 3000), sample(1:1e6+1e6, 200))
 
-backup_every <- 10#5#20#50          # Save after every 50 successful reps
+backup_every <- 6#2#10#5#20#50          # Save after every 6 successful reps
 # start_raw_iter <- 1         # Raw iteration to resume from (index in seed_pool)
 
 # select starting & ending condition numbers (correspond to rows in conditions dataframe) 
@@ -241,7 +235,7 @@ total_conditions <- nrow(conditions)
 # }
 
 # Number of desired replications (i.e., successful reps)
-reps <- 205#200#12#600 #300 #200 # 1000
+reps <- 200#12#600 #300 #200 # 1000
 
 # Set max number of iterations attempted (avoid infinite loop)
 max_attempts <- 500000#500#100#3000
@@ -252,7 +246,7 @@ max_attempts <- 500000#500#100#3000
 # Create parent output directory
 path <- "Output/S1_Simulation-Output"
 ## Add subdirectory, if desired (e.g., for test runs)
-additional_folder <- "2025-09-03_200-reps" #"2025-05-05-test-large-clusters_600-reps_TESTING" #"2025-02-08-test_600-reps"
+additional_folder <- "2025-09-02_200-reps" #"2025-05-05-test-large-clusters_600-reps_TESTING" #"2025-02-08-test_600-reps"
 ## Check if additional_folder is not NULL to add to path
 if (!exists("additional_folder") || !is.null(additional_folder)) {
     path <- file.path(path, additional_folder)
@@ -510,7 +504,7 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
                     
                     if (Fit == "mlr") {
                         learners_a <- learners_m <- learners_y <- c("SL.nnet", "SL.gam")
-                        num_folds <- 5 #10
+                        num_folds <- 5 #10 
                     }
                     
                     # More complex model 
@@ -573,6 +567,7 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
                         error = !is.null(err_msg), 
                         error_message = err_msg
                     )
+
                     
                     # old 
                     # warnings_list <- character(0)  # Reset warnings for each iteration
@@ -697,7 +692,7 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
         successful_batch <- Filter(function(x) {
             !is.null(x) && !isTRUE(x$error_all_methods) # drops iterations where all methods failed
         }, results_batch)
-        
+            
         if (length(successful_batch) > 0) {
             for (res in seq_along(successful_batch)) {
                 # successful_results[[rep_counter]] <- res
@@ -853,3 +848,419 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
 
 
 ################################## END #########################################
+
+# # ══════════════════════════════
+# #     Main Loop Over Conditions
+# # ══════════════════════════════
+# # n_cores <- 1
+# total_conditions <- nrow(conditions) #total_conditions <- 1 
+# for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
+#     
+#     cond <- conditions[cond_idx, ]
+#     isQuad <- cond[["quadratic"]]
+#     Mfamily <- cond[["Mfamily"]]
+#     Yfamily <- cond[["Yfamily"]]
+#     Nj_low <- cond[["Nj_low"]]
+#     Nj_high <- cond[["Nj_high"]]
+#     Jval <- cond[["J"]]
+#     isNull <- cond[["if.null"]]
+#     
+#     cond_label <- glue(
+#         "null={isNull}, quad={isQuad}, M={Mfamily}, Y={Yfamily}, nj=[{Nj_low},{Nj_high}], J={Jval}"
+#     )
+#     
+# 
+#     ### Start timing for condition ----------------------------------------------
+#     start_time_cond <- Sys.time()
+#     set.seed(12)
+#     seeds <- c(sample(1:1e6, 3000), sample(1:1e6+1e6, 200)) #datseeds <- c(sample(1:1e6, 3000), sample(1:1e6+1e6, 200))
+#     # seeds <- sample.int(1e7, reps)
+#     # seeds <- seeds[131:133] #[259:261]
+#     # seeds <- c(721442, 814237, 814286) #problematic seed nums
+#     
+#     result_list <- parallel::mclapply(seq_len(reps), function(rep_idx) {
+#         # catching error 
+#         tryCatch({
+#             
+#         Sys.setenv(OPENBLAS_NUM_THREADS = 1, OMP_NUM_THREADS = 1)  # Ensure settings per worker
+#         start_time_iter <- Sys.time()
+#         set.seed(seeds[rep_idx])
+#         
+#         # message 
+#         cat("Starting rep_idx =", rep_idx, "... @", format(Sys.time(), "%H:%M:%S"), "\n") #cat("Starting rep_idx =", rep_idx, "...\n")
+#     # result_list <- foreach(
+#     #     rep_idx = seq_len(reps),
+#     #     .packages = c("dplyr", "ggplot2", "glue", "purrr"), 
+#     #     # .export = c("cond_idx")
+#     #     .export = c("get_inference") #, "internal_estimate_mediation")  # Explicitly include your custom functions
+#     # ) %dopar% {
+#     #     start_time_iter <- Sys.time()
+#     #     set.seed(seeds[rep_idx])
+#         
+#         # tryCatch({#
+#         ### Generate data -----------------------------------------------------------
+#         sim_data <- generate_data2.0c(
+#             J = Jval, 
+#             njrange = c(Nj_low, Nj_high), 
+#             Mfamily = Mfamily,
+#             Yfamily = Yfamily,
+#             seed = seeds[rep_idx],
+#             quadratic.A = isQuad,
+#             quadratic.M = isQuad,
+#             quadratic.Y = isQuad,
+#             num_x = 3,
+#             include_overlapMsg = FALSE,
+#             plot_PSdiagnostics = FALSE, 
+#             randomize = FALSE, # TRUE, 
+#             
+#             m_on_a = 0.2, 
+#             m_on_az = 0.2, 
+#             m_on_anj = 0.2, 
+#             m_on_x = sqrt(0.15 / 3), #num_x
+#             m_on_z = sqrt(0.4), 
+#             y_on_a = 0.2, 
+#             y_on_m = 1, 
+#             y_on_am = 0, 
+#             y_on_az = 0.2, 
+#             y_on_mz = 0.2, 
+#             y_on_anj = 0.2, 
+#             y_on_x = sqrt(0.15 / 3), #num_x
+#             y_on_z = sqrt(0.4), 
+#             yintercept = 1, 
+#             x_z = 0 
+#             # include_truevals = TRUE, # FALSE, 
+#             
+#             # m_on_a = 2, 
+#             # m_on_anj = 0.5,
+#             # m_on_az = 0.2,
+#             # y_on_a = 1, 
+#             # y_on_m = 2, 
+#             # y_on_am = 2, 
+#             # y_on_az = 0.2,
+#             # y_on_mz = 0.2,
+#             # y_on_anj = 1
+#             
+#             # m_on_a = 15,
+#             # m_on_anj = 0.5,
+#             # m_on_az = 0.2,
+#             # y_on_a = 2,
+#             # y_on_m = 15,
+#             # y_on_am = 5,
+#             # y_on_az = 0.2,
+#             # y_on_mz = 0.2,
+#             # y_on_anj = 5,
+#             # int.XZ = FALSE 
+#         )
+#         
+#         
+#         # Save population data if applicable
+#         if (!is.null(sim_data$truevals$pop_data) && rep_idx == 1) { # drop && rep_idx == 1 to save all pop data
+#             # Save only for the first replication
+#             # pop_data_file <- file.path(pop_data_folder, glue("S1_pop-data-condition-{cond_idx}-rep-{rep_idx}.rds"))
+#             # saveRDS(sim_data$truevals$pop_data, pop_data_file)
+#             
+#             # Zero-padded condition number
+#             cond_idx_padded <- sprintf("%02d", cond_idx) # change condition number: 1 => 01
+#             # pop_data_file <- file.path(pop_data_folder, glue::glue("S1_pop-data-condition-{cond_idx_padded}-rep-{rep_idx}.rds"))
+#             pop_data_file <- file.path(pop_data_folder, glue::glue("S1_pop-data-condition-{cond_idx_padded}_quad-{isQuad}_M-{Mfamily}_Y-{Yfamily}_nj-[{Nj_low}-{Nj_high}]_J-{Jval}.rds"))
+#             saveRDS(sim_data$truevals$pop_data, pop_data_file)
+# 
+#         }
+#         
+#         
+#         
+#         ########################################################################
+#         # INSERT ESTIMATION CODE HERE 
+# 
+#         ### Estimate effects --------------------------------------------------------
+#         results <- list()
+#         for (meth in 1:nrow(methds)) {
+#             Fit <- as.character(methds$Fit[meth])
+#             
+#             if (Fit == "glm") {
+#                 learners_a <- learners_m <- learners_y <- c("SL.glm")
+#                 num_folds <- 1
+#             }
+#             
+#             if (Fit == "mlr") {
+#                 learners_a <- learners_m <- learners_y <- c("SL.nnet", "SL.gam")
+#                 num_folds <- 5
+#             }
+#             
+#             # More complex model 
+#             if (Fit == "mlr2") {
+#                 learners_a <- learners_m <- learners_y <- c("SL.nnet", "SL.gam", "SL.ranger")
+#                 num_folds <- 5
+#             }
+#             
+#             if (Fit == "mlr3") {
+#                 learners_a <- learners_m <- learners_y <- c("SL.nnet", "SL.gam", "SL.glmnet")
+#                 num_folds <- 5
+#             }
+#             
+#             cluster_opt <- methds$cluster_opt[meth]
+#             
+#             warnings_list <- character(0)  # Reset warnings for each iteration
+#             
+#             estimates <- withCallingHandlers(
+#                 {
+#                     estimate_mediation(
+#                         data = sim_data$data,
+#                         Sname = "school",
+#                         Wnames = NULL,
+#                         Xnames = names(sim_data$data)[grep("^X", names(sim_data$data))],
+#                         Aname = "A",
+#                         Mnames = "M",
+#                         Yname = "Y",
+#                         learners_a = learners_a,
+#                         learners_m = learners_m,
+#                         learners_y = learners_y,
+#                         cluster_opt = cluster_opt,  
+#                         num_folds = num_folds
+#                     )
+#                 },
+#                 warning = function(w) {
+#                     warnings_list <<- c(warnings_list, conditionMessage(w))  # Append warning message
+#                     invokeRestart("muffleWarning")  # Muffle warning to continue
+#                 }
+#             )
+#             
+#             # Store results and warnings in the list for this iteration
+#             results[[glue::glue("{methds$Fit[meth]}-{methds$cluster_opt[meth]}")]] <- list(
+#                 Fit = methds$Fit[[meth]], 
+#                 cluster_opt = methds$cluster_opt[[meth]], 
+#                 # methds[1, ], 
+#                 num_folds = num_folds, 
+#                 estimates = estimates,
+#                 warnings = warnings_list
+#             )
+#         }
+#         
+#         
+#         ###
+#         # clust_opt <- c("noncluster.glm", "FE.glm", "RE.glm") # "cwc", "cwc.FE"
+#         # results <- list()
+#         # 
+#         # for (opt in clust_opt) {
+#         #     warnings_list <- character(0)  # Reset warnings for each iteration
+#         #     
+#         #     estimates <- withCallingHandlers(
+#         #         {
+#         #             estimate_mediation(
+#         #                 data = sim_data$data,
+#         #                 Sname = "school",
+#         #                 Wnames = NULL,
+#         #                 Xnames = names(sim_data$data)[grep("^X", names(sim_data$data))],
+#         #                 Aname = "A",
+#         #                 Mnames = "M",
+#         #                 Yname = "Y",
+#         #                 learners_a = c("SL.glm"),
+#         #                 learners_m = c("SL.glm"),
+#         #                 learners_y = c("SL.glm"),
+#         #                 cluster_opt = opt,  
+#         #                 num_folds = 1
+#         #             )
+#         #         },
+#         #         warning = function(w) {
+#         #             warnings_list <<- c(warnings_list, conditionMessage(w))  # Append warning message
+#         #             invokeRestart("muffleWarning")  # Muffle warning to continue
+#         #         }
+#         #     )
+#         #     
+#         #     # Store results and warnings in the list for this iteration
+#         #     results[[opt]] <- list(
+#         #         estimates = estimates,
+#         #         warnings = warnings_list, 
+#         #         num_folds = 1           # change later
+#         #     )
+#         # }
+#         
+#         ########################################################################
+#         
+#         end_time_iter <- Sys.time()
+#         iter_duration <- as.numeric(difftime(end_time_iter, start_time_iter, units = "mins"))
+#         
+#         
+#         ########################################################################
+#         # Prep data for export (update code that follows this)
+#         iteration_data <- list(
+#             iteration = rep_idx,
+#             seed = seeds[rep_idx],
+#             cond_idx = cond_idx,
+#             condition_details = as.character(cond_label),
+#             iter_time_sec = round(iter_duration, 4),
+#             truevals = list(
+#                 truevals_individual = sim_data$truevals$truevals_individual, 
+#                 truevals_cluster = sim_data$truevals$truevals_cluster
+#             ), 
+#             effects = sim_data$effects,
+#             overlap = list(
+#                 ps_summary = sim_data$overlap$ps_summary, 
+#                 iptw_summary = sim_data$overlap$iptw_summary
+#             ), 
+#             parameters = list(
+#                 J = sim_data$parameters$J,
+#                 njrange = sim_data$parameters$njrange,
+#                 nj_sizes = sim_data$parameters$nj_sizes
+#             ), 
+#             # 
+#             results = results
+#         )
+#         # 
+#         # ########################################################################
+#         # 
+#         # # clear up space
+#         # rm(sim_data, results, estimates, warnings_list)
+#         # 
+#         # message 
+#         cat("Finished rep_idx =", rep_idx, "... @", format(Sys.time(), "%H:%M:%S"), "\n") #cat("Finished rep_idx =", rep_idx, "...\n")
+#         # Return the iteration data
+#         return(iteration_data)
+#         }, error = function(e) {
+#             list(iteration = rep_idx, 
+#                  error = TRUE, 
+#                  message = conditionMessage(e))
+#         })
+#     # })# 
+#     }, mc.cores = n_cores)# End of mclapply
+#     
+#     # # Validate structure of result_list #
+#     # if (!all(sapply(result_list, is.list))) { #
+#     #     stop("Some elements of result_list are not lists. Check the worker output.") #
+#     # } #
+#     # 
+#     # # Print structure for debugging #
+#     # str(result_list[1:5])  # Inspect the first few elements #
+#     
+#     # # Extract relevant fields and convert to a data frame
+#     # iteration_summary_df <- purrr::map_dfr(result_list, ~{
+#     #     tibble(
+#     #         iteration = .x$iteration,
+#     #         seed = .x$seed,
+#     #         cond_idx = .x$cond_idx,
+#     #         iter_time_sec = .x$iter_time_sec
+#     #     )
+#     # })
+#     
+#     # Check structure
+#     # str(result_list)
+#     # purrr::map(result_list, names)
+#     
+#     
+#     # Safely extract fields for the summary
+#     iteration_summary_df <- purrr::map_dfr(result_list, function(res) {
+#         if (is.null(res$iteration) || is.null(res$seed) || is.null(res$cond_idx)) {
+#             tibble(
+#                 iteration = NA,
+#                 seed = NA,
+#                 cond_idx = NA,
+#                 iter_time_sec = NA
+#             )
+#         } else {
+#             tibble(
+#                 iteration = res$iteration,
+#                 seed = res$seed,
+#                 cond_idx = res$cond_idx,
+#                 iter_time_sec = res$iter_time_sec
+#             )
+#         }
+#     })
+#     
+#     
+#     
+#     # iteration_summary_df <- do.call(rbind, result_list)
+#     mean_iter_time <- mean(iteration_summary_df$iter_time_sec)
+#     
+#     end_time_cond <- Sys.time()
+#     cond_duration <- as.numeric(difftime(end_time_cond, start_time_cond, units = "secs"))
+#     cond_time_formatted <- glue("{floor(cond_duration / 60)} min {round(cond_duration %% 60)} s")
+#     
+#     OverallPar_time <- rbind(
+#         OverallPar_time,
+#         data.frame(
+#             condition_index = cond_idx,
+#             condition_details = as.character(cond_label),
+#             n_reps = reps,
+#             total_time = cond_time_formatted,
+#             avg_iter_time = glue("{floor(mean_iter_time / 60)} min {round(mean_iter_time %% 60)} s"),
+#             stringsAsFactors  = FALSE
+#         )
+#     )
+#     
+#     # Save iteration summary in main folder
+#     # Commented out previous code:
+#     # saveRDS(iteration_summary_df, file.path(path, glue("S1_condition-{cond_idx}.rds")))
+#     # cond_idx_padded <- sprintf("%02d", cond_idx) # change condition number: 1 => 01
+#     # saveRDS(iteration_summary_df, file.path(path, glue("S1_condition-{cond_idx_padded}.rds")))
+#     
+#     # New code to save the list for each condition
+#     cond_idx_padded <- sprintf("%02d", cond_idx)
+#     # saveRDS(result_list, file.path(path, glue("S1_condition-{cond_idx_padded}.rds")))
+#     saveRDS(result_list, file.path(
+#         path,
+#         glue(
+#             "S1_condition-{cond_idx_padded}_reps-{reps}_null-{isNull}_quad-{isQuad}_M-{Mfamily}_Y-{Yfamily}_nj-[{Nj_low}-{Nj_high}]_J-{Jval}.rds"
+#         )
+#     ))
+#     
+#     #Glue used in prior code or Dr Liu's
+#     # cond_label <- glue("quad={isQuad}, M={Mfamily}, Y={Yfamily}, nj=[{Nj_low},{Nj_high}], J={Jval}")
+#     # rname <- glue("RData/qA{qA}qM{qM}qY{qY}_null{null}_cluster_opt{cluster_opt}_intXZ{intXZ}_xz{xz}_{Yfamily}_Fit_{learner}_icc{icc}_J{J}_n{nj}_rep{jobseeds[1]}_{tail(jobseeds, 1)}.RData")
+#     
+#     # clear space
+#     rm(result_list)
+#     # gc()
+#     
+#     cat(glue(
+#         "[{format(Sys.time(), '%Y-%m-%d %H:%M:%S')}] Condition {cond_idx_padded}/{total_conditions} ",
+#         "({round((cond_idx / total_conditions) * 100)}%) completed. ({cond_label}) ",
+#         "Time: {cond_time_formatted}"
+#     ))
+# }
+# 
+# # ══════════════════════════════
+# #     Save Overall Timing and Total Time
+# # ══════════════════════════════
+# # total_time_sum <- sum(as.numeric(gsub(" min.*", "", OverallPar_time$total_time)) * 60 + as.numeric(sub(".*min ", "", gsub(" s", "", OverallPar_time$total_time_min))))
+# # message(glue("Total computation time: {floor(total_time_sum / 60)} min {round(total_time_sum %% 60)} s"))
+# # saveRDS(OverallPar_time, file.path(path, "S1_Computation-Time.rds"))
+# 
+# total_seconds <- sum(
+#     OverallPar_time %>%
+#         mutate(
+#             minutes = as.numeric(str_extract(total_time, "\\d+(?= min)")),
+#             seconds = as.numeric(str_extract(total_time, "\\d+(?= s)"))
+#         ) %>%
+#         mutate(minutes = ifelse(is.na(minutes), 0, minutes),  # Handle cases with only seconds
+#                seconds = ifelse(is.na(seconds), 0, seconds)) %>%
+#         summarise(total_seconds = sum(minutes * 60 + seconds)) %>%
+#         pull(total_seconds)
+# )
+# 
+# # Convert total seconds to minutes and seconds
+# total_minutes <- floor(total_seconds / 60)
+# remaining_seconds <- total_seconds %% 60
+# 
+# message(glue("Total computation time: {total_minutes} min {remaining_seconds} s"))
+# 
+# # Add total time to Computation time file & save 
+# OverallPar_time <- rbind(OverallPar_time,
+#                          c(
+#                              NA,
+#                              NA,
+#                              sum(OverallPar_time$n_reps),
+#                              glue("{total_minutes} min {remaining_seconds} s"),
+#                              NA
+#                          ))
+# saveRDS(OverallPar_time, file.path(path, "S1_Computation-Time.rds"))
+# 
+# # ══════════════════════════════
+# #     Shutdown Parallel 
+# # ══════════════════════════════
+# # stopCluster(cl)
+# 
+# 
+# # END OF SCRIPT MESSAGE
+# # BRRR::skrrrahh_list()
+# # BRRR::skrrrahh("biggie")
+# # BRRR::skrrrahh("kendrick")

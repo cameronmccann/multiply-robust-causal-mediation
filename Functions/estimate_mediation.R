@@ -95,7 +95,8 @@ estimate_mediation <- function(data,
         cluster_opt_a = cluster_opt,
         cluster_opt_m = cluster_opt,
         cluster_opt_y = cluster_opt,
-        cluster_opt_v = "cwc",                # SHOULD USERS BE ABLE TO SPECIFY THIS THROUGH estimate_mediation()?
+        # cluster_opt_v = "cwc",                # SHOULD USERS BE ABLE TO SPECIFY THIS THROUGH estimate_mediation()?
+        cluster_opt_v = cluster_opt,
         interaction_fity = c("AM"),
         num_folds = num_folds,
         learners_a = learners_a,

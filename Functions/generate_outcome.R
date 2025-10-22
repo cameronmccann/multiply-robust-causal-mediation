@@ -59,7 +59,7 @@ generate_outcome <- function(data_list, iccy = 0.2, yintercept = 1,
     if (if.null == TRUE) {
         gen_y <- list(
             iccy = iccy,
-            yintercept = 1,
+            yintercept = yintercept, # 1, # changed on 2025-08-29
             y_on_a = 0,
             y_on_m = 0,
             y_on_am = 0,

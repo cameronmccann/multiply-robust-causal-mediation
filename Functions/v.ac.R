@@ -104,7 +104,12 @@ v.ac <- function(a=1, astar=0, mu_mac, data_in, varnames, Yfamily = "gaussian", 
 
             ##
             train_sub <- train[predict_subset, ]
-            message("In v.ac() fold ", v, ": nrow(train_sub) = ", nrow(train_sub))
+            # message("In v.ac() fold ", v, ": nrow(train_sub) = ", nrow(train_sub))
+            # message("In v.ac() fold ", v, ": nrow(train_sub) = ", nrow(train_sub), "; var(mu) = ", round(stats::var(train_sub$mu), 6))
+            message(glue::glue(
+                "In v.ac[opt={cluster_opt}|L=({toString(learners)})] fold {sprintf('%02d', v)}:     n ={sprintf('%4d', nrow(train_sub))}    var(mu)={formatC(round(stats::var(train_sub$mu), 6), format='f', digits=6)}", 
+                .trim = FALSE
+            ))
             if (nrow(train_sub) == 0) {
                 stop("Predict subset is empty—cannot fit a model.")
             }
@@ -113,6 +118,18 @@ v.ac <- function(a=1, astar=0, mu_mac, data_in, varnames, Yfamily = "gaussian", 
             if (sum(predict_subset) == 0) {
                 stop(glue("No matching rows in train where A equals astar for fold {v}."))
             }
+            
+            ## Error message 2025-08-19:
+            # compute variance and log
+            # mu_var <- tryCatch(stats::var(train_sub$mu), error = function(e) NA_real_)
+            # message(paste(
+            #               "                 ", 
+            #     "v.ac fold", v,
+            #     "n_train_sub=", nrow(train_sub),
+                # "var(mu)=", round(mu_var %||% NA_real_, 6),
+            #     "astar=", astar,
+            #     "cluster_opt_v=", cluster_opt
+            # ))
 
             alist <- crossfit(train[predict_subset, ], valid_list,
                               "mu",
@@ -120,7 +137,8 @@ v.ac <- function(a=1, astar=0, mu_mac, data_in, varnames, Yfamily = "gaussian", 
                               varnames,
                               ipw,
                               cluster_opt,
-                              type = "gaussian",
+                              # type = "gaussian",
+                              type = Yfamily,
                               learners, bounded, 
                               random_slope_vars = random_slope_vars)
         }

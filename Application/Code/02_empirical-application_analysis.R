@@ -18,12 +18,13 @@
 #   intervals. Covariate balance is visualized. Finally, it visualizes the 
 # estimated effects to facilitate interpretation of the results.
 # 
-# Last Updated: 2025-09-01
+# Last Updated: 2025-09-03
 #
 #
 # Notes:
 #   # Need to re-run empirical applicaiton (especially with updated functions). 
 #       Also clarify the larger neg association btw T & Y in larger clusters statement in paper. 
+#   # Also should get ICC
 # 
 ################################################################################
 
@@ -46,15 +47,21 @@ pacman::p_load(
     lme4, 
     WeMix, 
     parallel, 
-    kable
+    kable, 
+    
+    glue, 
+    mvtnorm, 
+    SuperLearner, 
+    origami, 
+    fastDummies
 )
 
-library(glue)
-library(tidyverse)
-library(mvtnorm)
-library(SuperLearner)
-library(origami)
-library(fastDummies)
+# library(glue)
+# library(tidyverse)
+# library(mvtnorm)
+# library(SuperLearner)
+# library(origami)
+# library(fastDummies)
 
 # Load Functions & Packages
 # source("Application/Functions/bootstrap_ci_paral_2.R")
@@ -64,12 +71,9 @@ library(fastDummies)
 # source("Application/Functions/analyze_clustered_mediation.R")
 # devtools::load_all("Application/Functions/MediatorCL")
 
-
-
 # ══════════════════════════════
 #     Source Updated Functions
 # ══════════════════════════════
-# Functions are from Functions folder in directory 
 function_names <- c(
     # # "generate_data", 
     # "generate_clusters", 
@@ -107,14 +111,9 @@ for (func in function_names) {
 }
 
 
-
 # Import Data -----------------------------------------------------
 # Load clean dataset 
 data <- read_rds(file = "Application/Data/Cleaned/Empirical-Application-Data.rds")
-
-# # Drop clusters < 8
-# data <- data |> 
-#     filter(CLUSTER2 != 274)
 
 # Need
 ## ICC
@@ -123,23 +122,28 @@ data <- read_rds(file = "Application/Data/Cleaned/Empirical-Application-Data.rds
 # ══════════════════════════════
 #    Treatment Proportion 
 # ══════════════════════════════
+
 # check proportion of adolescents in treatment per cluster 
 trt_df <- data |> 
     group_by(CLUSTER2) |> 
     reframe(size = max(n), 
             trt_num = sum(sportPartic_w1), 
             trt_prop = sum(sportPartic_w1) / n)
+
+# Descriptives of treatment proportion 
 psych::describe(trt_df$trt_prop)
 
+# Display those in a cluster with extreme treatment proportion
 trt_df[trt_df$trt_prop > 0.99 | trt_df$trt_prop < 0.01, ]
+
 # Drop cluster with extreme trt proportion 
 data <- data |>
     filter(CLUSTER2 != 216)
-# cluster_sizes[cluster_sizes$cluster_size < 10, ]
 
 # ══════════════════════════════
 #    Cluster Sizes 
 # ══════════════════════════════
+
 # cluster size description 
 psych::describe(data)
 # head(data)
@@ -149,6 +153,8 @@ cluster_sizes <- data %>%
     group_by(CLUSTER2) %>%
     summarise(cluster_size = n()) %>% 
     ungroup()
+# Descriptives on cluster size 
+psych::describe(cluster_sizes)
 
 # Compute overall descriptive statistics for cluster sizes
 cluster_summary <- cluster_sizes %>%
@@ -160,10 +166,195 @@ cluster_summary <- cluster_sizes %>%
         median_cluster_size = median(cluster_size),
         sd_cluster_size  = sd(cluster_size)
     )
-psych::describe(cluster_sizes)
 
 # Print the descriptive summary
 print(cluster_summary)
+
+
+
+
+# Build & Test make_fold_K ------------------------------------------------
+
+# ══════════════════════════════
+# In this section I will focus on testing make_fold_K() using the empirical application data. 
+# Currently, I am getting errors trying to use it on the dataset. 
+# ══════════════════════════════
+
+
+make_fold_K(data_in = data, Sname = "CLUSTER2", Yname = "depress_w4", cv_folds = 2)
+
+
+# Next, lets check the outcome frequency by cluster
+data |> 
+    group_by(CLUSTER2) |> 
+    summarize(n = n(), 
+              outcom_var = var(depress_w4), 
+              outcom_mean = mean(depress_w4), 
+              outcom_uniq_freq = length(unique(depress_w4)), 
+              outcom_uniq = toString(sort(unique(depress_w4)))) |> 
+    arrange(outcom_uniq_freq) |> 
+    print(n = Inf)
+# We do not have any clusters with only 2 outcome values (lowest is 5 unique outcome values)
+# So the binary code in make_fold_K() is not getting triggered. 
+
+
+# data_in
+unique(data[["CLUSTER2"]])
+
+
+
+
+
+
+
+
+make_fold_K <- function(data_in, Sname, Yname, cv_folds = 4) {
+    
+    # For each unique cluster, split its rows into V folds
+    fold_K <- lapply(unique(data_in[[Sname]]), FUN = function(k) {
+        
+        # Assign integer cluster labels
+        data_in$K <- match(data_in[[Sname]], unique(data_in[[Sname]]))
+        # Map label to index (helps if clusters are character, instead of numeric)
+        k_idx <- match(k, unique(data_in[[Sname]]))
+        
+        # Only split if cluster has at least one row
+        if (nrow(data_in[data_in$K == k_idx, ]) >= 1) {
+            
+            # Build strata within cluster (only when feasible)
+            strata_local <- NULL
+            if (!is.null(Yname) && Yname %in% names(data_in)) {
+                y_k <- data_in[data_in$K == k_idx, Yname, drop = TRUE]
+                tab <- table(y_k)
+                if (length(tab) == 2L) {
+                    if (min(tab) >= cv_folds) {
+                        strata_local <- as.integer(as.factor(y_k))
+                    } else {
+                        warning(sprintf(
+                            "Cluster '%s': minority count = %d < V = %d; not stratifying this cluster.",
+                            as.character(k), min(tab), cv_folds
+                        ))
+                    }
+                } else {
+                    warning(sprintf(
+                        "Cluster '%s': binary outcome only has one value; not stratifying this cluster.",
+                        as.character(k)
+                    ))
+                }
+            }
+            
+            # Create V-folds within this cluster (stratified when feasible)
+            fk <- origami::make_folds(data_in[data_in$K == k_idx, ], # k,],
+                                      fold_fun = origami::folds_vfold,
+                                      V = cv_folds,
+                                      strata_ids = strata_local)
+            fold_k <- fk
+            
+            # Remap fold indices (relative to the cluster) back to global row IDs
+            # v <- 1
+            for (v in 1:cv_folds) {
+                fold_k[[v]]$validation_set <-
+                    data_in$id[data_in$K == k_idx][fk[[v]]$validation_set]
+                fold_k[[v]]$training_set <-
+                    data_in$id[data_in$K == k_idx][fk[[v]]$training_set]
+            }
+        }
+        
+        # NOTE: commented out code would handle tiny clusters (< 4 rows)
+        # by reusing the whole cluster for both training and validation.
+        
+        # if (nrow(data_in[data_in$K==k, ]) < 4) {
+        #   # if cluster size too small, no cluster split; use entire cluster as both training and valid
+        #   fk <- origami::make_folds(
+        #     data_in[data_in$K==k, ][sample(1:nrow(data_in[data_in$K==k, ]), cv_folds*2, replace = T), ],
+        #                             fold_fun = origami::folds_vfold,
+        #                             V = cv_folds
+        #   )
+        #   fold_k <- fk
+        #   for(v in 1:cv_folds) {
+        #     fold_k[[v]]$validation_set <- data_in$id[data_in$K==k]
+        #     fold_k[[v]]$training_set <- data_in$id[data_in$K==k]
+        #   }
+        #
+        # }
+        
+        return(fold_k)
+    } )
+    
+    # Initialize global folds
+    folds <- origami::make_folds(data_in,
+                                 fold_fun = origami::folds_vfold,
+                                 V = cv_folds)
+    
+    # For each v-th fold, combine v-th within-cluster folds across clusters
+    for(v in 1:cv_folds) {
+        folds[[v]]$validation_set <- unlist(lapply(1:length(fold_K), FUN = function(k = 1) {
+            fold_K[[k]][[v]]$validation_set
+        }))
+        folds[[v]]$training_set <- unlist(lapply(1:length(fold_K), FUN = function(k = 1) {
+            fold_K[[k]][[v]]$training_set
+        }))
+    }
+    
+    folds
+}
+
+
+
+
+
+
+
+
+
+
+
+psych::describe(data$depress_w4)
+
+test <- estimate_mediation(
+    data = data, 
+    Sname = "CLUSTER2", 
+    Wnames = NULL, 
+    Xnames = 
+)
+# Run the mediation analysis
+set.seed(5897)
+start_time <- Sys.time()
+
+tmp <- estimate_mediation(
+    data = data,
+    Sname = "CLUSTER2",
+    Wnames = NULL,
+    Xnames = colnames(data[, c(
+        "age_w1_sc",
+        "sex_w1",
+        "white_w1",
+        "black_w1",
+        "parentalEdu_w1_sc",
+        "familyStruct_w1",
+        "feelings_w1_sc",
+        "selfEst_w1_sc"
+    )]),
+    Aname = "sportPartic_w1",
+    Mnames = "selfEst_w3_sc",
+    Yname = "depress_w4",
+    learners_a = params$learners,
+    learners_m = params$learners,
+    learners_y = params$learners,
+    cluster_opt = params$cluster_opt, 
+    num_folds = params$num_folds
+)
+
+end_time <- Sys.time()
+tmp$duration_secs <- as.numeric(difftime(end_time, start_time, units = "secs"))
+
+# Attach the parameters as extra columns to the output data frame.
+tmp$learners <- paste(params$learners, collapse = ", ")
+tmp$num_folds <- params$num_folds
+tmp$cluster_opt <- params$cluster_opt
+
+# Save the updated result into the results list.
+results_list[[i]] <- tmp
 
 
 
@@ -265,7 +456,7 @@ param_list <- list(
                       "SL.gam", # non-linearity
                       "SL.ranger", # random forest
                       xgb_depth2$names), # boosted trees with max depth of 2
-         num_folds = 20,
+         num_folds = 5, #20,
          cluster_opt = "cwc.FE"),
     
     list(learners = c(xgb_depth2$names), #c("SL.glm", "SL.glmnet", "SL.mean"), 
@@ -366,7 +557,12 @@ combined_results <- do.call(rbind, lapply(seq_along(results_list), function(i) {
 
 # If you want to view the combined results:
 print(combined_results)
-
+# on 2025-09-03: 
+#                   Effect  EffectVersion    Estimate   StdError     CILower    CIUpper duration_secs                                                learners num_folds cluster_opt   setup
+# 1   Direct Effect (DE) Individual-Avg -0.22984178 0.17243742 -0.57419650 0.11451294      1734.712 SL.mean, SL.glm, SL.glmnet, SL.gam, SL.ranger, xgb_d2_2         5      cwc.FE Setup_1
+# 2 Indirect Effect (IE) Individual-Avg -0.01763323 0.03665058 -0.09082385 0.05555739      1734.712 SL.mean, SL.glm, SL.glmnet, SL.gam, SL.ranger, xgb_d2_2         5      cwc.FE Setup_1
+# 3   Direct Effect (DE)    Cluster-Avg -0.08157478 0.21213742 -0.50520975 0.34206019      1734.712 SL.mean, SL.glm, SL.glmnet, SL.gam, SL.ranger, xgb_d2_2         5      cwc.FE Setup_1
+# 4 Indirect Effect (IE)    Cluster-Avg -0.03663675 0.04117814 -0.11886882 0.04559532      1734.712 SL.mean, SL.glm, SL.glmnet, SL.gam, SL.ranger, xgb_d2_2         5      cwc.FE Setup_1
 
 # library(BRRR)
 # BRRR::skrrrahh("waka")
@@ -375,7 +571,7 @@ BRRR::skrrrahh("biggie") #BRRR::skrrrahh_list()
 # Save
 readr::write_csv(
     combined_results, 
-    file = c("Application/Output/Effect-Estimates.csv"), 
+    file = paste0("Application/Output/Effect-Estimates", "_2025-09-03",  ".csv"), #file = c("Application/Output/Effect-Estimates.csv"), 
     col_names = TRUE
 )
 
@@ -390,6 +586,121 @@ readr::write_csv(
 # 2 Indirect Effect (IE) Individual-Avg -0.01773872 0.03568100 -0.08899311 0.05351566      7623.395   SL.mean, SL.glm, SL.glmnet, SL.gam, SL.ranger, xgb_d2_2        20      cwc.FE
 # 3   Direct Effect (DE)    Cluster-Avg -0.06675852 0.21300744 -0.49213091 0.35861387      7623.395   SL.mean, SL.glm, SL.glmnet, SL.gam, SL.ranger, xgb_d2_2        20      cwc.FE
 # 4 Indirect Effect (IE)    Cluster-Avg -0.04320476 0.04126664 -0.12561356 0.03920405      7623.395   SL.mean, SL.glm, SL.glmnet, SL.gam, SL.ranger, xgb_d2_2        20      cwc.FE
+
+
+# ══════════════════════════════
+#    Investigate why individual-avg PNDE is larger than cluster-avg PNDE 
+# ══════════════════════════════
+
+data |> 
+    ggplot(aes(x = as.factor(CLUSTER2), 
+               y = depress_w4, 
+               fill = as.factor(CLUSTER2))) +
+    geom_boxplot() +
+    theme(legend.position = "none")
+
+
+data |> 
+    ggplot(aes(x = sportPartic_w1, 
+               y = depress_w4, 
+               color = quartil)) +
+    geom_jitter() +
+    theme(legend.position = "none")
+
+
+
+# Create quartile category for cluster sizes 
+data2 <- data |> 
+    group_by(CLUSTER2) |> 
+    mutate(n = n(), 
+              .groups = "drop") |> 
+    mutate(n_quartile = ntile(n, 4), 
+           quartile_label = case_when(
+               n_quartile == 1 ~ "0-25%", 
+               n_quartile == 2 ~ "25-50%", 
+               n_quartile == 3 ~ "50-75%",
+               n_quartile == 4 ~ "75-100%"
+           ))
+# boxplot of depression scores (y) by sports participation (A) for each size of clusters
+data2 |> 
+    ggplot(aes(x = as.factor(sportPartic_w1), 
+               y = depress_w4, 
+               color = quartile_label)) +
+    geom_boxplot(aes(fill = quartile_label, alpha = 0.5)) + 
+    facet_grid(~quartile_label) 
+# 
+data2 |> 
+    group_by(n_quartile, CLUSTER2) |> 
+    summarise(
+        n = n(), 
+        correlation = cor(sportPartic_w1, depress_w4, use = "complete.obs"),
+        .groups = "drop"
+    ) |> 
+    ggplot(aes(x = n, 
+               y = correlation)) +
+    geom_point(aes(color = factor(n_quartile), size = n)) +
+    geom_smooth(method = lm, se = FALSE) +
+    theme(legend.position = "none")
+
+data2 |> 
+    group_by(quartile_label) |> #    group_by(CLUSTER2) |> 
+    summarise(
+        n = n(), 
+        correlation = cor(sportPartic_w1, depress_w4, use = "complete.obs"),
+        .groups = "drop"
+    ) |> 
+    ggplot(aes(x = n, 
+               y = correlation)) +
+    geom_point(aes(color = quartile_label, size = n)) +
+    geom_smooth(method = lm, se = FALSE) +
+    theme(legend.position = "none")
+
+
+
+
+
+unique(data2$n_quartile)
+
+
+# check corr
+data |> 
+    group_by(CLUSTER2) |> 
+    summarise(
+        n            = n(),
+        correlation  = cor(sportPartic_w1, depress_w4, use = "complete.obs"),
+        .groups      = "drop"
+    ) |> 
+    arrange(n) |> 
+    print(n = 120) |> 
+    mutate(
+        n_quartile = ntile(n, 4),
+        quartile_lbl = case_when(
+            n_quartile == 1 ~ "bottom 25%",
+            n_quartile == 2 ~ "25–50%",
+            n_quartile == 3 ~ "50–75%",
+            n_quartile == 4 ~ "top 25%"
+        )
+    ) |> 
+    group_by(quartile_lbl) %>%
+    summarise(
+        clusters      = n(),          
+        min_n         = min(n),
+        max_n         = max(n),
+        mean_n        = mean(n),
+        mean_corr     = mean(correlation),
+        sd_corr       = sd(correlation),
+        median_corr   = median(correlation),
+        .groups       = "drop"
+    ) %>%
+    arrange(match(quartile_lbl,
+                  c("bottom 25%", "25–50%", "50–75%", "top 25%")))
+
+
+
+
+
+
+
 
 
 # Display results ---------------------------------------------------------
