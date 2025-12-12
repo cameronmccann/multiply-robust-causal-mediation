@@ -22,7 +22,7 @@
 # /Users/cameronmccann/Documents/Research-2025/multiply-robust-causal-mediation/Output/S1_Simulation-Output/
 #     
 #
-# Last Updated: 2025-10-21
+# Last Updated: 2025-11-19
 #
 #
 # Notes:
@@ -57,10 +57,10 @@ pacman::p_load(
 # Set date, reps, & folders ----------------------------------------------
 
 # Date of simulation 
-sim_date <- "2025-09-03"
+sim_date <- "2025-10-22" # "2025-09-03"
 
 # Number of replications
-reps <- 200 # 1000
+reps <- 600 # 200 # 1000
 
 # Create directory to store results 
 ## Results folder 
@@ -69,7 +69,7 @@ if (!dir.exists(path)) {
     dir.create(path)
 }
 ### Add subdirectory, if desired (e.g., for test runs): where do you want results stored
-additional_folder_results <- "2025-09-03_200-reps" 
+additional_folder_results <- "2025-10-22_600-reps" # "2025-09-03_200-reps" 
 ### Check if additional_folder_results is not NULL to add to path
 if (!is.null(additional_folder_results)) {
     results_path <- file.path(path, additional_folder_results)
@@ -92,7 +92,7 @@ if (!dir.exists(paste0(results_path, "/Tables"))) {
 # Simulation output path 
 sim_output_path <- "Output/S1_Simulation-Output"
 ### where to pull output from 
-additional_folder_output <- "2025-09-03_200-reps" 
+additional_folder_output <- "2025-10-22_600-reps" # "2025-09-03_200-reps" 
 ### Check if additional_folder_output is not NULL to add to path
 if (!is.null(additional_folder_output)) {
     sim_output_path <- file.path(sim_output_path, additional_folder_output)
@@ -237,6 +237,18 @@ overall_list <- set_names(
 # File 79: Dropping 1 iterations with error msg at indices: 18 (S1_condition-79_reps-205_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-40.rds)
 # File 81: Dropping 1 iterations with error msg at indices: 43 (S1_condition-81_reps-205_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds)
 # File 83: Dropping 1 iterations with error msg at indices: 168 (S1_condition-83_reps-205_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds)
+
+# 2025-11-18:
+# File 52: Dropping 1 iterations with error msg at indices: 198 (S1_condition-52_reps-610_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-40.rds)
+# File 56: Dropping 3 iterations with error msg at indices: 403, 502, 538 (S1_condition-56_reps-610_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds)
+# File 57: Dropping 4 iterations with error msg at indices: 68, 238, 369, 458 (S1_condition-57_reps-610_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds)
+# File 59: Dropping 3 iterations with error msg at indices: 159, 330, 378 (S1_condition-59_reps-610_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds)
+# File 60: Dropping 1 iterations with error msg at indices: 485 (S1_condition-60_reps-610_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds)
+# File 73: Dropping 2 iterations with error msg at indices: 79, 333 (S1_condition-73_reps-610_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-40.rds)
+# File 74: Dropping 6 iterations with error msg at indices: 165, 205, 394, 399, 496, 595 (S1_condition-74_reps-610_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-70.rds)
+# File 77: Dropping 2 iterations with error msg at indices: 145, 605 (S1_condition-77_reps-610_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-70.rds)
+# File 78: Dropping 1 iterations with error msg at indices: 199 (S1_condition-78_reps-610_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-100.rds)
+# File 79: Dropping 2 iterations with error msg at indices: 18, 222 (S1_condition-79_reps-610_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-40.rds)
 
 # Save overall simulation output list for reference later
 saveRDS(overall_list, 
@@ -444,6 +456,63 @@ purrr::imap(extreme_list, function(cond, cond_name) {
 # cond_94 | mlr-cwc.FE: indx=74 | iter=550 | seed=944532
 # cond_96 | mlr-cwc.FE: indx=27, 157 | iter=2899, 21056 | seed=351074, 519951
 
+# 2025-11-18:
+# cond_01 | mlr-cwc.FE: indx=557 | iter=559 | seed=19233
+# cond_01 | mlr-cwc: indx=230 | iter=230 | seed=229531
+# cond_01 | glm-cwc.FE: indx=191, 230 | iter=191, 230 | seed=426662, 229531
+# cond_01 | glm-cwc: indx=191, 230, 403 | iter=191, 230, 403 | seed=426662, 229531, 232749
+# cond_02 | mlr-cwc: indx=416 | iter=419 | seed=875999
+# cond_02 | glm-cwc.FE: indx=274 | iter=277 | seed=800579
+# cond_04 | mlr-cwc.FE: indx=253, 510 | iter=254, 513 | seed=134127, 388028
+# cond_05 | mlr-cwc.FE: indx=480 | iter=484 | seed=299835
+# cond_06 | mlr-cwc.FE: indx=212 | iter=217 | seed=729113
+# cond_07 | mlr-cwc.FE: indx=449 | iter=449 | seed=657093
+# cond_10 | glm-cwc.FE: indx=43 | iter=43 | seed=468871
+# cond_10 | glm-cwc: indx=43 | iter=43 | seed=468871
+# cond_16 | mlr-cwc: indx=463 | iter=465 | seed=119637
+# cond_19 | mlr-cwc.FE: indx=580 | iter=583 | seed=478500
+# cond_20 | mlr-cwc.FE: indx=418 | iter=421 | seed=948810
+# cond_25 | glm-cwc.FE: indx=69, 144 | iter=69, 144 | seed=832984, 898270
+# cond_25 | glm-cwc: indx=69 | iter=69 | seed=832984
+# cond_26 | glm-cwc.FE: indx=328 | iter=331 | seed=269470
+# cond_26 | glm-cwc: indx=328 | iter=331 | seed=269470
+# cond_28 | mlr-cwc.FE: indx=515 | iter=518 | seed=988900
+# cond_28 | mlr-cwc: indx=377 | iter=379 | seed=678094
+# cond_28 | glm-cwc.FE: indx=89, 377 | iter=89, 379 | seed=446888, 678094
+# cond_28 | glm-cwc: indx=89, 377 | iter=89, 379 | seed=446888, 678094
+# cond_31 | glm-cwc.FE: indx=581 | iter=584 | seed=547459
+# cond_37 | glm-cwc.FE: indx=288 | iter=288 | seed=666953
+# cond_37 | glm-cwc: indx=288 | iter=288 | seed=666953
+# cond_40 | mlr-cwc.FE: indx=172, 275 | iter=172, 276 | seed=296995, 346669
+# cond_40 | mlr-cwc: indx=172 | iter=172 | seed=296995
+# cond_40 | glm-cwc.FE: indx=172 | iter=172 | seed=296995
+# cond_41 | glm-cwc.FE: indx=6 | iter=6 | seed=90493
+# cond_41 | glm-cwc: indx=6 | iter=6 | seed=90493
+# cond_43 | glm-cwc.FE: indx=253 | iter=253 | seed=574717
+# cond_43 | glm-cwc: indx=253 | iter=253 | seed=574717
+# cond_44 | mlr-cwc.FE: indx=114 | iter=115 | seed=521817
+# cond_46 | glm-cwc.FE: indx=252 | iter=253 | seed=574717
+# cond_46 | glm-cwc: indx=252 | iter=253 | seed=574717
+# cond_47 | mlr-cwc: indx=322 | iter=325 | seed=178893
+# cond_48 | mlr-cwc: indx=100 | iter=104 | seed=167465
+# cond_49 | glm-cwc: indx=424 | iter=2805 | seed=133033
+# cond_61 | mlr-cwc.FE: indx=562 | iter=3740 | seed=769694
+# cond_62 | mlr-cwc.FE: indx=497, 502, 569, 582 | iter=14053, 14101, 16070, 16315 | seed=369688, 698492, 206574, 23459
+# cond_64 | mlr-cwc.FE: indx=207, 236 | iter=1314, 1558 | seed=362398, 794982
+# cond_65 | mlr-cwc.FE: indx=89 | iter=2541 | seed=115790
+# cond_66 | mlr-cwc.FE: indx=20, 379, 496, 499 | iter=2438, 46716, 60086, 60510 | seed=283639, 102303, 981085, 998560
+# cond_67 | mlr-cwc.FE: indx=225, 327 | iter=1461, 2165 | seed=972867, 306937
+# cond_68 | mlr-cwc.FE: indx=68, 118, 347, 604 | iter=1956, 3474, 9441, 17006 | seed=608465, 562497, 84271, 868095
+# cond_69 | mlr-cwc.FE: indx=5, 124, 287, 461, 543 | iter=760, 14436, 32272, 53052, 60397 | seed=654070, 947055, 818437, 433695, 157278
+# cond_71 | mlr-cwc.FE: indx=68, 113, 386, 479, 555 | iter=1801, 3335, 10331, 13128, 15287 | seed=464385, 351844, 387499, 844063, 240313
+# cond_72 | mlr-cwc.FE: indx=133, 157 | iter=17163, 21056 | seed=338062, 519951
+# cond_73 | glm-cwc.FE: indx=418, 555 | iter=2778, 3730 | seed=168749, 72307
+# cond_73 | glm-cwc: indx=418, 555 | iter=2778, 3730 | seed=168749, 72307
+# cond_76 | glm-cwc.FE: indx=120, 224 | iter=849, 1472 | seed=224309, 439115
+# cond_76 | glm-cwc: indx=120, 224 | iter=849, 1472 | seed=224309, 439115
+# cond_77 | glm-cwc.FE: indx=312 | iter=8603 | seed=851825
+# cond_78 | mlr-cwc: indx=331 | iter=41170 | seed=102420
+# cond_79 | mlr-cwc: indx=188 | iter=1182 | seed=686620
 
 # ══════════════════════════════
 #     Source Updated Functions to re-run parts of simulation
