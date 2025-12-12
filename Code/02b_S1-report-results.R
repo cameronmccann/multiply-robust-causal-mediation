@@ -4,18 +4,18 @@
 
 ############################ Script Description ################################
 #
-# Author: Cameron McCann
+# Author: 
 # 
 # Date Created: 2025-07-01
 #
 #
 # Script Description: 
-#       This script creates tables and figures summarizing the performance 
+#       Creates tables and figures summarizing the performance 
 #       of estimation methods in Simulation 1, including metrics such as 
 #       bias, MSE, coverage, and power for direct and indirect effects.
 #
 #
-# Last Updated: 2025-10-22
+# Last Updated: 2025-12-11
 #
 #
 # Notes:
@@ -40,80 +40,81 @@ pacman::p_load(
     dplyr,
     tidyverse, 
     ggplot2, 
-    flextable, 
+    purrr, 
     stringr, 
+    flextable, 
+    huxtable, 
     ggdag, 
     dagitty, 
-    huxtable, 
     glue
 )
 
 
-# Set date, reps, & folders ----------------------------------------------
+# User Inputs / Global Options --------------------------------------------
 
 # Date of simulation
-sim_date <- "2025-09-03" 
+sim_date <- "2025-10-22" # "2025-09-03" 
 
-# Results folder 
-path <- "Output/S1_Results"
-if (!dir.exists(path)) {
-    dir.create(path)
+# Create no-values-replaced Figures folder?
+noValsReplaced_folder <- TRUE
+
+# Add subdirectory, if desired (e.g., for test runs): where do you want results stored
+additional_folder_results <- "2025-10-22_1000-reps" # "2025-09-03_200-reps" 
+
+
+# Set up directory structure ----------------------------------------------
+
+# Root folder where Simulation 1 results are stored (tables, figures, data)
+results_root <- "Output/S1_Results"
+
+if (!dir.exists(results_root)) {
+    dir.create(results_root, recursive = TRUE)
 }
-### Add subdirectory, if desired (e.g., for test runs): where do you want results stored
-additional_folder_results <- "2025-09-03_200-reps" 
-### Check if additional_folder is not NULL to add to path
+
+# Check if additional_folder is not NULL to add to path
 if (!is.null(additional_folder_results)) {
-    results_path <- file.path(path, additional_folder_results)
+    results_path <- file.path(results_root, additional_folder_results)
 }
-### Create directory
+
+# Create directory
+results_path <- file.path(results_root, additional_folder_results)
 if (!dir.exists(results_path)) {
-    dir.create(results_path)
-}
-## Data subfolder
-if (!dir.exists(paste0(results_path, "/Data"))) {
-    dir.create(paste0(results_path, "/Data"))
-}
-## Figure subfolder 
-if (!dir.exists(paste0(results_path, "/Figures"))) {
-    dir.create(paste0(results_path, "/Figures"))
-}
-## Tables subfolder
-if (!dir.exists(paste0(results_path, "/Tables"))) {
-    dir.create(paste0(results_path, "/Tables"))
+    dir.create(results_path, recursive = TRUE)
 }
 
-## Figures path 
-figures_path <- paste0(results_path, "/Figures_2025-10-21_replaced-extreme-values")
-## Create Figures folder  
-if (!dir.exists(figures_path)) {
-    dir.create(figures_path)
+# Create Data, Figures, Tables subfolders
+results_subfolders <- c("Data", "Figures", "Tables")
+for (sf in results_subfolders) {
+    dir.create(file.path(results_path, sf), showWarnings = FALSE, recursive = TRUE)
 }
 
-## Figures' subfolders
-if (!dir.exists(paste0(figures_path, "/TNIE"))) {
-    dir.create(paste0(figures_path, "/TNIE"))
+# Select which Figures folder to use 
+if (noValsReplaced_folder) {
+    figures_path <- file.path(results_path, "Figures_no-values-replaced")
+} else {
+    figures_path <- file.path(results_path, "Figures")
 }
-if (!dir.exists(paste0(figures_path, "/PNDE"))) {
-    dir.create(paste0(figures_path, "/PNDE"))
+
+# Ensure figure folder exists 
+dir.create(figures_path, showWarnings = FALSE, recursive = TRUE)
+
+# Create Figures subfolders 
+fig_subfolders <- c("NIE", "NDE", "Convergence", "In-text")
+for (sf in fig_subfolders) {
+    dir.create(file.path(figures_path, sf), showWarnings = FALSE, recursive = TRUE)
 }
-if (!dir.exists(paste0(figures_path, "/Convergence"))) {
-    dir.create(paste0(figures_path, "/Convergence"))
+
+# Create Figures subsubfolders (nonnull, null)
+for (ssf in c("nonnull", "null")) {
+    dir.create(file.path(figures_path, "NIE", ssf), showWarnings = FALSE, recursive = TRUE)
+    dir.create(file.path(figures_path, "NDE", ssf), showWarnings = FALSE, recursive = TRUE)
 }
-## Figures' subsubfolder
-### TNIE
-if (!dir.exists(paste0(figures_path, "/TNIE/nonnull"))) {
-    dir.create(paste0(figures_path, "/TNIE/nonnull"))
-}
-if (!dir.exists(paste0(figures_path, "/TNIE/null"))) {
-    dir.create(paste0(figures_path, "/TNIE/null"))
-}
-### PNDE
-if (!dir.exists(paste0(figures_path, "/PNDE/nonnull"))) {
-    dir.create(paste0(figures_path, "/PNDE/nonnull"))
-}
-if (!dir.exists(paste0(figures_path, "/PNDE/null"))) {
-    dir.create(paste0(figures_path, "/PNDE/null"))
-}
+
+
+
+
+
+
 
 
 # Import results data ----------------------------------------------------------
@@ -127,9 +128,9 @@ sim1_data_converged <- readRDS(file = paste0(results_path, "/Data/S1_simulation-
 convergence_rates <- readRDS(file = paste0(results_path, "/Tables/S1_convergence-rates_", sim_date, ".rds"))
 
 ## data with replacement values 
-perf_measures <- readRDS(file = paste0(results_path, "/Tables/S1_updated-performance-measures_", sim_date, "_converged-only.rds")) 
-sim1_data_nowarnings <- readRDS(file = paste0(results_path, "/Data/S1_updated-simulation-data_", sim_date, "_excludes-warnings.rds")) 
-sim1_data_converged <- readRDS(file = paste0(results_path, "/Data/S1_updated-simulation-data_", sim_date, "_converged-only.rds")) 
+# perf_measures <- readRDS(file = paste0(results_path, "/Tables/S1_updated-performance-measures_", sim_date, "_converged-only.rds")) 
+# sim1_data_nowarnings <- readRDS(file = paste0(results_path, "/Data/S1_updated-simulation-data_", sim_date, "_excludes-warnings.rds")) 
+# sim1_data_converged <- readRDS(file = paste0(results_path, "/Data/S1_updated-simulation-data_", sim_date, "_converged-only.rds")) 
 
 # Set sim_data dataset for visuals
 sim_data <- sim1_data_converged # use converged iterations 
@@ -174,7 +175,8 @@ sim_data <- sim_data |>
 # Modify convergence 
 convergence_rates <- convergence_rates |> 
     mutate(Fit = ifelse(cluster_opt == "RE.glm", "Parametric: RE", Fit), 
-           cluster_opt = ifelse(cluster_opt == "RE.glm", "cwc", cluster_opt))
+           cluster_opt = ifelse(cluster_opt == "RE.glm", "cwc", cluster_opt), 
+           Fit = ifelse(Fit == "Parametric", "Parametric: GLM", Fit))
 
 # # Drop RE.glm
 # perf_measures <- perf_measures |>
@@ -225,11 +227,361 @@ gglayer_facet <- facet_grid(
 
 
 
-# Function for visuals ----------------------------------------------------
+
+## In-text visuals ---------------------------------------------------------
+
+# ══════════════════════════════
+#    Bias  
+# ══════════════════════════════
+# NIE Bias for Gaussian mediator & outcome (large clusters)
+perf_measures_nonnull |> 
+    filter(Mfamily == "gaussian" & Yfamily == "gaussian" & nj == "50-100") |> 
+    ggplot(aes(x = factor(J), y = bias_individual_TNIE, color = Fit, shape = nj, linetype = Fit)) +
+    geom_hline(yintercept = 0) +
+    geom_point(size = 2) +
+    geom_line(aes(group = interaction(cluster_opt, Fit, nj)), linewidth = 0.8) +
+    facet_grid(Mfamily + Yfamily ~ quadratic + cluster_opt, # dropped Mfamily + Yfamily for rows
+               labeller = labeller(
+                   Mfamily = c("binomial" = "Mediator: Binomial", "gaussian" = "Mediator: Gaussian"),
+                   Yfamily = c("binomial" = "Outcome: Binomial", "gaussian" = "Outcome: Gaussian"),
+                   quadratic    = c("FALSE" = "Linear", "TRUE" = "Nonlinear"),
+                   cluster_opt = c("cwc" = "mean", "cwc.FE" = "mean + dummies")
+               )) +
+    gglayer_theme +
+    labs(title = NULL,
+         x = "\n Number of Clusters",
+         y = "Bias \n",
+         color = "Method",
+         linetype = "Method", 
+         shape = "Cluster size") +
+    scale_shape_manual(values = c("50-100" = 17)) + # make data point triangle (for large clusters) to match other visuals
+    guides(shape = "none") # drop shape from legend 
+
+# Save plot
+ggsave(filename = paste0(figures_path, "/In-text/",
+                         "S1_bias_large-cluster_nonnull_ind_NIE.png"),
+       plot = last_plot(), 
+       width = 9, 
+       height = 6, 
+       units = "in", 
+       dpi = 300)
+
+# NIE Bias for Gaussian mediator & outcome (small clusters)
+perf_measures_nonnull |> 
+    filter(Mfamily == "gaussian" & Yfamily == "gaussian" & nj == "5-20") |> 
+    ggplot(aes(x = factor(J), y = bias_individual_TNIE, color = Fit, shape = nj, linetype = Fit)) +
+    geom_hline(yintercept = 0) +
+    geom_point(size = 2) +
+    geom_line(aes(group = interaction(cluster_opt, Fit, nj)), linewidth = 0.8) +
+    facet_grid(Mfamily + Yfamily ~ quadratic + cluster_opt, # dropped Mfamily + Yfamily for rows
+               labeller = labeller(
+                   Mfamily = c("binomial" = "Mediator: Binomial", "gaussian" = "Mediator: Gaussian"),
+                   Yfamily = c("binomial" = "Outcome: Binomial", "gaussian" = "Outcome: Gaussian"),
+                   quadratic    = c("FALSE" = "Linear", "TRUE" = "Nonlinear"),
+                   cluster_opt = c("cwc" = "mean", "cwc.FE" = "mean + dummies")
+               )) +
+    gglayer_theme +
+    labs(title = NULL,
+         x = "\n Number of Clusters",
+         y = "Bias \n",
+         color = "Method",
+         linetype = "Method", 
+         shape = "Cluster size") +
+    guides(shape = "none") # drop shape from legend 
+
+# Save plot
+ggsave(filename = paste0(figures_path, "/In-text/",
+                         "S1_bias_small-cluster_nonnull_ind_NIE.png"),
+       plot = last_plot(), 
+       width = 9, 
+       height = 6, 
+       units = "in", 
+       dpi = 300)
+
+
+# ══════════════════════════════
+#    CI Coverage Rate 
+# ══════════════════════════════
+# NIE coverage rate for Gaussian mediator & outcome (large clusters)
+perf_measures_nonnull |> 
+    filter(Mfamily == "gaussian" & nj == "50-100") |> 
+    ggplot(aes(x = factor(J), y = cover_individual_TNIE, color = Fit, shape = nj, linetype = Fit)) +
+    geom_hline(yintercept = 0.95) +
+    geom_point(size = 2) +
+    geom_line(aes(group = interaction(cluster_opt, Fit, nj)), linewidth = 0.8) +
+    facet_grid(Mfamily + Yfamily ~ quadratic + cluster_opt, # dropped Mfamily + Yfamily for rows
+               labeller = labeller(
+                   Mfamily = c("binomial" = "Mediator: Binomial", "gaussian" = "Mediator: Gaussian"),
+                   Yfamily = c("binomial" = "Outcome: Binomial", "gaussian" = "Outcome: Gaussian"),
+                   quadratic    = c("FALSE" = "Linear", "TRUE" = "Nonlinear"),
+                   cluster_opt = c("cwc" = "mean", "cwc.FE" = "mean + dummies")
+               )) +
+    gglayer_theme +
+    labs(title = NULL,
+         x = "\n Number of Clusters",
+         y = "Coverage \n",
+         color = "Method",
+         linetype = "Method", 
+         shape = "Cluster size") +
+    scale_shape_manual(values = c("50-100" = 17)) + # make data point triangle (for large clusters) to match other visuals
+    guides(shape = "none") # drop shape from legend 
+
+# Save plot
+ggsave(filename = paste0(figures_path, "/In-text/",
+                         "S1_coverage_large-cluster_nonnull_ind_NIE.png"),
+       plot = last_plot(), 
+       width = 9, 
+       height = 6, 
+       units = "in", 
+       dpi = 300)
+
+# NIE coverage rate for Gaussian mediator & outcome (small clusters)
+perf_measures_nonnull |> 
+    filter(Mfamily == "gaussian" & nj == "5-20") |> 
+    ggplot(aes(x = factor(J), y = cover_individual_TNIE, color = Fit, shape = nj, linetype = Fit)) +
+    geom_hline(yintercept = 0.95) +
+    geom_point(size = 2) +
+    geom_line(aes(group = interaction(cluster_opt, Fit, nj)), linewidth = 0.8) +
+    facet_grid(Mfamily + Yfamily ~ quadratic + cluster_opt, # dropped Mfamily + Yfamily for rows
+               labeller = labeller(
+                   Mfamily = c("binomial" = "Mediator: Binomial", "gaussian" = "Mediator: Gaussian"),
+                   Yfamily = c("binomial" = "Outcome: Binomial", "gaussian" = "Outcome: Gaussian"),
+                   quadratic    = c("FALSE" = "Linear", "TRUE" = "Nonlinear"),
+                   cluster_opt = c("cwc" = "mean", "cwc.FE" = "mean + dummies")
+               )) +
+    gglayer_theme +
+    labs(title = NULL,
+         x = "\n Number of Clusters",
+         y = "Coverage \n",
+         color = "Method",
+         linetype = "Method", 
+         shape = "Cluster size") +
+    guides(shape = "none") # drop shape from legend 
+
+# Save plot
+ggsave(filename = paste0(figures_path, "/In-text/",
+                         "S1_coverage_small-cluster_nonnull_ind_NIE.png"),
+       plot = last_plot(), 
+       width = 9, 
+       height = 6, 
+       units = "in", 
+       dpi = 300)
+
+
+# ══════════════════════════════
+#    MSE  
+# ══════════════════════════════
+# NIE MSE for Gaussian mediator & outcome (large clusters)
+perf_measures_nonnull |> 
+    filter(Mfamily == "gaussian" & Yfamily == "gaussian" & nj == "50-100") |> 
+    ggplot(aes(x = factor(J), y = MSE_individual_TNIE, color = Fit, shape = nj, linetype = Fit)) +
+    geom_hline(yintercept = 0) +
+    geom_point(size = 2) +
+    geom_line(aes(group = interaction(cluster_opt, Fit, nj)), linewidth = 0.8) +
+    facet_grid(Mfamily + Yfamily ~ quadratic + cluster_opt, # dropped Mfamily + Yfamily for rows
+               labeller = labeller(
+                   Mfamily = c("binomial" = "Mediator: Binomial", "gaussian" = "Mediator: Gaussian"),
+                   Yfamily = c("binomial" = "Outcome: Binomial", "gaussian" = "Outcome: Gaussian"),
+                   quadratic    = c("FALSE" = "Linear", "TRUE" = "Nonlinear"),
+                   cluster_opt = c("cwc" = "mean", "cwc.FE" = "mean + dummies")
+               )) +
+    gglayer_theme +
+    labs(title = NULL,
+         x = "\n Number of Clusters",
+         y = "MSE \n",
+         color = "Method",
+         linetype = "Method", 
+         shape = "Cluster size") +
+    scale_shape_manual(values = c("50-100" = 17)) + # make data point triangle (for large clusters) to match other visuals
+    guides(shape = "none") # drop shape from legend 
+
+# Save plot
+ggsave(filename = paste0(figures_path, "/In-text/",
+                         "S1_mse_large-cluster_nonnull_ind_NIE.png"),
+       plot = last_plot(), 
+       width = 9, 
+       height = 6, 
+       units = "in", 
+       dpi = 300)
+
+# NIE MSE for Gaussian mediator & outcome (small clusters)
+perf_measures_nonnull |> 
+    filter(Mfamily == "gaussian" & Yfamily == "gaussian" & nj == "5-20") |> 
+    ggplot(aes(x = factor(J), y = MSE_individual_TNIE, color = Fit, shape = nj, linetype = Fit)) +
+    geom_hline(yintercept = 0) +
+    geom_point(size = 2) +
+    geom_line(aes(group = interaction(cluster_opt, Fit, nj)), linewidth = 0.8) +
+    facet_grid(Mfamily + Yfamily ~ quadratic + cluster_opt, # dropped Mfamily + Yfamily for rows
+               labeller = labeller(
+                   Mfamily = c("binomial" = "Mediator: Binomial", "gaussian" = "Mediator: Gaussian"),
+                   Yfamily = c("binomial" = "Outcome: Binomial", "gaussian" = "Outcome: Gaussian"),
+                   quadratic    = c("FALSE" = "Linear", "TRUE" = "Nonlinear"),
+                   cluster_opt = c("cwc" = "mean", "cwc.FE" = "mean + dummies")
+               )) +
+    gglayer_theme +
+    labs(title = NULL,
+         x = "\n Number of Clusters",
+         y = "MSE \n",
+         color = "Method",
+         linetype = "Method", 
+         shape = "Cluster size") +
+    guides(shape = "none") # drop shape from legend 
+
+# Save plot
+ggsave(filename = paste0(figures_path, "/In-text/",
+                         "S1_mse_small-cluster_nonnull_ind_NIE.png"),
+       plot = last_plot(), 
+       width = 9, 
+       height = 6, 
+       units = "in", 
+       dpi = 300)
+
+
+# ══════════════════════════════
+#    Power  
+# ══════════════════════════════
+# NIE Power for Gaussian mediator & outcome (large clusters)
+perf_measures_nonnull |> 
+    filter(Mfamily == "gaussian" & Yfamily == "gaussian" & nj == "50-100") |> 
+    ggplot(aes(x = factor(J), y = power_individual_TNIE, color = Fit, shape = nj, linetype = Fit)) +
+    geom_hline(yintercept = 0.80) +
+    geom_point(size = 2) +
+    geom_line(aes(group = interaction(cluster_opt, Fit, nj)), linewidth = 0.8) +
+    facet_grid(Mfamily + Yfamily ~ quadratic + cluster_opt, # dropped Mfamily + Yfamily for rows
+               labeller = labeller(
+                   Mfamily = c("binomial" = "Mediator: Binomial", "gaussian" = "Mediator: Gaussian"),
+                   Yfamily = c("binomial" = "Outcome: Binomial", "gaussian" = "Outcome: Gaussian"),
+                   quadratic    = c("FALSE" = "Linear", "TRUE" = "Nonlinear"),
+                   cluster_opt = c("cwc" = "mean", "cwc.FE" = "mean + dummies")
+               )) +
+    gglayer_theme +
+    labs(title = NULL,
+         x = "\n Number of Clusters",
+         y = "Power \n",
+         color = "Method",
+         linetype = "Method", 
+         shape = "Cluster size") +
+    scale_shape_manual(values = c("50-100" = 17)) + # make data point triangle (for large clusters) to match other visuals
+    guides(shape = "none") # drop shape from legend 
+
+# Save plot
+ggsave(filename = paste0(figures_path, "/In-text/",
+                         "S1_power_large-cluster_nonnull_ind_NIE.png"),
+       plot = last_plot(), 
+       width = 9, 
+       height = 6, 
+       units = "in", 
+       dpi = 300)
+
+# NIE Power for Gaussian mediator & outcome (small clusters)
+perf_measures_nonnull |> 
+    filter(Mfamily == "gaussian" & Yfamily == "gaussian" & nj == "5-20") |> 
+    ggplot(aes(x = factor(J), y = power_individual_TNIE, color = Fit, shape = nj, linetype = Fit)) +
+    geom_hline(yintercept = 0.80) +
+    geom_point(size = 2) +
+    geom_line(aes(group = interaction(cluster_opt, Fit, nj)), linewidth = 0.8) +
+    facet_grid(Mfamily + Yfamily ~ quadratic + cluster_opt, # dropped Mfamily + Yfamily for rows
+               labeller = labeller(
+                   Mfamily = c("binomial" = "Mediator: Binomial", "gaussian" = "Mediator: Gaussian"),
+                   Yfamily = c("binomial" = "Outcome: Binomial", "gaussian" = "Outcome: Gaussian"),
+                   quadratic    = c("FALSE" = "Linear", "TRUE" = "Nonlinear"),
+                   cluster_opt = c("cwc" = "mean", "cwc.FE" = "mean + dummies")
+               )) +
+    gglayer_theme +
+    labs(title = NULL,
+         x = "\n Number of Clusters",
+         y = "Power \n",
+         color = "Method",
+         linetype = "Method", 
+         shape = "Cluster size") +
+    guides(shape = "none") # drop shape from legend 
+
+# Save plot
+ggsave(filename = paste0(figures_path, "/In-text/",
+                         "S1_power_small-cluster_nonnull_ind_NIE.png"),
+       plot = last_plot(), 
+       width = 9, 
+       height = 6, 
+       units = "in", 
+       dpi = 300)
+
+
+# ══════════════════════════════
+#    Type I error  
+# ══════════════════════════════
+# NIE Type 1 error for Gaussian mediator & outcome (large clusters)
+perf_measures_null |> 
+    filter(Mfamily == "gaussian" & Yfamily == "gaussian" & nj == "50-100") |> 
+    ggplot(aes(x = factor(J), y = type1_individual_TNIE, color = Fit, shape = nj, linetype = Fit)) +
+    geom_hline(yintercept = 0.0) +
+    geom_point(size = 2) +
+    geom_line(aes(group = interaction(cluster_opt, Fit, nj)), linewidth = 0.8) +
+    facet_grid(Mfamily + Yfamily ~ quadratic + cluster_opt, # dropped Mfamily + Yfamily for rows
+               labeller = labeller(
+                   Mfamily = c("binomial" = "Mediator: Binomial", "gaussian" = "Mediator: Gaussian"),
+                   Yfamily = c("binomial" = "Outcome: Binomial", "gaussian" = "Outcome: Gaussian"),
+                   quadratic    = c("FALSE" = "Linear", "TRUE" = "Nonlinear"),
+                   cluster_opt = c("cwc" = "mean", "cwc.FE" = "mean + dummies")
+               )) +
+    gglayer_theme +
+    labs(title = NULL,
+         x = "\n Number of Clusters",
+         y = "Type I Error \n",
+         color = "Method",
+         linetype = "Method", 
+         shape = "Cluster size") +
+    scale_shape_manual(values = c("50-100" = 17)) + # make data point triangle (for large clusters) to match other visuals
+    guides(shape = "none") # drop shape from legend 
+
+# Save plot
+ggsave(filename = paste0(figures_path, "/In-text/",
+                         "S1_type1_large-cluster_null_ind_NIE.png"),
+       plot = last_plot(), 
+       width = 9, 
+       height = 6, 
+       units = "in", 
+       dpi = 300)
+
+# NIE Type 1 error for Gaussian mediator & outcome (small clusters)
+perf_measures_null |> 
+    filter(Mfamily == "gaussian" & Yfamily == "gaussian" & nj == "5-20") |> 
+    ggplot(aes(x = factor(J), y = type1_individual_TNIE, color = Fit, shape = nj, linetype = Fit)) +
+    geom_hline(yintercept = 0.0) +
+    geom_point(size = 2) +
+    geom_line(aes(group = interaction(cluster_opt, Fit, nj)), linewidth = 0.8) +
+    facet_grid(Mfamily + Yfamily ~ quadratic + cluster_opt, # dropped Mfamily + Yfamily for rows
+               labeller = labeller(
+                   Mfamily = c("binomial" = "Mediator: Binomial", "gaussian" = "Mediator: Gaussian"),
+                   Yfamily = c("binomial" = "Outcome: Binomial", "gaussian" = "Outcome: Gaussian"),
+                   quadratic    = c("FALSE" = "Linear", "TRUE" = "Nonlinear"),
+                   cluster_opt = c("cwc" = "mean", "cwc.FE" = "mean + dummies")
+               )) +
+    gglayer_theme +
+    labs(title = NULL,
+         x = "\n Number of Clusters",
+         y = "Type I Error \n",
+         color = "Method",
+         linetype = "Method", 
+         shape = "Cluster size") +
+    guides(shape = "none") # drop shape from legend 
+
+# Save plot
+ggsave(filename = paste0(figures_path, "/In-text/",
+                         "S1_type1_small-cluster_null_ind_NIE.png"),
+       plot = last_plot(), 
+       width = 9, 
+       height = 6, 
+       units = "in", 
+       dpi = 300)
+
+
+
+
+## Function for visuals ----------------------------------------------------
 
 create_plot <- function(data, 
                         y_var, 
-                        effect = "TNIE",  # "TNIE" or "PNDE" 
+                        effect = "NIE",  # "NIE" or "NDE" 
                         effect_level = "individual",  # "individual" or "cluster"  
                         null_status = "nonnull",  # "null" or "nonnull"
                         outcome_type = "all",  # "gaussian", "binomial", or "all"
@@ -270,9 +622,7 @@ create_plot <- function(data,
     
     # Create the base plot
     p <- ggplot(plot_data, aes(x = factor(J), y = !!sym(y_var), 
-                               color = Fit, shape = Nj, linetype = Fit)) +
-        geom_point(size = 2) +
-        geom_line(aes(group = interaction(cluster_opt, Fit, Nj)), linewidth = 0.8)
+                               color = Fit, shape = Nj, linetype = Fit)) 
     
     # Add reference line if requested
     if (add_reference_line) {
@@ -280,14 +630,20 @@ create_plot <- function(data,
             # Auto-determine reference value based on metric type
             if (grepl("bias|mse|type1", tolower(y_var))) {
                 reference_value <- 0
-            } else if (grepl("cover|power", tolower(y_var))) {
+            } else if (grepl("power", tolower(y_var))) {
                 reference_value <- 1
+            } else if (grepl("cover", tolower(y_var))) {
+                reference_value <- 0.95
             } else {
                 reference_value <- 0  # default
             }
         }
         p <- p + geom_hline(yintercept = reference_value)
     }
+
+    # Add remaining of base plot
+    p <- p + geom_point(size = 2) +
+        geom_line(aes(group = interaction(cluster_opt, Fit, Nj)), linewidth = 0.8)
     
     # Set default labels if not provided
     if (is.null(y_label)) {
@@ -383,34 +739,34 @@ ggsave(filename = paste0(figures_path, "/Convergence/",
 
 
 
-## TNIE (non-null) ---------------------------------------------------------
+## NIE (non-null) ---------------------------------------------------------
 
-### Individual-average TNIE -------------------------------------------------
+### Individual-average NIE -------------------------------------------------
 
 #### Bias --------------------------------------------------------------------
 # ═══════════════════
 #    Bias 
 # ═══════════════════
-# TNIE Bias for Gaussian outcomes 
+# NIE Bias for Gaussian outcomes 
 create_plot(data = perf_measures_nonnull, 
             y_var = "bias_individual_TNIE",
             outcome_type = "gaussian")
 # Save plot
-ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
-                         "S1_bias_nonnull_ind_TNIE_gaus.png"),
+ggsave(filename = paste0(figures_path, "/NIE/nonnull/",
+                         "S1_bias_nonnull_ind_NIE_gaus.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
        units = "in", 
        dpi = 300)
 
-# TNIE Bias for Binomial outcomes 
+# NIE Bias for Binomial outcomes 
 create_plot(data = perf_measures_nonnull, 
             y_var = "bias_individual_TNIE",
             outcome_type = "binomial")
 # Save plot
-ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
-                         "S1_bias_nonnull_ind_TNIE_binom.png"),
+ggsave(filename = paste0(figures_path, "/NIE/nonnull/",
+                         "S1_bias_nonnull_ind_NIE_binom.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
@@ -423,13 +779,13 @@ ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
 #    CI Coverage Rate 
 # ═══════════════════
 
-# TNIE CI coverage rate 
+# NIE CI coverage rate 
 create_plot(data = perf_measures_nonnull, 
             y_var = "cover_individual_TNIE",
             outcome_type = "all")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
-                         "S1_coverage_nonnull_ind_TNIE_all.png"),
+ggsave(filename = paste0(figures_path, "/NIE/nonnull/",
+                         "S1_coverage_nonnull_ind_NIE_all.png"),
        plot = last_plot(),
        width = 10,
        height = 11,
@@ -442,26 +798,26 @@ ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
 #    MSE
 # ═══════════════════
 
-# TNIE MSE for Gaussian outcomes 
+# NIE MSE for Gaussian outcomes 
 create_plot(data = perf_measures_nonnull, 
             y_var = "MSE_individual_TNIE",
             outcome_type = "gaussian")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
-                         "S1_mse_nonnull_ind_TNIE_gaus.png"),
+ggsave(filename = paste0(figures_path, "/NIE/nonnull/",
+                         "S1_mse_nonnull_ind_NIE_gaus.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
        units = "in", 
        dpi = 300)
 
-# TNIE MSE for Binomial outcomes 
+# NIE MSE for Binomial outcomes 
 create_plot(data = perf_measures_nonnull, 
             y_var = "MSE_individual_TNIE",
             outcome_type = "binomial")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
-                         "S1_mse_nonnull_ind_TNIE_binom.png"),
+ggsave(filename = paste0(figures_path, "/NIE/nonnull/",
+                         "S1_mse_nonnull_ind_NIE_binom.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
@@ -476,13 +832,13 @@ ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
 
 # perf_measures only included output with if.null = FALSE, so this computes power (not type 1 error rate)
 
-# TNIE Power 
+# NIE Power 
 create_plot(data = perf_measures_nonnull, 
             y_var = "power_individual_TNIE",
             outcome_type = "all")
 # Save plot     
-ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
-                         "S1_power_nonnull_ind_TNIE_all.png"),
+ggsave(filename = paste0(figures_path, "/NIE/nonnull/",
+                         "S1_power_nonnull_ind_NIE_all.png"),
        plot = last_plot(),
        width = 10,
        height = 11,
@@ -490,32 +846,32 @@ ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
        dpi = 300)
 
 
-### Cluster-average TNIE -------------------------------------------------
+### Cluster-average NIE -------------------------------------------------
 
 #### Bias --------------------------------------------------------------------
 # ═══════════════════
 #    Bias 
 # ═══════════════════
-# TNIE Bias for Gaussian outcomes 
+# NIE Bias for Gaussian outcomes 
 create_plot(data = perf_measures_nonnull, 
             y_var = "bias_cluster_TNIE",
             outcome_type = "gaussian")
 # Save 
-ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
-                         "S1_bias_nonnull_clus_TNIE_gaus.png"),
+ggsave(filename = paste0(figures_path, "/NIE/nonnull/",
+                         "S1_bias_nonnull_clus_NIE_gaus.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
        units = "in", 
        dpi = 300)
 
-# TNIE Bias for Binomial outcomes 
+# NIE Bias for Binomial outcomes 
 create_plot(data = perf_measures_nonnull, 
             y_var = "bias_cluster_TNIE",
             outcome_type = "binomial")
 # Save 
-ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
-                         "S1_bias_nonnull_clus_TNIE_binom.png"),
+ggsave(filename = paste0(figures_path, "/NIE/nonnull/",
+                         "S1_bias_nonnull_clus_NIE_binom.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
@@ -527,13 +883,13 @@ ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
 # ═══════════════════
 #    CI Coverage Rate 
 # ═══════════════════
-# TNIE CI coverage rate 
+# NIE CI coverage rate 
 create_plot(data = perf_measures_nonnull, 
             y_var = "cover_cluster_TNIE",
             outcome_type = "all")
 # Save 
-ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
-                         "S1_coverage_nonnull_clus_TNIE_all.png"),
+ggsave(filename = paste0(figures_path, "/NIE/nonnull/",
+                         "S1_coverage_nonnull_clus_NIE_all.png"),
        plot = last_plot(),
        width = 10,
        height = 11,
@@ -545,26 +901,26 @@ ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
 # ═══════════════════
 #    MSE
 # ═══════════════════
-# TNIE MSE for Gaussian outcomes 
+# NIE MSE for Gaussian outcomes 
 create_plot(data = perf_measures_nonnull, 
             y_var = "MSE_cluster_TNIE",
             outcome_type = "gaussian")
 # Save 
-ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
-                         "S1_mse_nonnull_clus_TNIE_gaus.png"),
+ggsave(filename = paste0(figures_path, "/NIE/nonnull/",
+                         "S1_mse_nonnull_clus_NIE_gaus.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
        units = "in", 
        dpi = 300)
 
-# TNIE MSE for Binomial outcomes 
+# NIE MSE for Binomial outcomes 
 create_plot(data = perf_measures_nonnull, 
             y_var = "MSE_cluster_TNIE",
             outcome_type = "binomial")
 # Save 
-ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
-                         "S1_mse_nonnull_clus_TNIE_binom.png"),
+ggsave(filename = paste0(figures_path, "/NIE/nonnull/",
+                         "S1_mse_nonnull_clus_NIE_binom.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
@@ -579,13 +935,13 @@ ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
 
 # perf_measures only included output with if.null = FALSE, so this computes power (not type 1 error rate)
 
-# TNIE Power 
+# NIE Power 
 create_plot(data = perf_measures_nonnull, 
             y_var = "power_cluster_TNIE",
             outcome_type = "all")
 # Save 
-ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
-                         "S1_power_nonnull_clus_TNIE_all.png"),
+ggsave(filename = paste0(figures_path, "/NIE/nonnull/",
+                         "S1_power_nonnull_clus_NIE_all.png"),
        plot = last_plot(),
        width = 10,
        height = 11,
@@ -593,36 +949,36 @@ ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
        dpi = 300)
 
 
-## TNIE (null) -------------------------------------------------------------
+## NIE (null) -------------------------------------------------------------
 
-### Individual-average TNIE -------------------------------------------------
+### Individual-average NIE -------------------------------------------------
 
 #### Bias --------------------------------------------------------------------
 # ═══════════════════
 #    Bias 
 # ═══════════════════
-# TNIE Bias for Gaussian outcomes 
+# NIE Bias for Gaussian outcomes 
 create_plot(data = perf_measures_null, 
             y_var = "bias_individual_TNIE",
             null_status = "null",
             outcome_type = "gaussian")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/TNIE/null/",
-                         "S1_bias_null_ind_TNIE_gaus.png"),
+ggsave(filename = paste0(figures_path, "/NIE/null/",
+                         "S1_bias_null_ind_NIE_gaus.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
        units = "in", 
        dpi = 300)
 
-# TNIE Bias for Binomial outcomes 
+# NIE Bias for Binomial outcomes 
 create_plot(data = perf_measures_null, 
             y_var = "bias_individual_TNIE",
             null_status = "null",
             outcome_type = "binomial")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/TNIE/null/",
-                         "S1_bias_null_ind_TNIE_binom.png"),
+ggsave(filename = paste0(figures_path, "/NIE/null/",
+                         "S1_bias_null_ind_NIE_binom.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
@@ -635,14 +991,14 @@ ggsave(filename = paste0(figures_path, "/TNIE/null/",
 #    CI Coverage Rate 
 # ═══════════════════
 
-# TNIE CI coverage rate 
+# NIE CI coverage rate 
 create_plot(data = perf_measures_null, 
             y_var = "cover_individual_TNIE",
             null_status = "null",
             outcome_type = "all")
 # Save 
-ggsave(filename = paste0(figures_path, "/TNIE/null/",
-                         "S1_coverage_null_ind_TNIE_all.png"),
+ggsave(filename = paste0(figures_path, "/NIE/null/",
+                         "S1_coverage_null_ind_NIE_all.png"),
        plot = last_plot(),
        width = 10,
        height = 11,
@@ -655,28 +1011,28 @@ ggsave(filename = paste0(figures_path, "/TNIE/null/",
 #    MSE
 # ═══════════════════
 
-# TNIE MSE for Gaussian outcomes 
+# NIE MSE for Gaussian outcomes 
 create_plot(data = perf_measures_null, 
             y_var = "MSE_individual_TNIE",
             null_status = "null",
             outcome_type = "gaussian")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/TNIE/null/",
-                         "S1_mse_null_ind_TNIE_gaus.png"),
+ggsave(filename = paste0(figures_path, "/NIE/null/",
+                         "S1_mse_null_ind_NIE_gaus.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
        units = "in", 
        dpi = 300)
 
-# TNIE MSE for Binomial outcomes 
+# NIE MSE for Binomial outcomes 
 create_plot(data = perf_measures_null, 
             y_var = "MSE_individual_TNIE",
             null_status = "null",
             outcome_type = "binomial")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/TNIE/null/",
-                         "S1_mse_null_ind_TNIE_binom.png"),
+ggsave(filename = paste0(figures_path, "/NIE/null/",
+                         "S1_mse_null_ind_NIE_binom.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
@@ -688,14 +1044,14 @@ ggsave(filename = paste0(figures_path, "/TNIE/null/",
 # ═══════════════════
 #    Type I Error 
 # ═══════════════════
-# TNIE Type I Error
+# NIE Type I Error
 create_plot(data = perf_measures_null, 
             y_var = "type1_individual_TNIE",
             null_status = "null",
             outcome_type = "all")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/TNIE/null/",
-                         "S1_type1_null_ind_TNIE_all.png"),
+ggsave(filename = paste0(figures_path, "/NIE/null/",
+                         "S1_type1_null_ind_NIE_all.png"),
        plot = last_plot(),
        width = 10,
        height = 11,
@@ -703,35 +1059,35 @@ ggsave(filename = paste0(figures_path, "/TNIE/null/",
        dpi = 300)
 
 
-### Cluster-average TNIE -------------------------------------------------
+### Cluster-average NIE -------------------------------------------------
 
 #### Bias --------------------------------------------------------------------
 # ═══════════════════
 #    Bias 
 # ═══════════════════
 
-# TNIE Bias for Gaussian outcomes 
+# NIE Bias for Gaussian outcomes 
 create_plot(data = perf_measures_null, 
             y_var = "bias_cluster_TNIE",
             null_status = "null",
             outcome_type = "gaussian")
 # Save 
-ggsave(filename = paste0(figures_path, "/TNIE/null/",
-                         "S1_bias_null_clus_TNIE_gaus.png"),
+ggsave(filename = paste0(figures_path, "/NIE/null/",
+                         "S1_bias_null_clus_NIE_gaus.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
        units = "in", 
        dpi = 300)
 
-# TNIE Bias for Binomial outcomes 
+# NIE Bias for Binomial outcomes 
 create_plot(data = perf_measures_null, 
             y_var = "bias_cluster_TNIE",
             null_status = "null",
             outcome_type = "binomial")
 #Save 
-ggsave(filename = paste0(figures_path, "/TNIE/null/",
-                         "S1_bias_null_clus_TNIE_binom.png"),
+ggsave(filename = paste0(figures_path, "/NIE/null/",
+                         "S1_bias_null_clus_NIE_binom.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
@@ -745,14 +1101,14 @@ ggsave(filename = paste0(figures_path, "/TNIE/null/",
 #    CI Coverage Rate 
 # ═══════════════════
 
-# TNIE CI coverage rate 
+# NIE CI coverage rate 
 create_plot(data = perf_measures_null, 
             y_var = "cover_cluster_TNIE",
             null_status = "null",
             outcome_type = "all")
 # Save 
-ggsave(filename = paste0(figures_path, "/TNIE/null/",
-                         "S1_coverage_null_clus_TNIE_all.png"),
+ggsave(filename = paste0(figures_path, "/NIE/null/",
+                         "S1_coverage_null_clus_NIE_all.png"),
        plot = last_plot(),
        width = 10,
        height = 11,
@@ -764,28 +1120,28 @@ ggsave(filename = paste0(figures_path, "/TNIE/null/",
 # ═══════════════════
 #    MSE
 # ═══════════════════
-# TNIE MSE for Gaussian outcomes 
+# NIE MSE for Gaussian outcomes 
 create_plot(data = perf_measures_null, 
             y_var = "MSE_cluster_TNIE",
             null_status = "null",
             outcome_type = "gaussian")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/TNIE/null/",
-                         "S1_mse_null_clus_TNIE_gaus.png"),
+ggsave(filename = paste0(figures_path, "/NIE/null/",
+                         "S1_mse_null_clus_NIE_gaus.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
        units = "in", 
        dpi = 300)
 
-# TNIE MSE for Binomial outcomes 
+# NIE MSE for Binomial outcomes 
 create_plot(data = perf_measures_null, 
             y_var = "MSE_cluster_TNIE",
             null_status = "null",
             outcome_type = "binomial")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/TNIE/null/",
-                         "S1_mse_null_clus_TNIE_binom.png"),
+ggsave(filename = paste0(figures_path, "/NIE/null/",
+                         "S1_mse_null_clus_NIE_binom.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
@@ -797,14 +1153,14 @@ ggsave(filename = paste0(figures_path, "/TNIE/null/",
 # ═══════════════════
 #    Type I Error 
 # ═══════════════════
-# TNIE Type I Error
+# NIE Type I Error
 create_plot(data = perf_measures_null, 
             y_var = "type1_cluster_TNIE",
             null_status = "null",
             outcome_type = "all")
 # Save 
-ggsave(filename = paste0(figures_path, "/TNIE/null/",
-                         "S1_type1_null_clus_TNIE_all.png"),
+ggsave(filename = paste0(figures_path, "/NIE/null/",
+                         "S1_type1_null_clus_NIE_all.png"),
        plot = last_plot(),
        width = 10,
        height = 11,
@@ -813,38 +1169,38 @@ ggsave(filename = paste0(figures_path, "/TNIE/null/",
 
 
 
-## PNDE --------------------------------------------------------------------
+## NDE --------------------------------------------------------------------
 
-## PNDE (non-null) --------------------------------------------------------------------
+## NDE (non-null) --------------------------------------------------------------------
 
-### Individual-average PNDE -------------------------------------------------
+### Individual-average NDE -------------------------------------------------
 
 #### Bias --------------------------------------------------------------------
 # ═══════════════════
 #    Bias 
 # ═══════════════════
-# PNDE Bias for Gaussian outcomes 
+# NDE Bias for Gaussian outcomes 
 create_plot(data = perf_measures_nonnull, 
             y_var = "bias_individual_PNDE",
             null_status = "nonnull",
             outcome_type = "gaussian")
 # Save plot
-ggsave(filename = paste0(figures_path, "/PNDE/nonnull/",
-                         "S1_bias_nonnull_ind_PNDE_gaus.png"),
+ggsave(filename = paste0(figures_path, "/NDE/nonnull/",
+                         "S1_bias_nonnull_ind_NDE_gaus.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
        units = "in", 
        dpi = 300)
 
-# PNDE Bias for Binomial outcomes 
+# NDE Bias for Binomial outcomes 
 create_plot(data = perf_measures_nonnull, 
             y_var = "bias_individual_PNDE",
             null_status = "nonnull",
             outcome_type = "binomial")
 # Save plot
-ggsave(filename = paste0(figures_path, "/PNDE/nonnull/",
-                         "S1_bias_nonnull_ind_PNDE_binom.png"),
+ggsave(filename = paste0(figures_path, "/NDE/nonnull/",
+                         "S1_bias_nonnull_ind_NDE_binom.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
@@ -856,14 +1212,14 @@ ggsave(filename = paste0(figures_path, "/PNDE/nonnull/",
 # ═══════════════════
 #    CI Coverage Rate 
 # ═══════════════════
-# PNDE CI coverage rate 
+# NDE CI coverage rate 
 create_plot(data = perf_measures_nonnull, 
             y_var = "cover_individual_PNDE",
             null_status = "nonnull",
             outcome_type = "all")
 # Save plot
-ggsave(filename = paste0(figures_path, "/PNDE/nonnull/",
-                         "S1_coverage_nonnull_ind_PNDE_all.png"),
+ggsave(filename = paste0(figures_path, "/NDE/nonnull/",
+                         "S1_coverage_nonnull_ind_NDE_all.png"),
        plot = last_plot(),
        width = 10,
        height = 11,
@@ -875,28 +1231,28 @@ ggsave(filename = paste0(figures_path, "/PNDE/nonnull/",
 # ═══════════════════
 #    MSE
 # ═══════════════════
-# PNDE MSE for Gaussian outcomes 
+# NDE MSE for Gaussian outcomes 
 create_plot(data = perf_measures_nonnull, 
             y_var = "MSE_individual_PNDE",
             null_status = "nonnull",
             outcome_type = "gaussian")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/PNDE/nonnull/",
-                         "S1_mse_nonnull_ind_PNDE_gaus.png"),
+ggsave(filename = paste0(figures_path, "/NDE/nonnull/",
+                         "S1_mse_nonnull_ind_NDE_gaus.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
        units = "in", 
        dpi = 300)
 
-# PNDE MSE for Binomial outcomes 
+# NDE MSE for Binomial outcomes 
 create_plot(data = perf_measures_nonnull, 
             y_var = "MSE_individual_PNDE",
             null_status = "nonnull",
             outcome_type = "binomial")
 # Save plot
-ggsave(filename = paste0(figures_path, "/PNDE/nonnull/",
-                         "S1_mse_nonnull_ind_PNDE_binom.png"),
+ggsave(filename = paste0(figures_path, "/NDE/nonnull/",
+                         "S1_mse_nonnull_ind_NDE_binom.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
@@ -908,14 +1264,14 @@ ggsave(filename = paste0(figures_path, "/PNDE/nonnull/",
 # ═══════════════════
 #    Power
 # ═══════════════════
-# TNIE Power 
+# NIE Power 
 create_plot(data = perf_measures_nonnull, 
             y_var = "power_individual_PNDE",
             null_status = "nonnull",
             outcome_type = "all")
 # Save plot
-ggsave(filename = paste0(figures_path, "/PNDE/nonnull/",
-                         "S1_power_nonnull_ind_PNDE_all.png"),
+ggsave(filename = paste0(figures_path, "/NDE/nonnull/",
+                         "S1_power_nonnull_ind_NDE_all.png"),
        plot = last_plot(),
        width = 10,
        height = 11,
@@ -923,34 +1279,34 @@ ggsave(filename = paste0(figures_path, "/PNDE/nonnull/",
        dpi = 300)
 
 
-### Cluster-average PNDE -------------------------------------------------
+### Cluster-average NDE -------------------------------------------------
 
 #### Bias --------------------------------------------------------------------
 # ═══════════════════
 #    Bias 
 # ═══════════════════
-# PNDE Bias for Gaussian outcomes 
+# NDE Bias for Gaussian outcomes 
 create_plot(data = perf_measures_nonnull, 
             y_var = "bias_cluster_PNDE",
             null_status = "nonnull",
             outcome_type = "gaussian")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/PNDE/nonnull/",
-                         "S1_bias_nonnull_clus_PNDE_gaus.png"),
+ggsave(filename = paste0(figures_path, "/NDE/nonnull/",
+                         "S1_bias_nonnull_clus_NDE_gaus.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
        units = "in", 
        dpi = 300)
 
-# PNDE Bias for Binomial outcomes 
+# NDE Bias for Binomial outcomes 
 create_plot(data = perf_measures_nonnull, 
             y_var = "bias_cluster_PNDE",
             null_status = "nonnull",
             outcome_type = "binomial")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/PNDE/nonnull/",
-                         "S1_bias_nonnull_clus_PNDE_binom.png"),
+ggsave(filename = paste0(figures_path, "/NDE/nonnull/",
+                         "S1_bias_nonnull_clus_NDE_binom.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
@@ -962,14 +1318,14 @@ ggsave(filename = paste0(figures_path, "/PNDE/nonnull/",
 # ═══════════════════
 #    CI Coverage Rate 
 # ═══════════════════
-# PNDE CI coverage rate 
+# NDE CI coverage rate 
 create_plot(data = perf_measures_nonnull, 
             y_var = "cover_cluster_PNDE",
             null_status = "nonnull",
             outcome_type = "all")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/PNDE/nonnull/",
-                         "S1_coverage_nonnull_clus_PNDE_all.png"),
+ggsave(filename = paste0(figures_path, "/NDE/nonnull/",
+                         "S1_coverage_nonnull_clus_NDE_all.png"),
        plot = last_plot(),
        width = 10,
        height = 11,
@@ -981,28 +1337,28 @@ ggsave(filename = paste0(figures_path, "/PNDE/nonnull/",
 # ═══════════════════
 #    MSE
 # ═══════════════════
-# PNDE MSE for Gaussian outcomes 
+# NDE MSE for Gaussian outcomes 
 create_plot(data = perf_measures_nonnull, 
             y_var = "MSE_cluster_PNDE",
             null_status = "nonnull",
             outcome_type = "gaussian")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/PNDE/nonnull/",
-                         "S1_mse_nonnull_clus_PNDE_gaus.png"),
+ggsave(filename = paste0(figures_path, "/NDE/nonnull/",
+                         "S1_mse_nonnull_clus_NDE_gaus.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
        units = "in", 
        dpi = 300)
 
-# PNDE MSE for Binomial outcomes 
+# NDE MSE for Binomial outcomes 
 create_plot(data = perf_measures_nonnull, 
             y_var = "MSE_cluster_PNDE",
             null_status = "nonnull",
             outcome_type = "binomial")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/PNDE/nonnull/",
-                         "S1_mse_nonnull_clus_PNDE_binom.png"),
+ggsave(filename = paste0(figures_path, "/NDE/nonnull/",
+                         "S1_mse_nonnull_clus_NDE_binom.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
@@ -1014,14 +1370,14 @@ ggsave(filename = paste0(figures_path, "/PNDE/nonnull/",
 # ═══════════════════
 #    Power
 # ═══════════════════
-# TNIE Power 
+# NIE Power 
 create_plot(data = perf_measures_nonnull, 
             y_var = "power_cluster_PNDE",
             null_status = "nonnull",
             outcome_type = "all")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/PNDE/nonnull/",
-                         "S1_power_nonnull_clus_PNDE_all.png"),
+ggsave(filename = paste0(figures_path, "/NDE/nonnull/",
+                         "S1_power_nonnull_clus_NDE_all.png"),
        plot = last_plot(),
        width = 10,
        height = 11,
@@ -1029,36 +1385,36 @@ ggsave(filename = paste0(figures_path, "/PNDE/nonnull/",
        dpi = 300)
 
 
-## PNDE (null) --------------------------------------------------------------------
+## NDE (null) --------------------------------------------------------------------
 
-### Individual-average PNDE -------------------------------------------------
+### Individual-average NDE -------------------------------------------------
 
 #### Bias --------------------------------------------------------------------
 # ═══════════════════
 #    Bias 
 # ═══════════════════
-# PNDE Bias for Gaussian outcomes 
+# NDE Bias for Gaussian outcomes 
 create_plot(data = perf_measures_null, 
             y_var = "bias_individual_PNDE",
             null_status = "null",
             outcome_type = "gaussian")
 # Save plot
-ggsave(filename = paste0(figures_path, "/PNDE/null/",
-                         "S1_bias_null_ind_PNDE_gaus.png"),
+ggsave(filename = paste0(figures_path, "/NDE/null/",
+                         "S1_bias_null_ind_NDE_gaus.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
        units = "in", 
        dpi = 300)
 
-# PNDE Bias for Binomial outcomes 
+# NDE Bias for Binomial outcomes 
 create_plot(data = perf_measures_null, 
             y_var = "bias_individual_PNDE",
             null_status = "null",
             outcome_type = "binomial")
 # Save plot
-ggsave(filename = paste0(figures_path, "/PNDE/null/",
-                         "S1_bias_null_ind_PNDE_binom.png"),
+ggsave(filename = paste0(figures_path, "/NDE/null/",
+                         "S1_bias_null_ind_NDE_binom.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
@@ -1070,14 +1426,14 @@ ggsave(filename = paste0(figures_path, "/PNDE/null/",
 # ═══════════════════
 #    CI Coverage Rate 
 # ═══════════════════
-# PNDE CI coverage rate 
+# NDE CI coverage rate 
 create_plot(data = perf_measures_null, 
             y_var = "cover_individual_PNDE",
             null_status = "null",
             outcome_type = "all")
 # Save plot
-ggsave(filename = paste0(figures_path, "/PNDE/null/",
-                         "S1_coverage_null_ind_PNDE_all.png"),
+ggsave(filename = paste0(figures_path, "/NDE/null/",
+                         "S1_coverage_null_ind_NDE_all.png"),
        plot = last_plot(),
        width = 10,
        height = 11,
@@ -1089,28 +1445,28 @@ ggsave(filename = paste0(figures_path, "/PNDE/null/",
 # ═══════════════════
 #    MSE
 # ═══════════════════
-# PNDE MSE for Gaussian outcomes 
+# NDE MSE for Gaussian outcomes 
 create_plot(data = perf_measures_null, 
             y_var = "MSE_individual_PNDE",
             null_status = "null",
             outcome_type = "gaussian")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/PNDE/null/",
-                         "S1_mse_null_ind_PNDE_gaus.png"),
+ggsave(filename = paste0(figures_path, "/NDE/null/",
+                         "S1_mse_null_ind_NDE_gaus.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
        units = "in", 
        dpi = 300)
 
-# PNDE MSE for Binomial outcomes 
+# NDE MSE for Binomial outcomes 
 create_plot(data = perf_measures_null, 
             y_var = "MSE_individual_PNDE",
             null_status = "null",
             outcome_type = "binomial")
 # Save plot
-ggsave(filename = paste0(figures_path, "/PNDE/null/",
-                         "S1_mse_null_ind_PNDE_binom.png"),
+ggsave(filename = paste0(figures_path, "/NDE/null/",
+                         "S1_mse_null_ind_NDE_binom.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
@@ -1122,14 +1478,14 @@ ggsave(filename = paste0(figures_path, "/PNDE/null/",
 # ═══════════════════
 #    Type I Error
 # ═══════════════════
-# TNIE Type I Error 
+# NDE Type I Error 
 create_plot(data = perf_measures_null, 
             y_var = "type1_individual_PNDE",
             null_status = "null",
             outcome_type = "all")
 # Save plot
-ggsave(filename = paste0(figures_path, "/PNDE/null/",
-                         "S1_type1_null_ind_PNDE_all.png"),
+ggsave(filename = paste0(figures_path, "/NDE/null/",
+                         "S1_type1_null_ind_NDE_all.png"),
        plot = last_plot(),
        width = 10,
        height = 11,
@@ -1137,34 +1493,34 @@ ggsave(filename = paste0(figures_path, "/PNDE/null/",
        dpi = 300)
 
 
-### Cluster-average PNDE -------------------------------------------------
+### Cluster-average NDE -------------------------------------------------
 
 #### Bias --------------------------------------------------------------------
 # ═══════════════════
 #    Bias 
 # ═══════════════════
-# PNDE Bias for Gaussian outcomes 
+# NDE Bias for Gaussian outcomes 
 create_plot(data = perf_measures_null, 
             y_var = "bias_cluster_PNDE",
             null_status = "null",
             outcome_type = "gaussian")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/PNDE/null/",
-                         "S1_bias_null_clus_PNDE_gaus.png"),
+ggsave(filename = paste0(figures_path, "/NDE/null/",
+                         "S1_bias_null_clus_NDE_gaus.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
        units = "in", 
        dpi = 300)
 
-# PNDE Bias for Binomial outcomes 
+# NDE Bias for Binomial outcomes 
 create_plot(data = perf_measures_null, 
             y_var = "bias_cluster_PNDE",
             null_status = "null",
             outcome_type = "binomial")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/PNDE/null/",
-                         "S1_bias_null_clus_PNDE_binom.png"),
+ggsave(filename = paste0(figures_path, "/NDE/null/",
+                         "S1_bias_null_clus_NDE_binom.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
@@ -1176,14 +1532,14 @@ ggsave(filename = paste0(figures_path, "/PNDE/null/",
 # ═══════════════════
 #    CI Coverage Rate 
 # ═══════════════════
-# PNDE CI coverage rate 
+# NDE CI coverage rate 
 create_plot(data = perf_measures_null, 
             y_var = "cover_cluster_PNDE",
             null_status = "null",
             outcome_type = "all")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/PNDE/null/",
-                         "S1_coverage_null_clus_PNDE_all.png"),
+ggsave(filename = paste0(figures_path, "/NDE/null/",
+                         "S1_coverage_null_clus_NDE_all.png"),
        plot = last_plot(),
        width = 10,
        height = 11,
@@ -1195,28 +1551,28 @@ ggsave(filename = paste0(figures_path, "/PNDE/null/",
 # ═══════════════════
 #    MSE
 # ═══════════════════
-# PNDE MSE for Gaussian outcomes 
+# NDE MSE for Gaussian outcomes 
 create_plot(data = perf_measures_null, 
             y_var = "MSE_cluster_PNDE",
             null_status = "null",
             outcome_type = "gaussian")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/PNDE/null/",
-                         "S1_mse_null_clus_PNDE_gaus.png"),
+ggsave(filename = paste0(figures_path, "/NDE/null/",
+                         "S1_mse_null_clus_NDE_gaus.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
        units = "in", 
        dpi = 300)
 
-# PNDE MSE for Binomial outcomes 
+# NDE MSE for Binomial outcomes 
 create_plot(data = perf_measures_null, 
             y_var = "MSE_cluster_PNDE",
             null_status = "null",
             outcome_type = "binomial")
 # Save plot 
-ggsave(filename = paste0(figures_path, "/PNDE/null/",
-                         "S1_mse_null_clus_PNDE_binom.png"),
+ggsave(filename = paste0(figures_path, "/NDE/null/",
+                         "S1_mse_null_clus_NDE_binom.png"),
        plot = last_plot(), 
        width = 10, 
        height = 9, 
@@ -1228,14 +1584,14 @@ ggsave(filename = paste0(figures_path, "/PNDE/null/",
 # ═══════════════════
 #    Type I Error
 # ═══════════════════
-# TNIE Type I Error 
+# NDE Type I Error 
 create_plot(data = perf_measures_null, 
             y_var = "type1_cluster_PNDE",
             null_status = "null",
             outcome_type = "all")
 # Save plot
-ggsave(filename = paste0(figures_path, "/PNDE/null/",
-                         "S1_type1_null_clus_PNDE_all.png"),
+ggsave(filename = paste0(figures_path, "/NDE/null/",
+                         "S1_type1_null_clus_NDE_all.png"),
        plot = last_plot(),
        width = 10,
        height = 11,
@@ -1247,7 +1603,9 @@ ggsave(filename = paste0(figures_path, "/PNDE/null/",
 
 
 
-# Check variability in TNIE estimates -------------------------------------
+# Check variability in NIE estimates -------------------------------------
+
+## Nonnull -----------------------------------------------------------------
 
 # ══════════════════════════════
 #    gaussian outcome  
@@ -1284,8 +1642,8 @@ sim1_data_converged |>
     )
 
 # Save 
-ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
-                         "S1-extra_bias_nonnull_ind_TNIE_gaus.png"),
+ggsave(filename = paste0(figures_path, "/NIE/nonnull/",
+                         "S1-extra_bias_nonnull_ind_NIE_gaus.png"),
        plot = last_plot(),
        width = 10,
        height = 11,
@@ -1324,8 +1682,8 @@ sim1_data_converged |>
     )
 
 # Save 
-ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
-                         "S1-extra_bias_nonnull_ind_TNIE_binom.png"),
+ggsave(filename = paste0(figures_path, "/NIE/nonnull/",
+                         "S1-extra_bias_nonnull_ind_NIE_binom.png"),
        plot = last_plot(),
        width = 10,
        height = 11,
@@ -1333,6 +1691,90 @@ ggsave(filename = paste0(figures_path, "/TNIE/nonnull/",
        dpi = 300)
 
 
+## Null -----------------------------------------------------------------
+
+# ══════════════════════════════
+#    gaussian outcome  
+# ══════════════════════════════
+sim1_data_converged |> 
+    filter(ifnull == TRUE & nj == "5-20" & Yfamily == "gaussian") |> # & cluster_opt == "cwc.FE") |> 
+    filter(cluster_opt != "RE.glm") |> 
+    mutate(res = individual_ie_Estimate - individual_tnie) |> 
+    ggplot(aes(x = as.factor(J), y = res, fill = Fit)) +
+    geom_boxplot(outlier.shape = 21,
+                 outlier.size = 1.5,
+                 outlier.alpha = 0.9, 
+                 aes(fill = Fit)) +   
+    facet_grid(Mfamily + Yfamily ~ quadratic + cluster_opt, 
+               labeller = labeller(
+                   Mfamily = c("binomial" = "Mediator: Binomial", "gaussian" = "Mediator: Gaussian"),
+                   Yfamily = c("binomial" = "Outcome: Binomial", "gaussian" = "Outcome: Gaussian"),
+                   quadratic    = c("FALSE" = "Linear", "TRUE" = "Nonlinear"),
+                   cluster_opt = c("cwc" = "mean", "cwc.FE" = "mean + dummies")
+               )) +
+    geom_hline(yintercept = 0.5, color = "red") +
+    geom_hline(yintercept = -0.5, color = "red") +
+    gglayer_theme +
+    scale_fill_manual(values = c("#579D42", # glm
+                                 "#BF5700", # mlr
+                                 "#333F48")) +
+    scale_color_manual(values = c("#579D42", # glm
+                                  "#BF5700", # mlr
+                                  "#333F48")) +
+    labs(
+        x = "J",
+        y = "estimate - tnie", 
+        caption = "Note: red line = +/- 0.5"
+    )
+
+# Save 
+ggsave(filename = paste0(figures_path, "/NIE/nonnull/",
+                         "S1-extra_bias_null_ind_NIE_gaus.png"),
+       plot = last_plot(),
+       width = 10,
+       height = 11,
+       units = "in",
+       dpi = 300)
+
+
+# ══════════════════════════════
+#    binomial outcome  
+# ══════════════════════════════
+sim1_data_converged |> 
+    filter(ifnull == TRUE & nj == "5-20" & Yfamily == "binomial") |> # & cluster_opt == "cwc.FE") |> 
+    filter(cluster_opt != "RE.glm") |> 
+    mutate(res = individual_ie_Estimate - individual_tnie) |> 
+    ggplot(aes(x = as.factor(J), y = res, fill = Fit)) +
+    geom_boxplot(outlier.shape = 21,
+                 outlier.size = 1.5,
+                 outlier.alpha = 0.9, 
+                 aes(fill = Fit)) +   
+    facet_grid(Mfamily + Yfamily ~ quadratic + cluster_opt, 
+               labeller = labeller(
+                   Mfamily = c("binomial" = "Mediator: Binomial", "gaussian" = "Mediator: Gaussian"),
+                   Yfamily = c("binomial" = "Outcome: Binomial", "gaussian" = "Outcome: Gaussian"),
+                   quadratic    = c("FALSE" = "Linear", "TRUE" = "Nonlinear"),
+                   cluster_opt = c("cwc" = "mean", "cwc.FE" = "mean + dummies")
+               )) +
+    # geom_hline(yintercept = 0.5, color = "red") +
+    # geom_hline(yintercept = -0.5, color = "red") +
+    gglayer_theme +
+    scale_fill_manual(values = c("#579D42", # glm
+                                 "#BF5700", # mlr
+                                 "#333F48")) +
+    labs(
+        x = "J",
+        y = "estimate - tnie", 
+    )
+
+# Save 
+ggsave(filename = paste0(figures_path, "/NIE/nonnull/",
+                         "S1-extra_bias_null_ind_NIE_binom.png"),
+       plot = last_plot(),
+       width = 10,
+       height = 11,
+       units = "in",
+       dpi = 300)
 
 
 
@@ -1684,7 +2126,7 @@ convergence_rates <- sim1_data |>
     ) 
 
 
-# TNIE Convergence rate 
+# NIE Convergence rate 
 convergence_rates |> 
     ggplot(aes(x = factor(J), y = convergence_rate, color = Fit, shape = Nj, linetype = Fit)) +
     geom_point(size = 2) +

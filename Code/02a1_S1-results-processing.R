@@ -4,21 +4,28 @@
 
 ############################ Script Description ################################
 #
-# Author: Cameron McCann
+# Author: 
 # 
 # Date Created: 2025-01-09
 #
 #
 # Script Description: 
-#       This code summarizes and reports the results for the 
-#       first simulation study (i.e., obtains performance measures). 
+#       Summarize and report results for the simulation study 
+#       (i.e., compute performance measures). 
 #
+# Inputs:
+#   - Simulation output .rds files in: "Output/S1_Simulation-Output/2025-10-22_1000-reps/"
+# 
+# Outputs: 
+#   - 
+# 
+# 
 # To obtain output files from TACC, run a similar command in your terminal: 
-# scp -r "cameronmccann@ls6.tacc.utexas.edu:/home1/10384/cameronmccann/multiply-robust-causal-mediation copy/Output/S1_Simulation-Output/2025-09-03_200-reps" \
-# /Users/cameronmccann/Documents/Research-2025/multiply-robust-causal-mediation/Output/S1_Simulation-Output/
 #     
+# scp -r "cameronmccann@ls6.tacc.utexas.edu:/home1/10384/cameronmccann/multiply-robust-causal-mediation copy/Output/S1_Simulation-Output/2025-10-22_1000-reps" \
+# /Users/cameronmccann/Documents/Research-2025/multiply-robust-causal-mediation/Output/S1_Simulation-Output/
 #
-# Last Updated: 2025-10-21
+# Last Updated: 2025-12-11
 #
 #
 # Notes:
@@ -40,23 +47,94 @@ pacman::p_load(
     dplyr,
     tidyverse, 
     ggplot2, 
-    flextable, 
+    purrr, 
     stringr, 
+    flextable, 
+    huxtable, 
     ggdag, 
     dagitty, 
-    huxtable, 
-    glue, 
-    purrr
+    glue
 )
+
+
+# User Inputs / Global Options --------------------------------------------
+
+# Date of simulation 
+sim_date <- "2025-10-22" #"2025-09-03"# "2025-07-30" #"2025-07-21" #"2025-07-01" # (Note: Simulations were ran around 2025-02-08 & 2025-05-05) #"2025-02-08" #"2025-01-25" #Sys.Date() #"2025-01-23" #"2025-01-18" 
+
+# Number of replications
+reps <- 1000 #600#200 
+
+# # Results folder 
+# results_root <- "Output/S1_Results" #path <- "Output/S1_Results"
+
+# Add subdirectory, if desired (e.g., for test runs): where do you want results stored
+additional_folder_results <- "2025-10-22_1000-reps" # "2025-09-03_200-reps" 
+
+# # Simulation output path 
+# sim_output_path <- "Output/S1_Simulation-Output"
+
+# Where to pull output from 
+additional_folder_output <- "2025-10-22_1000-reps" # "2025-09-03_200-reps" 
+
+
+
+# Set up directory structure ----------------------------------------------
+
+# Create directory to store results 
+results_root <- "Output/S1_Results"
+
+if (!dir.exists(results_root)) {
+    dir.create(results_root, recursive = TRUE)  
+}
+
+# Combine results_root + run-specific subfolder
+if (!is.null(additional_folder_results)) {
+    results_path <- file.path(results_root, additional_folder_results)
+} else {
+    results_path <- file.path(results_root, paste0(sim_date, "_", reps, "-reps"))
+}
+
+# Add subdirectory
+if (!dir.exists(results_path)) {
+    dir.create(results_path, recursive = TRUE)
+}
+
+# Create Data, Figures, and Tables subfolders
+results_subfolders <- c("Data", "Figures", "Tables")
+for (sf in results_subfolders) {
+    dir_sf <- file.path(results_path, sf)
+    if (!dir.exists(dir_sf)) dir.create(dir_sf, recursive = TRUE)
+}
+
+# Simulation output path (where .rds files already live)
+sim_output_root <- "Output/S1_Simulation-Output"
+
+## Obtain simulation output path
+if (!is.null(additional_folder_output)) {
+    sim_output_path <- file.path(sim_output_root, additional_folder_output)
+} else {
+    sim_output_path <- file.path(sim_output_root, paste0(sim_date, "_", reps, "-reps"))   
+}
+
+## error message 
+if (!dir.exists(sim_output_path)) {
+    stop("Simulation output directory does not exist: ", sim_output_path)   
+}
+
+
+
+
+
 
 
 # Set date, reps, & folders ----------------------------------------------
 
 # Date of simulation 
-sim_date <- "2025-09-03"# "2025-07-30" #"2025-07-21" #"2025-07-01" # (Note: Simulations were ran around 2025-02-08 & 2025-05-05) #"2025-02-08" #"2025-01-25" #Sys.Date() #"2025-01-23" #"2025-01-18" 
+sim_date <- "2025-10-22" #"2025-09-03"# "2025-07-30" #"2025-07-21" #"2025-07-01" # (Note: Simulations were ran around 2025-02-08 & 2025-05-05) #"2025-02-08" #"2025-01-25" #Sys.Date() #"2025-01-23" #"2025-01-18" 
 
 # Number of replications
-reps <- 200 # 1000
+reps <- 1000 #600#200 
 
 # Create directory to store results 
 ## Results folder 
@@ -65,7 +143,7 @@ if (!dir.exists(path)) {
     dir.create(path)
 }
 ### Add subdirectory, if desired (e.g., for test runs): where do you want results stored
-additional_folder_results <- "2025-09-03_200-reps" 
+additional_folder_results <- "2025-10-22_1000-reps" # "2025-09-03_200-reps" 
 ### Check if additional_folder_results is not NULL to add to path
 if (!is.null(additional_folder_results)) {
     results_path <- file.path(path, additional_folder_results)
@@ -88,7 +166,7 @@ if (!dir.exists(paste0(results_path, "/Tables"))) {
 # Simulation output path 
 sim_output_path <- "Output/S1_Simulation-Output"
 ### where to pull output from 
-additional_folder_output <- "2025-09-03_200-reps" 
+additional_folder_output <- "2025-10-22_1000-reps" # "2025-09-03_200-reps" 
 ### Check if additional_folder_output is not NULL to add to path
 if (!is.null(additional_folder_output)) {
     sim_output_path <- file.path(sim_output_path, additional_folder_output)
@@ -122,44 +200,38 @@ conditions_all <- data.frame(rbind(
 ), 
 icc = c(0.2))
 
-# limit conditions for testing 
-conditions <- conditions_all 
-# limit conditions 
-conditions <- conditions_all |> #[c(1:7, 9, 10, 12, 13, 15, 16, 18, 19, 21, 22, 24, 49, 51, 52, 54, 55, 56, 57, 58, 60, 67, 69, 70, 72, 61:66), , drop = FALSE] |> #c(1:2, 49:72) #1:7, 9, 10, 12, 13, 15, 16, 18, 19, 21, 22, 24, 49, 51, 52, 54, 55, 56, 57, 58, 60, 67, 69, 70, 72, 61:66
-    tibble::rownames_to_column("condition_number")
-conditions
+
+# Add condition number & limit conditions 
+conditions <- conditions_all |> 
+    tibble::rownames_to_column("condition_number") #|> 
+    # dplyr::filter(condition_number %in% c(1:6)) # subset conditions
 
 # ══════════════════════════════
 #    Methods  
 # ══════════════════════════════
-methds_all <- data.frame(expand.grid(
-    cluster_a = "FE", #c("FE", "RE", "noncluster"), # "RE", # "noncluster", #
-    cluster_m = "FE", # c("FE", "RE", "noncluster"), # "RE", #  "noncluster.mlr", #
-    cluster_y =  "FE", #c("FE", "RE", "noncluster"), # "noncluster.mlr", ## "FE.mlr", #
-    # interact_fitm2 =  c(T), # NULL, #
-    # interact_fity = c(T), # NULL, #
-    # Morder = c("21", "12"),
-    Fit = c("mlr3", "mlr2", "mlr","glm"), # 
-    # cluster_opt_a = c("sufficient_stats",  "cwc.FE"), # "FE.glm", #  
-    # cluster_opt_m = c("sufficient_stats",  "cwc.FE"),  #"FE.glm", # 
-    # cluster_opt_y = c("sufficient_stats",  "cwc.FE") # "cwc.FE"#c("sufficient_stats") #, 
-    cluster_opt = c("cwc.FE", "cwc") #,  "noncluster.glm"
-)) %>% 
+methds_all <- data.frame(
+    expand.grid(
+        cluster_a = "FE", #c("FE", "RE", "noncluster"), # "RE", # "noncluster", #
+        cluster_m = "FE", # c("FE", "RE", "noncluster"), # "RE", #  "noncluster.mlr", #
+        cluster_y = "FE", #c("FE", "RE", "noncluster"), # "noncluster.mlr", ## "FE.mlr", #
+        Fit = c("mlr3", "mlr2", "mlr", "glm"),
+        cluster_opt = c("cwc.FE", "cwc") #,  "noncluster.glm"
+    )
+) |>
     mutate(
-        cluster_opt_a = cluster_opt, 
-        cluster_opt_m = cluster_opt, 
+        cluster_opt_a = cluster_opt,
+        cluster_opt_m = cluster_opt,
         cluster_opt_y = cluster_opt
     )
 
-# limit conditions
+# Limit to methods used in paper
 methds <- methds_all |> 
-    filter(cluster_opt %in% c("cwc", "cwc.FE"), Fit %in% c("glm", "mlr")) #, "mlr2", "mlr3")) #, "glm")) 
+    filter(cluster_opt %in% c("cwc", "cwc.FE"), Fit %in% c("glm", "mlr")) 
 
 # Add RE & RE with random slopes 
-## Add column for random-slope variables
 methds <- data.frame(methds,
                      random_slope_vars_y = "NULL") 
-## Add RE & RE with random slopes to dataframe 
+
 methds <- bind_rows(
     methds,
     data.frame(
@@ -174,7 +246,8 @@ methds <- bind_rows(
         random_slope_vars_y = c("NULL", "A")
     )
 )
-## Drop RE with random slopes 
+
+# Drop RE with random slopes (not reported in paper)
 methds <- methds |>
     filter(cluster_opt != "RE.glm.rs")
 
@@ -186,20 +259,21 @@ rds_files_all <- list.files(
     path = sim_output_path,              # e.g., "Output/S1_Simulation-Output"
     pattern = "^S1_condition.*\\.rds$",   # only files starting with S1_condition and ending in .rds
     full.names = TRUE
-)
+) |> sort()
 
 # Extract padded condition numbers 
 cond_ids <- rds_files_all |> 
     basename() |> 
     str_extract("S1_condition-\\d{2}") |> 
     str_extract("\\d{2}") 
+
 cond_ids <- paste0("cond_", cond_ids)
 
 # ══════════════════════════════
 #    Create overall list (dropping iterations with error) 
 # ══════════════════════════════
 # Create overall simulation output list with padded condition numbers as element names (e.g., cond_01) & drop any iterations with errors
-overall_list <- set_names(
+overall_list <- purrr::set_names(
     purrr::imap(rds_files_all, function(file, i) {
         # Load file 
         data <- readRDS(file)
@@ -223,42 +297,36 @@ overall_list <- set_names(
     }), 
     nm = cond_ids
 )
-# File 52: Dropping 1 iterations with error msg at indices: 198 (S1_condition-52_reps-200_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-40.rds)
-# File 57: Dropping 1 iterations with error msg at indices: 68 (S1_condition-57_reps-205_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds)
-# File 59: Dropping 1 iterations with error msg at indices: 159 (S1_condition-59_reps-205_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds)
-# File 73: Dropping 1 iterations with error msg at indices: 79 (S1_condition-73_reps-205_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-40.rds)
-# File 74: Dropping 2 iterations with error msg at indices: 165, 205 (S1_condition-74_reps-205_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-70.rds)
-# File 77: Dropping 1 iterations with error msg at indices: 145 (S1_condition-77_reps-205_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-70.rds)
-# File 78: Dropping 1 iterations with error msg at indices: 199 (S1_condition-78_reps-205_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-100.rds)
-# File 79: Dropping 1 iterations with error msg at indices: 18 (S1_condition-79_reps-205_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-40.rds)
-# File 81: Dropping 1 iterations with error msg at indices: 43 (S1_condition-81_reps-205_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds)
-# File 83: Dropping 1 iterations with error msg at indices: 168 (S1_condition-83_reps-205_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds)
+# File 9: Dropping 1 iterations with error msg at indices: 661 (S1_condition-09_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-40.rds)
+# File 52: Dropping 1 iterations with error msg at indices: 198 (S1_condition-52_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-40.rds)
+# File 56: Dropping 3 iterations with error msg at indices: 403, 502, 538 (S1_condition-56_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds)
+# File 57: Dropping 5 iterations with error msg at indices: 68, 238, 369, 458, 978 (S1_condition-57_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds)
+# File 58: Dropping 1 iterations with error msg at indices: 696 (S1_condition-58_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-40.rds)
+# File 59: Dropping 5 iterations with error msg at indices: 159, 330, 378, 616, 696 (S1_condition-59_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds)
+# File 60: Dropping 2 iterations with error msg at indices: 485, 666 (S1_condition-60_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds)
 
 # Save overall simulation output list for reference later
 saveRDS(overall_list, 
-        file = file.path(results_path, "Data", paste0("S1_overall-output-list_", sim_date, ".rds")))
+        file = file.path(results_path, "Data", 
+                         paste0("S1_overall-output-list_", sim_date, ".rds")))
 
 
 # Create dataframe version ------------------------------------------------
 
-# Note: this does not include replacements for problematic cases (If you would 
-# like to include replacements go to "Convert updated_overall_list to dataframe 
-# format" section in other script)
+# Note: 
+#   This does not include replacements for problematic cases. 
+#   If you would like to include replacements, see: 
+#   "Convert updated_overall_list to dataframe format" section in 
+#   02a2_S1-results-processing.R.
+
 
 ## Import data  ------------------------------------------------------------
-
-# List all RDS files in the simulation output folder that start with "S1_condition"
-rds_files_all <- list.files(
-    path = sim_output_path,              # e.g., "Output/S1_Simulation-Output"
-    pattern = "^S1_condition.*\\.rds$",   # only files starting with S1_condition and ending in .rds
-    full.names = TRUE
-)
 
 # ══════════════════════════════
 #    check for matches & duplicates  
 # ══════════════════════════════
 # Create a normalized ID column for matching
-conditions_str <- conditions %>%
+conditions_str <- conditions |> 
     mutate(
         file_pattern = paste0(
             "null-", toupper(as.character(if.null)),
@@ -274,8 +342,8 @@ conditions_str <- conditions %>%
 # Normalize rds file names (get just the tail filename)
 rds_filenames <- sub(".*(null-)", "\\1", basename(rds_files_all))
 
-### Check for missing
-conditions_str <- conditions_str %>%
+# Check for missing
+conditions_str <- conditions_str |> 
     mutate(in_rds = file_pattern %in% rds_filenames)
 
 missing_conditions <- filter(conditions_str, !in_rds)
@@ -287,17 +355,15 @@ if (nrow(missing_conditions) == 0) {
     print(missing_conditions)
 }
 
-### Check for duplicates 
-# Extract normalized file patterns from rds_files_all
-rds_pattern_extracted <- str_extract(rds_filenames,
-                                     "null-[^_]+_quad-[^_]+_M-[^_]+_Y-[^_]+_nj-\\[[^\\]]+\\]_J-[0-9]+\\.rds")
+# Check for duplicates 
+## Extract normalized file patterns from rds_files_all
+rds_pattern_extracted <- str_extract(
+    rds_filenames,
+    "null-[^_]+_quad-[^_]+_M-[^_]+_Y-[^_]+_nj-\\[[^\\]]+\\]_J-[0-9]+\\.rds"
+)
 
-duplicate_patterns <- rds_pattern_extracted[duplicated(rds_pattern_extracted)]
-
-duplicates_df <- tibble(
-    file_pattern = duplicate_patterns
-) %>%
-    count(file_pattern, name = "count") %>%
+duplicates_df <- tibble(file_pattern = rds_pattern_extracted[duplicated(rds_pattern_extracted)]) |>
+    count(file_pattern, name = "count") |>
     filter(count > 1)
 
 if (nrow(duplicates_df) == 0) {
@@ -308,38 +374,36 @@ if (nrow(duplicates_df) == 0) {
 }
 
 
-# 2. Read each file and attach its file name for later extraction of condition information
+# Read each file and attach its file name for later extraction of condition information
 all_data_list <- lapply(rds_files_all, function(file) {
     data <- readRDS(file)
     data$file <- file  # store file name within the data object
     data
 })
 
-# 3. Initialize the main data frame to store all simulation results
+# Initialize the main data frame to store all simulation results
 sim1_data <- NULL
 
-# 4. Loop through each file's data and process the simulation output
-## helper to extract value (or insert NA)
-get1 <- function(x, default = NA_real_) if (is.null(x) || length(x) == 0) default else x[[1]]
-## loop 
+## Helper to extract value (or insert NA)
+get1 <- function(x, default = NA_real_) {
+    if (is.null(x) || length(x) == 0) default else x[[1]]
+}
+
+# Loop through each file's data and process the simulation output
 for (file_data in all_data_list) {
     
     # Get the file name from the data (we will parse this to extract condition info)
     fname <- file_data$file
     
-    message(sprintf("--------------------------------- \ncond_%s: ", str_extract(basename(fname), "(?<=condition-)[0-9]{2}")))
+    message(sprintf("--------------------------------- \ncond_%s: ", 
+                    str_extract(basename(fname), "(?<=condition-)[0-9]{2}")))
     
     # Remove the "file" element from file_data so that only simulation iterations remain
     iter_data <- file_data
     if ("file" %in% names(file_data)) {
         iter_data <- file_data[names(file_data) != "file"]
     }
-    # --- NEW: isolate iteration list and drop error iterations (1 message per file) ---
-    # iter_data <- file_data
-    # if ("file" %in% names(file_data)) {
-    #     iter_data <- file_data[names(file_data) != "file"]
-    # }
-    
+
     # Identify iterations with error
     error_iter <- which(vapply(iter_data, function(it) {
         msg <- it$results$`mlr-cwc.FE`$error_message
@@ -351,30 +415,17 @@ for (file_data in all_data_list) {
     }, logical(1)))
     
     # Drop iterations with error 
-    # if (length(error_iter)) {
-    #     iter_data <- iter_data[-error_iter]
-    #     message(sprintf(
-    #         "Dropping %d problematic iterations from %s at indices: %s",
-    #         length(error_iter), basename(fname), paste(error_iter, collapse = ", ")
-    #     ))
-    # }
-    
-    
     if (length(error_iter)) {
         iter_data <- iter_data[-error_iter]
     }
     message(sprintf("Dropping %d iterations with error msg at indices %s: %s", 
                     length(error_iter), paste(error_iter, collapse = ", "), basename(fname)))
-    # message(sprintf("File %d: Dropping %d iterations with error msg at indices: %s (%s)",
-    #                 i, length(error_iter), paste(error_iter, collapse = ", "), basename(file)))
-    
-    # --- end NEW ---
-    
     
     # Identify iterations known to be problematic 
     prblm_iter <- which(vapply(iter_data, function(iter) {
         iter$raw_iteration %in% c(1956, 3474, 760, 14436)
     }, logical(1)))
+    
     # Drop known problematic iterations (1956 & 3474 for cond 68 and 760 & 14436 for cond 69)
     if (length(prblm_iter)) {
         iter_data <- iter_data[-prblm_iter]
@@ -384,8 +435,7 @@ for (file_data in all_data_list) {
     
     # Extract condition number 
     condition_number <- str_extract(basename(fname), "(?<=condition-)[0-9]{2}")
-    # Extract condition information from the file name using regex.
-    # Expected pattern: "reps-200_quad-FALSE_M-gaussian_Y-gaussian_nj-[5,20]_J-100"
+    # Extract condition information from the file name using regex; expected pattern: "reps-200_quad-FALSE_M-gaussian_Y-gaussian_nj-[5,20]_J-100"
     pattern <- "reps-([0-9]+)_null-([A-Za-z]+)_quad-([A-Za-z]+)_M-([A-Za-z]+)_Y-([A-Za-z]+)_nj-\\[([^\\]]+)\\]_J-([0-9]+)"
     matches <- str_match(fname, pattern)
     
@@ -416,17 +466,11 @@ for (file_data in all_data_list) {
         }
         M_val <- matches[1,5]
         Y_val <- matches[1,6]
-        nj_val <- matches[1,7]   # this remains as a string (e.g., "5,20"); you can parse it further if needed
+        nj_val <- matches[1,7]   # this remains as a string (e.g., "5,20")
         J_val <- as.numeric(matches[1,8])
     }
     
     overall_models <- NULL  # to store processed results for the current file
-    
-    # # Remove the "file" element from file_data so that only simulation iterations remain
-    # iter_data <- file_data
-    # if ("file" %in% names(file_data)) {
-    #     iter_data <- file_data[names(file_data) != "file"]
-    # }
     
     # Keep only the first desired number of replications (e.g., `reps`; 200) to avoid cases from overrun parallelization
     if (length(iter_data) > reps) {
@@ -441,7 +485,6 @@ for (file_data in all_data_list) {
             # Create a key to extract the correct results from the simulation object
             key <- glue("{methds$Fit[mod]}-{methds$cluster_opt[mod]}")
             
-            # 
             res <- iter_data[[i]]$results[[key]]
             if (is.null(res) || length(res) == 0) res <- list()
             
@@ -457,27 +500,7 @@ for (file_data in all_data_list) {
                 )
             } 
             
-            # # Check if the expected results exist in the current iteration
-            # if (is.null(iter_data[[i]]$results[[key]])) {
-            #     warning("Missing result for key ", key, " in iteration ", i, " of file ", fname)
-            #     next
-            # }
-            # 
-            # estimates <- iter_data[[i]]$results[[key]]$estimates
-            # 
-            # # If estimates is NULL, replace with empty tibble with needed columns
-            # if (is.null(estimates)) {
-            #     estimates <- tibble(
-            #         Effect = character(),
-            #         EffectVersion = character(),
-            #         Estimate = as.numeric(NA),
-            #         StdError = as.numeric(NA),
-            #         CILower = as.numeric(NA),
-            #         CIUpper = as.numeric(NA)
-            #     )
-            # }
-            
-            # Extract individual and cluster estimates using dplyr filters
+            # Extract individual and cluster estimates 
             individual_de <- estimates %>% 
                 filter(EffectVersion == "Individual-Avg" & grepl("DE", Effect)) %>% 
                 slice(1)
@@ -491,29 +514,38 @@ for (file_data in all_data_list) {
                 filter(EffectVersion == "Cluster-Avg" & grepl("IE", Effect)) %>% 
                 slice(1)
             
-            # # Extract individual and cluster effects
-            # individual_effects <- iter_data[[i]]$effects$individual
-            # cluster_effects    <- iter_data[[i]]$effects$cluster
-            # 
-            # 
+            # Extract individual effects & fix NAs
             individual_effects <- iter_data[[i]]$effects$individual
+            # if (is.null(individual_effects) || length(individual_effects) == 0) {
+            #     list(pnde = NA_real_, tnie = NA_real_, tnde = NA_real_, pnie = NA_real_)
+            # } 
             if (is.null(individual_effects) || length(individual_effects) == 0) {
-                list(pnde = NA_real_, tnie = NA_real_, tnde = NA_real_, pnie = NA_real_)
-            } 
-            # 
-            cluster_effects <- iter_data[[i]]$effects$cluster
-            if (is.null(cluster_effects) || length(cluster_effects) == 0) {
-                list(pnde = NA_real_, tnie = NA_real_, tnde = NA_real_, pnie = NA_real_)
+                individual_effects <- list(
+                    pnde = NA_real_, tnie = NA_real_,
+                    tnde = NA_real_, pnie = NA_real_
+                )
             } 
             
-            # warnings / error fields (scalar defaults)
+            # Extract cluster effects & fix NAs
+            cluster_effects <- iter_data[[i]]$effects$cluster
+            # if (is.null(cluster_effects) || length(cluster_effects) == 0) {
+            #     list(pnde = NA_real_, tnie = NA_real_, tnde = NA_real_, pnie = NA_real_)
+            # } 
+            if (is.null(cluster_effects) || length(cluster_effects) == 0) {
+                cluster_effects <- list(
+                    pnde = NA_real_, tnie = NA_real_,
+                    tnde = NA_real_, pnie = NA_real_
+                )
+            } 
+            
+            # Warnings fields 
             warns <- res$warnings
             if (is.null(warns)) warns <- character(0)
-            
             warnings_chr <- if (length(warns) == 0) NA_character_ else paste(warns, collapse="; ")
             n_warnings   <- length(warns)
-            error_flag <- res$error
             
+            # Error fields
+            error_flag <- res$error
             error_msg <- res$error_message
             if (is.null(error_msg)) error_msg <- NA_character_
             
@@ -1009,7 +1041,6 @@ for (file_data in all_data_list) {
 
 # Save 
 saveRDS(sim1_data, file = file.path(results_path, "Data", paste0("S1_overall-output-dataframe_", sim_date, ".rds")))
-
 
 
 # Check warning & error messages ------------------------------------------
