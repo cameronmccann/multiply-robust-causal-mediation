@@ -10,24 +10,23 @@
 #
 #
 # Script Description: 
-#       Part 2 replaces problematic cases with simulation output from personal computer
+#       Part 2 replaces problematic cases with simulation output from personal computer.
 # 
-#       This code summarizes and reports the results for the 
+#       This code then summarizes and reports the results for the 
 #       first simulation study (i.e., obtains performance measures). 
 # 
-#       files with "updated-" in name are versions from this script
+#       Note: files with "updated-" in name are versions from this script
 #
 # To obtain output files from TACC, run a similar command in your terminal: 
 # scp -r "cameronmccann@ls6.tacc.utexas.edu:/home1/10384/cameronmccann/multiply-robust-causal-mediation copy/Output/S1_Simulation-Output/2025-09-03_200-reps" \
 # /Users/cameronmccann/Documents/Research-2025/multiply-robust-causal-mediation/Output/S1_Simulation-Output/
 #     
 #
-# Last Updated: 2025-11-19
+# Last Updated: 2025-12-16
 #
 #
 # Notes:
 #   To-Do
-#       # filter out problematic iterations (1956 & 3474 for cond 68 and 760 & 14436 for cond 69) 
 # 
 #   Done: 
 # 
@@ -54,48 +53,68 @@ pacman::p_load(
 )
 
 
-# Set date, reps, & folders ----------------------------------------------
+# User Inputs / Global Options --------------------------------------------
 
 # Date of simulation 
 sim_date <- "2025-10-22" # "2025-09-03"
 
 # Number of replications
-reps <- 600 # 200 # 1000
+reps <- 1000 #600#200 
 
-# Create directory to store results 
-## Results folder 
-path <- "Output/S1_Results"
-if (!dir.exists(path)) {
-    dir.create(path)
+# # Results folder 
+# results_root <- "Output/S1_Results" #path <- "Output/S1_Results"
+
+# Add subdirectory, if desired (e.g., for test runs): where do you want results stored
+additional_folder_results <- "2025-10-22_1000-reps" # "2025-09-03_200-reps" 
+
+# # Simulation output path 
+# sim_output_path <- "Output/S1_Simulation-Output"
+
+# Where to pull output from 
+additional_folder_output <- "2025-10-22_1000-reps" # "2025-09-03_200-reps" 
+
+
+# Set up directory structure ----------------------------------------------
+
+# Create directory to store results
+results_root <- "Output/S1_Results"
+
+if (!dir.exists(results_root)) {
+    dir.create(results_root, recursive = TRUE)
 }
-### Add subdirectory, if desired (e.g., for test runs): where do you want results stored
-additional_folder_results <- "2025-10-22_600-reps" # "2025-09-03_200-reps" 
-### Check if additional_folder_results is not NULL to add to path
+
+# Combine results_root + run-specific subfolder
 if (!is.null(additional_folder_results)) {
-    results_path <- file.path(path, additional_folder_results)
-}
-### Create directory 
-if (!dir.exists(results_path)) {
-    dir.create(results_path)
-}
-## Data, Figures, & Tables subfolders 
-if (!dir.exists(paste0(results_path, "/Data"))) {
-    dir.create(paste0(results_path, "/Data"))
-}
-if (!dir.exists(paste0(results_path, "/Figures"))) {
-    dir.create(paste0(results_path, "/Figures"))
-}
-if (!dir.exists(paste0(results_path, "/Tables"))) {
-    dir.create(paste0(results_path, "/Tables"))
+    results_path <- file.path(results_root, additional_folder_results)
+} else {
+    results_path <- file.path(results_root, paste0(sim_date, "_", reps, "-reps"))
 }
 
-# Simulation output path 
-sim_output_path <- "Output/S1_Simulation-Output"
-### where to pull output from 
-additional_folder_output <- "2025-10-22_600-reps" # "2025-09-03_200-reps" 
-### Check if additional_folder_output is not NULL to add to path
+# Add subdirectory
+if (!dir.exists(results_path)) {
+    dir.create(results_path, recursive = TRUE)
+}
+
+# Create Data, Figures, and Tables subfolders
+results_subfolders <- c("Data", "Figures", "Tables")
+for (sf in results_subfolders) {
+    dir_sf <- file.path(results_path, sf)
+    if (!dir.exists(dir_sf)) dir.create(dir_sf, recursive = TRUE)
+}
+
+# Simulation output path (where .rds files already live)
+sim_output_root <- "Output/S1_Simulation-Output"
+
+## Obtain simulation output path
 if (!is.null(additional_folder_output)) {
-    sim_output_path <- file.path(sim_output_path, additional_folder_output)
+    sim_output_path <- file.path(sim_output_root, additional_folder_output)
+} else {
+    sim_output_path <- file.path(sim_output_root, paste0(sim_date, "_", reps, "-reps"))
+}
+
+## error message
+if (!dir.exists(sim_output_path)) {
+    stop("Simulation output directory does not exist: ", sim_output_path)
 }
 
 
@@ -126,44 +145,38 @@ conditions_all <- data.frame(rbind(
 ), 
 icc = c(0.2))
 
-# limit conditions for testing 
-conditions <- conditions_all 
-# limit conditions 
-conditions <- conditions_all |> #[c(1:7, 9, 10, 12, 13, 15, 16, 18, 19, 21, 22, 24, 49, 51, 52, 54, 55, 56, 57, 58, 60, 67, 69, 70, 72, 61:66), , drop = FALSE] |> #c(1:2, 49:72) #1:7, 9, 10, 12, 13, 15, 16, 18, 19, 21, 22, 24, 49, 51, 52, 54, 55, 56, 57, 58, 60, 67, 69, 70, 72, 61:66
-    tibble::rownames_to_column("condition_number")
-conditions
+
+# Add condition number & limit conditions 
+conditions <- conditions_all |> 
+    tibble::rownames_to_column("condition_number") #|> 
+# dplyr::filter(condition_number %in% c(1:6)) # subset conditions
 
 # ══════════════════════════════
 #    Methods  
 # ══════════════════════════════
-methds_all <- data.frame(expand.grid(
-    cluster_a = "FE", #c("FE", "RE", "noncluster"), # "RE", # "noncluster", #
-    cluster_m = "FE", # c("FE", "RE", "noncluster"), # "RE", #  "noncluster.mlr", #
-    cluster_y =  "FE", #c("FE", "RE", "noncluster"), # "noncluster.mlr", ## "FE.mlr", #
-    # interact_fitm2 =  c(T), # NULL, #
-    # interact_fity = c(T), # NULL, #
-    # Morder = c("21", "12"),
-    Fit = c("mlr3", "mlr2", "mlr","glm"), # 
-    # cluster_opt_a = c("sufficient_stats",  "cwc.FE"), # "FE.glm", #  
-    # cluster_opt_m = c("sufficient_stats",  "cwc.FE"),  #"FE.glm", # 
-    # cluster_opt_y = c("sufficient_stats",  "cwc.FE") # "cwc.FE"#c("sufficient_stats") #, 
-    cluster_opt = c("cwc.FE", "cwc") #,  "noncluster.glm"
-)) %>% 
+methds_all <- data.frame(
+    expand.grid(
+        cluster_a = "FE", #c("FE", "RE", "noncluster"), # "RE", # "noncluster", #
+        cluster_m = "FE", # c("FE", "RE", "noncluster"), # "RE", #  "noncluster.mlr", #
+        cluster_y = "FE", #c("FE", "RE", "noncluster"), # "noncluster.mlr", ## "FE.mlr", #
+        Fit = c("mlr3", "mlr2", "mlr", "glm"),
+        cluster_opt = c("cwc.FE", "cwc") #,  "noncluster.glm"
+    )
+) |>
     mutate(
-        cluster_opt_a = cluster_opt, 
-        cluster_opt_m = cluster_opt, 
+        cluster_opt_a = cluster_opt,
+        cluster_opt_m = cluster_opt,
         cluster_opt_y = cluster_opt
     )
 
-# limit conditions
+# Limit to methods used in paper
 methds <- methds_all |> 
-    filter(cluster_opt %in% c("cwc", "cwc.FE"), Fit %in% c("glm", "mlr")) #, "mlr2", "mlr3")) #, "glm")) 
+    filter(cluster_opt %in% c("cwc", "cwc.FE"), Fit %in% c("glm", "mlr")) 
 
 # Add RE & RE with random slopes 
-## Add column for random-slope variables
 methds <- data.frame(methds,
                      random_slope_vars_y = "NULL") 
-## Add RE & RE with random slopes to dataframe 
+
 methds <- bind_rows(
     methds,
     data.frame(
@@ -178,234 +191,238 @@ methds <- bind_rows(
         random_slope_vars_y = c("NULL", "A")
     )
 )
-## Drop RE with random slopes 
+
+# Drop RE with random slopes (not reported in paper)
 methds <- methds |>
     filter(cluster_opt != "RE.glm.rs")
 
 
-# Create overall list for all simulation output ---------------------------
-
-# List all simulation output .rds files
-rds_files_all <- list.files(
-    path = sim_output_path,              # e.g., "Output/S1_Simulation-Output"
-    pattern = "^S1_condition.*\\.rds$",   # only files starting with S1_condition and ending in .rds
-    full.names = TRUE
-)
-
-# Extract padded condition numbers 
-cond_ids <- rds_files_all |> 
-    basename() |> 
-    str_extract("S1_condition-\\d{2}") |> 
-    str_extract("\\d{2}") 
-cond_ids <- paste0("cond_", cond_ids)
-
-# ══════════════════════════════
-#    Create overall list (dropping iterations with error) 
-# ══════════════════════════════
-# Create overall simulation output list with padded condition numbers as element names (e.g., cond_01) & drop any iterations with errors
-overall_list <- set_names(
-    purrr::imap(rds_files_all, function(file, i) {
-        # Load file 
-        data <- readRDS(file)
-        
-        # Identify iterations with error
-        prblm_iter <- which(vapply(data, function(x) {
-            msg <- x$results$`mlr-cwc.FE`$error_message
-            !is.null(msg) && grepl("Error in internal function `v.ac()`: no applicable method for 'predict' applied to an object of class \"NULL\"", 
-                                   msg, 
-                                   fixed = TRUE)
-        }, logical(1)))
-        
-        # Drop iterations with error 
-        if (length(prblm_iter)) {
-            data <- data[-prblm_iter]
-            message(sprintf("File %d: Dropping %d iterations with error msg at indices: %s (%s)",
-                            i, length(prblm_iter), paste(prblm_iter, collapse = ", "), basename(file)))
-        }
-        
-        return(data)
-    }), 
-    nm = cond_ids
-)
-# File 52: Dropping 1 iterations with error msg at indices: 198 (S1_condition-52_reps-200_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-40.rds)
-# File 57: Dropping 1 iterations with error msg at indices: 68 (S1_condition-57_reps-205_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds)
-# File 59: Dropping 1 iterations with error msg at indices: 159 (S1_condition-59_reps-205_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds)
-# File 73: Dropping 1 iterations with error msg at indices: 79 (S1_condition-73_reps-205_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-40.rds)
-# File 74: Dropping 2 iterations with error msg at indices: 165, 205 (S1_condition-74_reps-205_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-70.rds)
-# File 77: Dropping 1 iterations with error msg at indices: 145 (S1_condition-77_reps-205_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-70.rds)
-# File 78: Dropping 1 iterations with error msg at indices: 199 (S1_condition-78_reps-205_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-100.rds)
-# File 79: Dropping 1 iterations with error msg at indices: 18 (S1_condition-79_reps-205_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-40.rds)
-# File 81: Dropping 1 iterations with error msg at indices: 43 (S1_condition-81_reps-205_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds)
-# File 83: Dropping 1 iterations with error msg at indices: 168 (S1_condition-83_reps-205_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds)
-
-# 2025-11-18:
-# File 52: Dropping 1 iterations with error msg at indices: 198 (S1_condition-52_reps-610_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-40.rds)
-# File 56: Dropping 3 iterations with error msg at indices: 403, 502, 538 (S1_condition-56_reps-610_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds)
-# File 57: Dropping 4 iterations with error msg at indices: 68, 238, 369, 458 (S1_condition-57_reps-610_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds)
-# File 59: Dropping 3 iterations with error msg at indices: 159, 330, 378 (S1_condition-59_reps-610_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds)
-# File 60: Dropping 1 iterations with error msg at indices: 485 (S1_condition-60_reps-610_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds)
-# File 73: Dropping 2 iterations with error msg at indices: 79, 333 (S1_condition-73_reps-610_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-40.rds)
-# File 74: Dropping 6 iterations with error msg at indices: 165, 205, 394, 399, 496, 595 (S1_condition-74_reps-610_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-70.rds)
-# File 77: Dropping 2 iterations with error msg at indices: 145, 605 (S1_condition-77_reps-610_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-70.rds)
-# File 78: Dropping 1 iterations with error msg at indices: 199 (S1_condition-78_reps-610_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-100.rds)
-# File 79: Dropping 2 iterations with error msg at indices: 18, 222 (S1_condition-79_reps-610_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-40.rds)
-
-# Save overall simulation output list for reference later
-saveRDS(overall_list, 
-        file = file.path(results_path, "Data", paste0("S1_overall-output-list_", sim_date, ".rds")))
-
-
 ## Identify problematic iterations (very extreme estimates) ----------------
 
-# Prior problematic iterations are: (1956 & 3474 for cond 68 and 760 & 14436 for cond 69)
-#.We are obtaining those for these & other conditions
-# 
+# Import overall simulation output list (created in 02a1_S1-results-processing.R)
+overall_list <- readRDS(file = file.path(
+    results_path, "Data", paste0("S1_overall-output-list_", sim_date, ".rds")
+))
+
+# Below we identify "problematic" iterations (i.e., extreme estimates with large 
+# influence) by checking whether the raw bias is greater than the 75th percentile +
+# 3xIQR or less than the 25th percentile - 3xIQR. If either is true, we flag the 
+# iteration. This is repeated across all estimation methods. 
 
 # ══════════════════════════════
 #    Identify iterations with extreme estimates for each model across conditions
 # ══════════════════════════════
+
+# Helper function: difference between estimated & true tnie 
+tnie_diff <- function(x, key) {
+    res <- x$results[[key]]
+    est <- res$estimates
+    tnie <- x$effects$individual$tnie
+    
+    as.numeric(est[2, "Estimate"] - tnie)
+}
+
+# Helper function: identify extreme differences estimated & true tnie 
+find_extreme_idx <- function(x) {
+    q25 <- quantile(x, 0.25, na.rm = TRUE)
+    q75 <- quantile(x, 0.75, na.rm = TRUE)
+    iqr <- IQR(x, na.rm = TRUE)
+    which(x < (q25 - 3 * iqr) | x > (q75 + 3 * iqr))
+}
+
+# Methods to check (single source of truth)
+methods_key <- c(
+    "mlr-cwc.FE",
+    "mlr-cwc",
+    "glm-cwc.FE",
+    "glm-cwc"
+)
+
 # Create a list containing bias (estimate - tnie) and extreme estimates if present
-extreme_list <- purrr::imap(overall_list, function(lst, nm) {
-    # mlr-cwc.FE
-    ## difference
-    mlrcwcFE_diff <- vapply(lst, function(x) {
-        x$results$`mlr-cwc.FE`$estimates[2, "Estimate"] - x$effects$individual$tnie
-    }, numeric(1))
-    ## identify extreme estimates
-    mlrcwcFE_extreme_indx <- which(
-        mlrcwcFE_diff > quantile(mlrcwcFE_diff, 0.75, na.rm = TRUE) + 3 * IQR(mlrcwcFE_diff)  |
-            mlrcwcFE_diff < quantile(mlrcwcFE_diff, 0.25, na.rm = TRUE) - 3 * IQR(mlrcwcFE_diff)
-    )
-    ## pull raw_iteration & seed number for extreme indices 
-    if (length(mlrcwcFE_extreme_indx)) {
-        # iteration 
-        mlrcwcFE_extreme_iter <- vapply(
-            lst[mlrcwcFE_extreme_indx],
-            function(x) x$raw_iteration,
-            numeric(1)
-        )
-        # seed
-        mlrcwcFE_extreme_seed <- vapply(
-            lst[mlrcwcFE_extreme_indx],
-            function(x) x$seed,
-            numeric(1)
-        )
-    } else {
-        # empty vectors 
-        mlrcwcFE_extreme_iter <- numeric(0)
-        mlrcwcFE_extreme_seed <- numeric(0)
-    }
-    
-    # mlr-cwc
-    ## difference
-    mlrcwc_diff <- vapply(lst, function(x) {
-        x$results$`mlr-cwc`$estimates[2, "Estimate"] - x$effects$individual$tnie
-    }, numeric(1))
-    ## identify extreme estimates
-    mlrcwc_extreme_indx <- which(
-        mlrcwc_diff > quantile(mlrcwc_diff, 0.75, na.rm = TRUE) + 3 * IQR(mlrcwc_diff)  |
-            mlrcwc_diff < quantile(mlrcwc_diff, 0.25, na.rm = TRUE) - 3 * IQR(mlrcwc_diff)
-    )
-    ## pull raw_iteration & seed number for extreme indices 
-    if (length(mlrcwc_extreme_indx)) {
-        # iteration 
-        mlrcwc_extreme_iter <- vapply(
-            lst[mlrcwc_extreme_indx],
-            function(x) x$raw_iteration,
-            numeric(1)
-        )
-        # seed
-        mlrcwc_extreme_seed <- vapply(
-            lst[mlrcwc_extreme_indx],
-            function(x) x$seed,
-            numeric(1)
-        )
-    } else {
-        # empty vectors 
-        mlrcwc_extreme_iter <- numeric(0)
-        mlrcwc_extreme_seed <- numeric(0)
-    }
-    
-    # glm-cwc.FE
-    ## difference
-    glmcwcFE_diff <- vapply(lst, function(x) {
-        x$results$`glm-cwc.FE`$estimates[2, "Estimate"] - x$effects$individual$tnie
-    }, numeric(1))
-    ## identify extreme estimates
-    glmcwcFE_extreme_indx <- which(
-        glmcwcFE_diff > quantile(glmcwcFE_diff, 0.75, na.rm = TRUE) + 3 * IQR(glmcwcFE_diff)  |
-            glmcwcFE_diff < quantile(glmcwcFE_diff, 0.25, na.rm = TRUE) - 3 * IQR(glmcwcFE_diff)
-    )
-    ## pull raw_iteration & seed number for extreme indices 
-    if (length(glmcwcFE_extreme_indx)) {
-        # iteration 
-        glmcwcFE_extreme_iter <- vapply(
-            lst[glmcwcFE_extreme_indx],
-            function(x) x$raw_iteration,
-            numeric(1)
-        )
-        # seed
-        glmcwcFE_extreme_seed <- vapply(
-            lst[glmcwcFE_extreme_indx],
-            function(x) x$seed,
-            numeric(1)
-        )
-    } else {
-        # empty vectors 
-        glmcwcFE_extreme_iter <- numeric(0)
-        glmcwcFE_extreme_seed <- numeric(0)
-    }
-    
-    # glm-cwc
-    ## difference
-    glmcwc_diff <- vapply(lst, function(x) {
-        x$results$`glm-cwc`$estimates[2, "Estimate"] - x$effects$individual$tnie
-    }, numeric(1))
-    ## identify extreme estimates
-    glmcwc_extreme_indx <- which(
-        glmcwc_diff > quantile(glmcwc_diff, 0.75, na.rm = TRUE) + 3 * IQR(glmcwc_diff)  |
-            glmcwc_diff < quantile(glmcwc_diff, 0.25, na.rm = TRUE) - 3 * IQR(glmcwc_diff)
-    )
-    ## pull raw_iteration & seed number for extreme indices 
-    if (length(glmcwc_extreme_indx)) {
-        # iteration 
-        glmcwc_extreme_iter <- vapply(
-            lst[glmcwc_extreme_indx],
-            function(x) x$raw_iteration,
-            numeric(1)
-        )
-        # seed
-        glmcwc_extreme_seed <- vapply(
-            lst[glmcwc_extreme_indx],
-            function(x) x$seed,
-            numeric(1)
-        )
-    } else {
-        # empty vectors 
-        glmcwc_extreme_iter <- numeric(0)
-        glmcwc_extreme_seed <- numeric(0)
-    }
-    
-    # Return list
-    list(
-        `mlr-cwc.FE` = list(tnie_diff = mlrcwcFE_diff, 
-                            extreme_indx = mlrcwcFE_extreme_indx, 
-                            iteration = mlrcwcFE_extreme_iter, 
-                            seed = mlrcwcFE_extreme_seed),
-        `mlr-cwc` = list(tnie_diff = mlrcwc_diff, 
-                         extreme_indx = mlrcwc_extreme_indx, 
-                         iteration = mlrcwc_extreme_iter, 
-                         seed = mlrcwc_extreme_seed),
-        `glm-cwc.FE` = list(tnie_diff = glmcwcFE_diff, 
-                            extreme_indx = glmcwcFE_extreme_indx, 
-                            iteration = glmcwcFE_extreme_iter, 
-                            seed = glmcwcFE_extreme_seed),
-        `glm-cwc` = list(tnie_diff = glmcwc_diff, 
-                         extreme_indx = glmcwc_extreme_indx, 
-                         iteration = glmcwc_extreme_iter, 
-                         seed = glmcwc_extreme_seed)
+extreme_list <- purrr::imap(overall_list, function(lst, cod_name) {
+    purrr::set_names(
+        lapply(methods_key, function(key) {
+            # difference
+            diffs <- vapply(lst, tnie_diff, numeric(1), key = key)
+            
+            # identify extreme estimates
+            extreme_indx <- find_extreme_idx(diffs)
+            
+            # pull raw_iteration & seed number for extreme indices 
+            if (length(extreme_indx)) {
+                # iteration 
+                iteration <- vapply(
+                    lst[extreme_indx],
+                    function(x) x$raw_iteration,
+                    numeric(1)
+                )
+                # seed
+                seed <- vapply(
+                    lst[extreme_indx],
+                    function(x) x$seed,
+                    numeric(1)
+                )
+            } else {
+                # empty vectors 
+                iteration <- numeric(0)
+                seed <- numeric(0)
+            }
+            
+            # Return list
+            list(
+                tnie_diff = diffs, 
+                extreme_indx = extreme_indx, 
+                iteration = iteration, 
+                seed = seed
+                )
+        }),
+        method_keys
     )
 })
+
+
+# # Create a list containing bias (estimate - tnie) and extreme estimates if present
+# extreme_list <- purrr::imap(overall_list, function(lst, nm) {
+#     # mlr-cwc.FE
+#     ## difference
+#     mlrcwcFE_diff <- vapply(lst, function(x) {
+#         x$results$`mlr-cwc.FE`$estimates[2, "Estimate"] - x$effects$individual$tnie
+#     }, numeric(1))
+#     ## identify extreme estimates
+#     mlrcwcFE_extreme_indx <- which(
+#         mlrcwcFE_diff > quantile(mlrcwcFE_diff, 0.75, na.rm = TRUE) + 3 * IQR(mlrcwcFE_diff)  |
+#             mlrcwcFE_diff < quantile(mlrcwcFE_diff, 0.25, na.rm = TRUE) - 3 * IQR(mlrcwcFE_diff)
+#     )
+#     ## pull raw_iteration & seed number for extreme indices 
+#     if (length(mlrcwcFE_extreme_indx)) {
+#         # iteration 
+#         mlrcwcFE_extreme_iter <- vapply(
+#             lst[mlrcwcFE_extreme_indx],
+#             function(x) x$raw_iteration,
+#             numeric(1)
+#         )
+#         # seed
+#         mlrcwcFE_extreme_seed <- vapply(
+#             lst[mlrcwcFE_extreme_indx],
+#             function(x) x$seed,
+#             numeric(1)
+#         )
+#     } else {
+#         # empty vectors 
+#         mlrcwcFE_extreme_iter <- numeric(0)
+#         mlrcwcFE_extreme_seed <- numeric(0)
+#     }
+#     
+#     # mlr-cwc
+#     ## difference
+#     mlrcwc_diff <- vapply(lst, function(x) {
+#         x$results$`mlr-cwc`$estimates[2, "Estimate"] - x$effects$individual$tnie
+#     }, numeric(1))
+#     ## identify extreme estimates
+#     mlrcwc_extreme_indx <- which(
+#         mlrcwc_diff > quantile(mlrcwc_diff, 0.75, na.rm = TRUE) + 3 * IQR(mlrcwc_diff)  |
+#             mlrcwc_diff < quantile(mlrcwc_diff, 0.25, na.rm = TRUE) - 3 * IQR(mlrcwc_diff)
+#     )
+#     ## pull raw_iteration & seed number for extreme indices 
+#     if (length(mlrcwc_extreme_indx)) {
+#         # iteration 
+#         mlrcwc_extreme_iter <- vapply(
+#             lst[mlrcwc_extreme_indx],
+#             function(x) x$raw_iteration,
+#             numeric(1)
+#         )
+#         # seed
+#         mlrcwc_extreme_seed <- vapply(
+#             lst[mlrcwc_extreme_indx],
+#             function(x) x$seed,
+#             numeric(1)
+#         )
+#     } else {
+#         # empty vectors 
+#         mlrcwc_extreme_iter <- numeric(0)
+#         mlrcwc_extreme_seed <- numeric(0)
+#     }
+#     
+#     # glm-cwc.FE
+#     ## difference
+#     glmcwcFE_diff <- vapply(lst, function(x) {
+#         x$results$`glm-cwc.FE`$estimates[2, "Estimate"] - x$effects$individual$tnie
+#     }, numeric(1))
+#     ## identify extreme estimates
+#     glmcwcFE_extreme_indx <- which(
+#         glmcwcFE_diff > quantile(glmcwcFE_diff, 0.75, na.rm = TRUE) + 3 * IQR(glmcwcFE_diff)  |
+#             glmcwcFE_diff < quantile(glmcwcFE_diff, 0.25, na.rm = TRUE) - 3 * IQR(glmcwcFE_diff)
+#     )
+#     ## pull raw_iteration & seed number for extreme indices 
+#     if (length(glmcwcFE_extreme_indx)) {
+#         # iteration 
+#         glmcwcFE_extreme_iter <- vapply(
+#             lst[glmcwcFE_extreme_indx],
+#             function(x) x$raw_iteration,
+#             numeric(1)
+#         )
+#         # seed
+#         glmcwcFE_extreme_seed <- vapply(
+#             lst[glmcwcFE_extreme_indx],
+#             function(x) x$seed,
+#             numeric(1)
+#         )
+#     } else {
+#         # empty vectors 
+#         glmcwcFE_extreme_iter <- numeric(0)
+#         glmcwcFE_extreme_seed <- numeric(0)
+#     }
+#     
+#     # glm-cwc
+#     ## difference
+#     glmcwc_diff <- vapply(lst, function(x) {
+#         x$results$`glm-cwc`$estimates[2, "Estimate"] - x$effects$individual$tnie
+#     }, numeric(1))
+#     ## identify extreme estimates
+#     glmcwc_extreme_indx <- which(
+#         glmcwc_diff > quantile(glmcwc_diff, 0.75, na.rm = TRUE) + 3 * IQR(glmcwc_diff)  |
+#             glmcwc_diff < quantile(glmcwc_diff, 0.25, na.rm = TRUE) - 3 * IQR(glmcwc_diff)
+#     )
+#     ## pull raw_iteration & seed number for extreme indices 
+#     if (length(glmcwc_extreme_indx)) {
+#         # iteration 
+#         glmcwc_extreme_iter <- vapply(
+#             lst[glmcwc_extreme_indx],
+#             function(x) x$raw_iteration,
+#             numeric(1)
+#         )
+#         # seed
+#         glmcwc_extreme_seed <- vapply(
+#             lst[glmcwc_extreme_indx],
+#             function(x) x$seed,
+#             numeric(1)
+#         )
+#     } else {
+#         # empty vectors 
+#         glmcwc_extreme_iter <- numeric(0)
+#         glmcwc_extreme_seed <- numeric(0)
+#     }
+#     
+#     # Return list
+#     list(
+#         `mlr-cwc.FE` = list(tnie_diff = mlrcwcFE_diff, 
+#                             extreme_indx = mlrcwcFE_extreme_indx, 
+#                             iteration = mlrcwcFE_extreme_iter, 
+#                             seed = mlrcwcFE_extreme_seed),
+#         `mlr-cwc` = list(tnie_diff = mlrcwc_diff, 
+#                          extreme_indx = mlrcwc_extreme_indx, 
+#                          iteration = mlrcwc_extreme_iter, 
+#                          seed = mlrcwc_extreme_seed),
+#         `glm-cwc.FE` = list(tnie_diff = glmcwcFE_diff, 
+#                             extreme_indx = glmcwcFE_extreme_indx, 
+#                             iteration = glmcwcFE_extreme_iter, 
+#                             seed = glmcwcFE_extreme_seed),
+#         `glm-cwc` = list(tnie_diff = glmcwc_diff, 
+#                          extreme_indx = glmcwc_extreme_indx, 
+#                          iteration = glmcwc_extreme_iter, 
+#                          seed = glmcwc_extreme_seed)
+#     )
+# })
 
 # Show extreme iterations for each model & condition 
 purrr::imap(extreme_list, function(cond, cond_name) {
@@ -422,6 +439,63 @@ purrr::imap(extreme_list, function(cond, cond_name) {
         }
     }) |> purrr::compact()
 }) |> purrr::compact() |> unlist() |> cat(sep = "\n")
+# 2025-12-15:
+# cond_01 | mlr-cwc.FE: indx=230, 557 | iter=230, 559 | seed=229531, 19233
+# cond_01 | mlr-cwc: indx=230, 858 | iter=230, 865 | seed=229531, 705983
+# cond_01 | glm-cwc.FE: indx=191, 230, 858 | iter=191, 230, 865 | seed=426662, 229531, 705983
+# cond_01 | glm-cwc: indx=191, 230, 403, 858 | iter=191, 230, 403, 865 | seed=426662, 229531, 232749, 705983
+# cond_02 | mlr-cwc: indx=416 | iter=419 | seed=875999
+# cond_04 | mlr-cwc.FE: indx=253, 510 | iter=254, 513 | seed=134127, 388028
+# cond_06 | mlr-cwc.FE: indx=212 | iter=217 | seed=729113
+# cond_10 | glm-cwc: indx=43 | iter=43 | seed=468871
+# cond_16 | mlr-cwc: indx=463 | iter=465 | seed=119637
+# cond_19 | mlr-cwc.FE: indx=580 | iter=583 | seed=478500
+# cond_20 | mlr-cwc.FE: indx=418 | iter=421 | seed=948810
+# cond_25 | mlr-cwc.FE: indx=677 | iter=682 | seed=965831
+# cond_25 | mlr-cwc: indx=677 | iter=682 | seed=965831
+# cond_25 | glm-cwc.FE: indx=69, 144, 677, 957 | iter=69, 144, 682, 965 | seed=832984, 898270, 965831, 356832
+# cond_25 | glm-cwc: indx=69, 677, 957 | iter=69, 682, 965 | seed=832984, 965831, 356832
+# cond_26 | glm-cwc.FE: indx=328 | iter=331 | seed=269470
+# cond_26 | glm-cwc: indx=328 | iter=331 | seed=269470
+# cond_28 | mlr-cwc.FE: indx=857 | iter=865 | seed=705983
+# cond_28 | mlr-cwc: indx=377, 857 | iter=379, 865 | seed=678094, 705983
+# cond_28 | glm-cwc.FE: indx=89, 377, 660, 667, 857, 875 | iter=89, 379, 666, 673, 865, 883 | seed=446888, 678094, 126620, 276025, 705983, 152190
+# cond_28 | glm-cwc: indx=89, 377, 660, 857, 875 | iter=89, 379, 666, 865, 883 | seed=446888, 678094, 126620, 705983, 152190
+# cond_29 | mlr-cwc: indx=965 | iter=975 | seed=589627
+# cond_36 | mlr-cwc.FE: indx=767 | iter=778 | seed=589326
+# cond_37 | mlr-cwc: indx=1036 | iter=1045 | seed=762384
+# cond_37 | glm-cwc.FE: indx=288, 1036 | iter=288, 1045 | seed=666953, 762384
+# cond_37 | glm-cwc: indx=288, 1036 | iter=288, 1045 | seed=666953, 762384
+# cond_39 | mlr-cwc.FE: indx=819 | iter=828 | seed=806726
+# cond_40 | mlr-cwc.FE: indx=172, 275 | iter=172, 276 | seed=296995, 346669
+# cond_40 | mlr-cwc: indx=172, 738, 890, 985 | iter=172, 746, 898, 993 | seed=296995, 689371, 577587, 521569
+# cond_40 | glm-cwc.FE: indx=676, 985 | iter=682, 993 | seed=965831, 521569
+# cond_40 | glm-cwc: indx=676, 985 | iter=682, 993 | seed=965831, 521569
+# cond_41 | glm-cwc.FE: indx=6 | iter=6 | seed=90493
+# cond_43 | mlr-cwc: indx=765 | iter=772 | seed=266060
+# cond_43 | glm-cwc.FE: indx=253 | iter=253 | seed=574717
+# cond_43 | glm-cwc: indx=253, 954 | iter=253, 962 | seed=574717, 225595
+# cond_44 | mlr-cwc.FE: indx=114 | iter=115 | seed=521817
+# cond_46 | glm-cwc.FE: indx=252 | iter=253 | seed=574717
+# cond_46 | glm-cwc: indx=252 | iter=253 | seed=574717
+# cond_47 | mlr-cwc: indx=322 | iter=325 | seed=178893
+# cond_48 | mlr-cwc: indx=100 | iter=104 | seed=167465
+# cond_52 | mlr-cwc.FE: indx=788 | iter=5357 | seed=560671
+# cond_54 | glm-cwc.FE: indx=681 | iter=83531 | seed=544981
+# cond_61 | mlr-cwc.FE: indx=562, 748 | iter=3740, 5080 | seed=769694, 340305
+# cond_62 | mlr-cwc.FE: indx=497, 502, 569, 582, 626, 708, 798, 879, 891 | iter=14053, 14101, 16070, 16315, 17545, 19966, 22642, 24934, 25448 | seed=369688, 698492, 206574, 23459, 55088, 244338, 499166, 564136, 572751
+# cond_63 | mlr-cwc.FE: indx=713 | iter=79582 | seed=632257
+# cond_64 | mlr-cwc.FE: indx=207, 236, 615 | iter=1314, 1558, 4115 | seed=362398, 794982, 686630
+# cond_64 | mlr-cwc: indx=7, 549, 855 | iter=43, 3649, 5795 | seed=468871, 192223, 548728
+# cond_65 | mlr-cwc.FE: indx=89 | iter=2541 | seed=115790
+# cond_66 | mlr-cwc.FE: indx=20, 379, 496, 499, 554, 705, 811 | iter=2438, 46716, 60086, 60510, 68992, 87017, 101314 | seed=283639, 102303, 981085, 998560, 523160, 693732, 474692
+# cond_67 | mlr-cwc.FE: indx=225, 327, 877, 996, 1043, 1045 | iter=1461, 2165, 6082, 6967, 7290, 7303 | seed=972867, 306937, 956523, 411707, 814013, 179127
+# cond_68 | mlr-cwc.FE: indx=68, 118, 347, 604, 954 | iter=1956, 3474, 9441, 17006, 26887 | seed=608465, 562497, 84271, 868095, 702240
+# cond_69 | mlr-cwc.FE: indx=5, 124, 287, 461, 543, 743, 891 | iter=760, 14436, 32272, 53052, 60397, 83002, 102298 | seed=654070, 947055, 818437, 433695, 157278, 624048, 171376
+# cond_70 | mlr-cwc.FE: indx=184, 658, 765, 974, 1023 | iter=1204, 4517, 5194, 6637, 7034 | seed=473758, 727283, 364363, 709756, 238757
+# cond_71 | mlr-cwc.FE: indx=14, 68, 113, 163, 386, 479, 555, 964, 1030 | iter=390, 1801, 3335, 4998, 10331, 13128, 15287, 27452, 29791 | seed=780975, 464385, 351844, 903911, 387499, 844063, 240313, 705046, 722676
+# cond_72 | mlr-cwc.FE: indx=133, 157, 630, 664, 717, 978 | iter=17163, 21056, 77183, 81914, 88148, 121887 | seed=338062, 519951, 637586, 365684, 74783, 124095
+
 # cond_01 | glm-cwc.FE: indx=191 | iter=191 | seed=426662
 # cond_01 | glm-cwc: indx=191 | iter=191 | seed=426662
 # cond_17 | mlr-cwc.FE: indx=196 | iter=198 | seed=35168
@@ -612,13 +686,13 @@ for (cond_name in names(targets_by_cond)) {
     true_cond_number <- as.integer(stringr::str_extract(cond_name, "\\d+"))
     cond_row <- conditions_all[true_cond_number, , drop = FALSE]
     
-    isQuad  <- cond_row[["quadratic"]]
+    isQuad <- cond_row[["quadratic"]]
     Mfamily <- cond_row[["Mfamily"]]
     Yfamily <- cond_row[["Yfamily"]]
-    Nj_low  <- cond_row[["Nj_low"]]
+    Nj_low <- cond_row[["Nj_low"]]
     Nj_high <- cond_row[["Nj_high"]]
-    Jval    <- cond_row[["J"]]
-    isNull  <- cond_row[["if.null"]]
+    Jval <- cond_row[["J"]]
+    isNull <- cond_row[["if.null"]]
     
     cond_label <- glue::glue("null={isNull}, quad={isQuad}, M={Mfamily}, Y={Yfamily}, nj=[{Nj_low},{Nj_high}], J={Jval}")
     
@@ -982,6 +1056,13 @@ saveRDS(updated_overall_df2, file = file.path(
 ))
 
 
+
+
+
+
+# ══════════════════════════════
+#    DELETE CODE BELOW (in 02a3) 
+# ══════════════════════════════
 # Check warning & error messages ------------------------------------------
 
 # Import sim dataframe (with replacements)

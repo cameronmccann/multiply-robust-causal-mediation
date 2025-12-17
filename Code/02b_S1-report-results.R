@@ -15,7 +15,7 @@
 #       bias, MSE, coverage, and power for direct and indirect effects.
 #
 #
-# Last Updated: 2025-12-11
+# Last Updated: 2025-12-16
 #
 #
 # Notes:
@@ -55,8 +55,12 @@ pacman::p_load(
 # Date of simulation
 sim_date <- "2025-10-22" # "2025-09-03" 
 
-# Create no-values-replaced Figures folder?
-noValsReplaced_folder <- TRUE
+# Choose which results to report
+use_updated <- TRUE    # FALSE = no values replaced
+                       # TRUE  = values replaced
+
+# Create prefix for file labels when saving 
+prefix <- if (use_updated) "S1_updated" else "S1"
 
 # Add subdirectory, if desired (e.g., for test runs): where do you want results stored
 additional_folder_results <- "2025-10-22_1000-reps" # "2025-09-03_200-reps" 
@@ -88,11 +92,11 @@ for (sf in results_subfolders) {
     dir.create(file.path(results_path, sf), showWarnings = FALSE, recursive = TRUE)
 }
 
-# Select which Figures folder to use 
-if (noValsReplaced_folder) {
-    figures_path <- file.path(results_path, "Figures_no-values-replaced")
-} else {
+# Select Figures folder based on data source
+if (use_updated) {
     figures_path <- file.path(results_path, "Figures")
+} else {
+    figures_path <- file.path(results_path, "Figures_no-values-replaced")
 }
 
 # Ensure figure folder exists 
@@ -111,26 +115,47 @@ for (ssf in c("nonnull", "null")) {
 }
 
 
-
-
-
-
-
-
 # Import results data ----------------------------------------------------------
 
-# import data if needed 
-# perf_measures <- readRDS(file = paste0(results_path, "/Tables/S1_performance-measures_", sim_date, ".rds"))
-perf_measures <- readRDS(file = paste0(results_path, "/Tables/S1_performance-measures_", sim_date, "_converged-only.rds")) # perf_measures <- readRDS(file = paste0(results_path, "/Tables/S1_performance-measures_", sim_date, "_excludes-warnings.rds")) 
-# sim_data <- readRDS(file = paste0(results_path, "/Data/S1_simulation-data_", sim_date, "_excludes-warnings.rds")) #"_excludes-nonconvergence.rds"))
-sim1_data_nowarnings <- readRDS(file = paste0(results_path, "/Data/S1_simulation-data_", sim_date, "_excludes-warnings.rds")) 
-sim1_data_converged <- readRDS(file = paste0(results_path, "/Data/S1_simulation-data_", sim_date, "_converged-only.rds")) 
-convergence_rates <- readRDS(file = paste0(results_path, "/Tables/S1_convergence-rates_", sim_date, ".rds"))
+# Import data 
+perf_measures <- readRDS(file.path(
+    results_path, "Tables",
+    paste0(prefix, "_performance-measures_", sim_date, "_converged-only.rds")
+))
+
+sim1_data_nowarnings <- readRDS(file.path(
+    results_path, "Data",
+    paste0(prefix, "_simulation-data_", sim_date, "_excludes-warnings.rds")
+))
+
+sim1_data_converged <- readRDS(file.path(
+    results_path, "Data",
+    paste0(prefix, "_simulation-data_", sim_date, "_converged-only.rds")
+))
+
+convergence_rates <- readRDS(file.path(
+    results_path, "Tables", 
+    paste0(prefix, "_convergence-rates_", sim_date, ".rds")
+))
+
+
+# # import data if needed 
+# # perf_measures <- readRDS(file = paste0(results_path, "/Tables/S1_performance-measures_", sim_date, ".rds"))
+# perf_measures <- readRDS(file = paste0(results_path, "/Tables/S1_performance-measures_", sim_date, "_converged-only.rds")) # perf_measures <- readRDS(file = paste0(results_path, "/Tables/S1_performance-measures_", sim_date, "_excludes-warnings.rds")) 
+# # sim_data <- readRDS(file = paste0(results_path, "/Data/S1_simulation-data_", sim_date, "_excludes-warnings.rds")) #"_excludes-nonconvergence.rds"))
+# sim1_data_nowarnings <- readRDS(file = paste0(results_path, "/Data/S1_simulation-data_", sim_date, "_excludes-warnings.rds")) 
+# sim1_data_converged <- readRDS(file = paste0(results_path, "/Data/S1_simulation-data_", sim_date, "_converged-only.rds")) 
+# convergence_rates <- readRDS(file = paste0(results_path, "/Tables/S1_convergence-rates_", sim_date, ".rds"))
 
 ## data with replacement values 
 # perf_measures <- readRDS(file = paste0(results_path, "/Tables/S1_updated-performance-measures_", sim_date, "_converged-only.rds")) 
 # sim1_data_nowarnings <- readRDS(file = paste0(results_path, "/Data/S1_updated-simulation-data_", sim_date, "_excludes-warnings.rds")) 
 # sim1_data_converged <- readRDS(file = paste0(results_path, "/Data/S1_updated-simulation-data_", sim_date, "_converged-only.rds")) 
+
+# Which data is being reported?
+message("Reporting results using: ",
+        if (use_updated) "UPDATED (values replaced)" else "ORIGINAL (no values replaced)")
+
 
 # Set sim_data dataset for visuals
 sim_data <- sim1_data_converged # use converged iterations 

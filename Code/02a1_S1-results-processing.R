@@ -25,7 +25,7 @@
 # scp -r "cameronmccann@ls6.tacc.utexas.edu:/home1/10384/cameronmccann/multiply-robust-causal-mediation copy/Output/S1_Simulation-Output/2025-10-22_1000-reps" \
 # /Users/cameronmccann/Documents/Research-2025/multiply-robust-causal-mediation/Output/S1_Simulation-Output/
 #
-# Last Updated: 2025-12-11
+# Last Updated: 2025-12-16
 #
 #
 # Notes:
@@ -78,7 +78,6 @@ additional_folder_results <- "2025-10-22_1000-reps" # "2025-09-03_200-reps"
 additional_folder_output <- "2025-10-22_1000-reps" # "2025-09-03_200-reps" 
 
 
-
 # Set up directory structure ----------------------------------------------
 
 # Create directory to store results 
@@ -120,56 +119,6 @@ if (!is.null(additional_folder_output)) {
 ## error message 
 if (!dir.exists(sim_output_path)) {
     stop("Simulation output directory does not exist: ", sim_output_path)   
-}
-
-
-
-
-
-
-
-# Set date, reps, & folders ----------------------------------------------
-
-# Date of simulation 
-sim_date <- "2025-10-22" #"2025-09-03"# "2025-07-30" #"2025-07-21" #"2025-07-01" # (Note: Simulations were ran around 2025-02-08 & 2025-05-05) #"2025-02-08" #"2025-01-25" #Sys.Date() #"2025-01-23" #"2025-01-18" 
-
-# Number of replications
-reps <- 1000 #600#200 
-
-# Create directory to store results 
-## Results folder 
-path <- "Output/S1_Results"
-if (!dir.exists(path)) {
-    dir.create(path)
-}
-### Add subdirectory, if desired (e.g., for test runs): where do you want results stored
-additional_folder_results <- "2025-10-22_1000-reps" # "2025-09-03_200-reps" 
-### Check if additional_folder_results is not NULL to add to path
-if (!is.null(additional_folder_results)) {
-    results_path <- file.path(path, additional_folder_results)
-}
-### Create directory 
-if (!dir.exists(results_path)) {
-    dir.create(results_path)
-}
-## Data, Figures, & Tables subfolders 
-if (!dir.exists(paste0(results_path, "/Data"))) {
-    dir.create(paste0(results_path, "/Data"))
-}
-if (!dir.exists(paste0(results_path, "/Figures"))) {
-    dir.create(paste0(results_path, "/Figures"))
-}
-if (!dir.exists(paste0(results_path, "/Tables"))) {
-    dir.create(paste0(results_path, "/Tables"))
-}
-
-# Simulation output path 
-sim_output_path <- "Output/S1_Simulation-Output"
-### where to pull output from 
-additional_folder_output <- "2025-10-22_1000-reps" # "2025-09-03_200-reps" 
-### Check if additional_folder_output is not NULL to add to path
-if (!is.null(additional_folder_output)) {
-    sim_output_path <- file.path(sim_output_path, additional_folder_output)
 }
 
 
@@ -272,27 +221,57 @@ cond_ids <- paste0("cond_", cond_ids)
 # ══════════════════════════════
 #    Create overall list (dropping iterations with error) 
 # ══════════════════════════════
+
+# Define once (outside imap) for efficiency and clarity
+error_msg <- "Error in internal function `v.ac()`: no applicable method for 'predict' applied to an object of class \"NULL\""
+methd <- c("mlr-cwc.FE", "mlr-cwc", "glm-cwc.FE", "glm-cwc")
+
 # Create overall simulation output list with padded condition numbers as element names (e.g., cond_01) & drop any iterations with errors
 overall_list <- purrr::set_names(
     purrr::imap(rds_files_all, function(file, i) {
         # Load file 
         data <- readRDS(file)
         
-        # Identify iterations with error
+        # # ORIGINAL CODE ###########################
+        # # Identify iterations with error
+        # prblm_iter <- which(vapply(data, function(x) {
+        #     msg <- x$results$`mlr-cwc.FE`$error_message
+        #     !is.null(msg) && grepl("Error in internal function `v.ac()`: no applicable method for 'predict' applied to an object of class \"NULL\"", 
+        #                            msg, 
+        #                            fixed = TRUE)
+        # }, logical(1)))
+        # 
+        # # Drop iterations with error 
+        # if (length(prblm_iter)) {
+        #     data <- data[-prblm_iter]
+        #     message(sprintf("File %d: Dropping %d iterations with error msg at indices: %s (%s)",
+        #                     i, length(prblm_iter), paste(prblm_iter, collapse = ", "), basename(file)))
+        # }
+        # ############################################
+
+        # Identify iterations with error in ANY method
         prblm_iter <- which(vapply(data, function(x) {
-            msg <- x$results$`mlr-cwc.FE`$error_message
-            !is.null(msg) && grepl("Error in internal function `v.ac()`: no applicable method for 'predict' applied to an object of class \"NULL\"", 
-                                   msg, 
-                                   fixed = TRUE)
+            
+            # Extract error messages for relevant methods
+            msgs <- vapply(methd, function(k) {
+                err_m <- x$results[[k]]$error_message
+                if (is.null(err_m)) "" else err_m
+            }, character(1))
+            
+            # Check for the specific fatal error
+            any(grepl(error_msg, msgs, fixed = TRUE))
+            
         }, logical(1)))
         
-        # Drop iterations with error 
+        # Drop iterations with error
         if (length(prblm_iter)) {
             data <- data[-prblm_iter]
-            message(sprintf("File %d: Dropping %d iterations with error msg at indices: %s (%s)",
-                            i, length(prblm_iter), paste(prblm_iter, collapse = ", "), basename(file)))
+            message(sprintf(
+                "File %d: Dropping %d iterations with error msg at indices: %s (%s)",
+                i, length(prblm_iter), paste(prblm_iter, collapse = ", "), basename(file)
+            ))
         }
-
+        
         return(data)
     }), 
     nm = cond_ids
@@ -314,10 +293,10 @@ saveRDS(overall_list,
 # Create dataframe version ------------------------------------------------
 
 # Note: 
-#   This does not include replacements for problematic cases. 
-#   If you would like to include replacements, see: 
-#   "Convert updated_overall_list to dataframe format" section in 
-#   02a2_S1-results-processing.R.
+#   Simulation was conducted on TACC system. This script processes the simulation 
+#   output. However, to replace the "problematic"/extreme cases, run the 
+#   "02a2_S1-results-processing.R" script (which re-runs these cases on 
+#   your computer, a different operating system than TACC). 
 
 
 ## Import data  ------------------------------------------------------------
@@ -421,17 +400,17 @@ for (file_data in all_data_list) {
     message(sprintf("Dropping %d iterations with error msg at indices %s: %s", 
                     length(error_iter), paste(error_iter, collapse = ", "), basename(fname)))
     
-    # Identify iterations known to be problematic 
-    prblm_iter <- which(vapply(iter_data, function(iter) {
-        iter$raw_iteration %in% c(1956, 3474, 760, 14436)
-    }, logical(1)))
-    
-    # Drop known problematic iterations (1956 & 3474 for cond 68 and 760 & 14436 for cond 69)
-    if (length(prblm_iter)) {
-        iter_data <- iter_data[-prblm_iter]
-    }
-    message(sprintf("Dropping %d iterations with known problematic at indices %s: %s", 
-                    length(prblm_iter), paste(prblm_iter, collapse = ", "), basename(fname)))
+    # # Identify iterations known to be problematic 
+    # prblm_iter <- which(vapply(iter_data, function(iter) {
+    #     iter$raw_iteration %in% c(1956, 3474, 760, 14436)
+    # }, logical(1)))
+    # 
+    # # Drop known problematic iterations (1956 & 3474 for cond 68 and 760 & 14436 for cond 69)
+    # if (length(prblm_iter)) {
+    #     iter_data <- iter_data[-prblm_iter]
+    # }
+    # message(sprintf("Dropping %d iterations with known problematic at indices %s: %s", 
+    #                 length(prblm_iter), paste(prblm_iter, collapse = ", "), basename(fname)))
     
     # Extract condition number 
     condition_number <- str_extract(basename(fname), "(?<=condition-)[0-9]{2}")
@@ -668,381 +647,300 @@ for (file_data in all_data_list) {
 
 # --------------------------------- 
 #     cond_01: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-01_reps-200_null-FALSE_quad-TRUE_M-binomial_Y-binomial_nj-[50-100]_J-10.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-01_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-binomial_nj-[50-100]_J-10.rds
+# Trimming to first 1000 iterations from 1051 for file: S1_condition-01_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-binomial_nj-[50-100]_J-10.rds
 # --------------------------------- 
 #     cond_02: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-02_reps-200_null-FALSE_quad-TRUE_M-binomial_Y-binomial_nj-[50-100]_J-20.rds
-# Trimming to first 200 iterations from 208 for file: S1_condition-02_reps-200_null-FALSE_quad-TRUE_M-binomial_Y-binomial_nj-[50-100]_J-20.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-02_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-binomial_nj-[50-100]_J-20.rds
+# Trimming to first 1000 iterations from 1052 for file: S1_condition-02_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-binomial_nj-[50-100]_J-20.rds
 # --------------------------------- 
 #     cond_03: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-03_reps-200_null-FALSE_quad-TRUE_M-binomial_Y-binomial_nj-[50-100]_J-40.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-03_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-binomial_nj-[50-100]_J-40.rds
+# Trimming to first 1000 iterations from 1058 for file: S1_condition-03_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-binomial_nj-[50-100]_J-40.rds
 # --------------------------------- 
 #     cond_04: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-04_reps-200_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-10.rds
-# Trimming to first 200 iterations from 209 for file: S1_condition-04_reps-200_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-10.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-04_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-10.rds
+# Trimming to first 1000 iterations from 1059 for file: S1_condition-04_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-10.rds
 # --------------------------------- 
 #     cond_05: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-05_reps-200_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-20.rds
-# Trimming to first 200 iterations from 208 for file: S1_condition-05_reps-200_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-20.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-05_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-20.rds
+# Trimming to first 1000 iterations from 1059 for file: S1_condition-05_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-20.rds
 # --------------------------------- 
 #     cond_06: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-06_reps-200_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-40.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-06_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-40.rds
+# Trimming to first 1000 iterations from 1055 for file: S1_condition-06_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-40.rds
 # --------------------------------- 
 #     cond_07: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-07_reps-200_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-10.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-07_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-10.rds
+# Trimming to first 1000 iterations from 1051 for file: S1_condition-07_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-10.rds
 # --------------------------------- 
 #     cond_08: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-08_reps-200_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-20.rds
-# Trimming to first 200 iterations from 208 for file: S1_condition-08_reps-200_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-20.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-08_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-20.rds
+# Trimming to first 1000 iterations from 1052 for file: S1_condition-08_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-20.rds
 # --------------------------------- 
 #     cond_09: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-09_reps-200_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-40.rds
-# Trimming to first 200 iterations from 207 for file: S1_condition-09_reps-200_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-40.rds
+#     Dropping 1 iterations with error msg at indices 661: S1_condition-09_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-40.rds
+# Trimming to first 1000 iterations from 1057 for file: S1_condition-09_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-40.rds
 # --------------------------------- 
 #     cond_10: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-10_reps-200_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-10.rds
-# Trimming to first 200 iterations from 209 for file: S1_condition-10_reps-200_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-10.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-10_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-10.rds
+# Trimming to first 1000 iterations from 1051 for file: S1_condition-10_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-10.rds
 # --------------------------------- 
 #     cond_11: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-11_reps-200_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-20.rds
-# Trimming to first 200 iterations from 208 for file: S1_condition-11_reps-200_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-20.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-11_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-20.rds
+# Trimming to first 1000 iterations from 1059 for file: S1_condition-11_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-20.rds
 # --------------------------------- 
 #     cond_12: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-12_reps-200_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-40.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-12_reps-200_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-40.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-12_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-40.rds
+# Trimming to first 1000 iterations from 1050 for file: S1_condition-12_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-40.rds
 # --------------------------------- 
 #     cond_13: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-13_reps-200_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-10.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-13_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-10.rds
+# Trimming to first 1000 iterations from 1051 for file: S1_condition-13_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-10.rds
 # --------------------------------- 
 #     cond_14: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-14_reps-200_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-20.rds
-# Trimming to first 200 iterations from 208 for file: S1_condition-14_reps-200_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-20.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-14_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-20.rds
+# Trimming to first 1000 iterations from 1052 for file: S1_condition-14_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-20.rds
 # --------------------------------- 
 #     cond_15: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-15_reps-200_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-40.rds
-# Trimming to first 200 iterations from 207 for file: S1_condition-15_reps-200_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-40.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-15_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-40.rds
+# Trimming to first 1000 iterations from 1058 for file: S1_condition-15_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-40.rds
 # --------------------------------- 
 #     cond_16: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-16_reps-200_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-10.rds
-# Trimming to first 200 iterations from 209 for file: S1_condition-16_reps-200_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-10.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-16_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-10.rds
+# Trimming to first 1000 iterations from 1051 for file: S1_condition-16_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-10.rds
 # --------------------------------- 
 #     cond_17: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-17_reps-200_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-20.rds
-# Trimming to first 200 iterations from 208 for file: S1_condition-17_reps-200_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-20.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-17_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-20.rds
+# Trimming to first 1000 iterations from 1059 for file: S1_condition-17_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-20.rds
 # --------------------------------- 
 #     cond_18: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-18_reps-200_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-40.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-18_reps-200_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-40.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-18_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-40.rds
+# Trimming to first 1000 iterations from 1057 for file: S1_condition-18_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-40.rds
 # --------------------------------- 
 #     cond_19: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-19_reps-200_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-10.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-19_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-10.rds
+# Trimming to first 1000 iterations from 1051 for file: S1_condition-19_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-10.rds
 # --------------------------------- 
 #     cond_20: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-20_reps-200_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-20.rds
-# Trimming to first 200 iterations from 208 for file: S1_condition-20_reps-200_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-20.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-20_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-20.rds
+# Trimming to first 1000 iterations from 1052 for file: S1_condition-20_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-20.rds
 # --------------------------------- 
 #     cond_21: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-21_reps-200_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-40.rds
-# Trimming to first 200 iterations from 207 for file: S1_condition-21_reps-200_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-40.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-21_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-40.rds
+# Trimming to first 1000 iterations from 1058 for file: S1_condition-21_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-40.rds
 # --------------------------------- 
 #     cond_22: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-22_reps-200_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-10.rds
-# Trimming to first 200 iterations from 209 for file: S1_condition-22_reps-200_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-10.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-22_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-10.rds
+# Trimming to first 1000 iterations from 1051 for file: S1_condition-22_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-10.rds
 # --------------------------------- 
 #     cond_23: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-23_reps-200_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-20.rds
-# Trimming to first 200 iterations from 208 for file: S1_condition-23_reps-200_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-20.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-23_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-20.rds
+# Trimming to first 1000 iterations from 1059 for file: S1_condition-23_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-20.rds
 # --------------------------------- 
 #     cond_24: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-24_reps-200_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-40.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-24_reps-200_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-40.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-24_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-40.rds
+# Trimming to first 1000 iterations from 1055 for file: S1_condition-24_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-40.rds
 # --------------------------------- 
 #     cond_25: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-25_reps-200_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[50-100]_J-10.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-25_reps-1050_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[50-100]_J-10.rds
+# Trimming to first 1000 iterations from 1051 for file: S1_condition-25_reps-1050_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[50-100]_J-10.rds
 # --------------------------------- 
 #     cond_26: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-26_reps-200_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[50-100]_J-20.rds
-# Trimming to first 200 iterations from 208 for file: S1_condition-26_reps-200_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[50-100]_J-20.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-26_reps-1050_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[50-100]_J-20.rds
+# Trimming to first 1000 iterations from 1052 for file: S1_condition-26_reps-1050_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[50-100]_J-20.rds
 # --------------------------------- 
 #     cond_27: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-27_reps-200_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[50-100]_J-40.rds
-# Trimming to first 200 iterations from 207 for file: S1_condition-27_reps-200_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[50-100]_J-40.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-27_reps-1050_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[50-100]_J-40.rds
+# Trimming to first 1000 iterations from 1058 for file: S1_condition-27_reps-1050_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[50-100]_J-40.rds
 # --------------------------------- 
 #     cond_28: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-28_reps-200_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-10.rds
-# Trimming to first 200 iterations from 209 for file: S1_condition-28_reps-200_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-10.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-28_reps-1050_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-10.rds
+# Trimming to first 1000 iterations from 1051 for file: S1_condition-28_reps-1050_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-10.rds
 # --------------------------------- 
 #     cond_29: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-29_reps-200_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-20.rds
-# Trimming to first 200 iterations from 208 for file: S1_condition-29_reps-200_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-20.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-29_reps-1050_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-20.rds
+# Trimming to first 1000 iterations from 1059 for file: S1_condition-29_reps-1050_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-20.rds
 # --------------------------------- 
 #     cond_30: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-30_reps-200_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-40.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-30_reps-200_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-40.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-30_reps-1050_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-40.rds
+# Trimming to first 1000 iterations from 1056 for file: S1_condition-30_reps-1050_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[50-100]_J-40.rds
 # --------------------------------- 
 #     cond_31: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-31_reps-200_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-10.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-31_reps-1050_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-10.rds
+# Trimming to first 1000 iterations from 1051 for file: S1_condition-31_reps-1050_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-10.rds
 # --------------------------------- 
 #     cond_32: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-32_reps-200_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-20.rds
-# Trimming to first 200 iterations from 208 for file: S1_condition-32_reps-200_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-20.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-32_reps-1050_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-20.rds
+# Trimming to first 1000 iterations from 1052 for file: S1_condition-32_reps-1050_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-20.rds
 # --------------------------------- 
 #     cond_33: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-33_reps-200_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-40.rds
-# Trimming to first 200 iterations from 207 for file: S1_condition-33_reps-200_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-40.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-33_reps-1050_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-40.rds
+# Trimming to first 1000 iterations from 1058 for file: S1_condition-33_reps-1050_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[50-100]_J-40.rds
 # --------------------------------- 
 #     cond_34: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-34_reps-200_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-10.rds
-# Trimming to first 200 iterations from 209 for file: S1_condition-34_reps-200_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-10.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-34_reps-1050_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-10.rds
+# Trimming to first 1000 iterations from 1051 for file: S1_condition-34_reps-1050_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-10.rds
 # --------------------------------- 
 #     cond_35: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-35_reps-200_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-20.rds
-# Trimming to first 200 iterations from 208 for file: S1_condition-35_reps-200_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-20.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-35_reps-1050_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-20.rds
+# Trimming to first 1000 iterations from 1059 for file: S1_condition-35_reps-1050_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-20.rds
 # --------------------------------- 
 #     cond_36: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-36_reps-200_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-40.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-36_reps-200_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-40.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-36_reps-1050_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-40.rds
+# Trimming to first 1000 iterations from 1055 for file: S1_condition-36_reps-1050_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[50-100]_J-40.rds
 # --------------------------------- 
 #     cond_37: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-37_reps-200_null-TRUE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-10.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-37_reps-1050_null-TRUE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-10.rds
+# Trimming to first 1000 iterations from 1051 for file: S1_condition-37_reps-1050_null-TRUE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-10.rds
 # --------------------------------- 
 #     cond_38: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-38_reps-200_null-TRUE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-20.rds
-# Trimming to first 200 iterations from 208 for file: S1_condition-38_reps-200_null-TRUE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-20.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-38_reps-1050_null-TRUE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-20.rds
+# Trimming to first 1000 iterations from 1052 for file: S1_condition-38_reps-1050_null-TRUE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-20.rds
 # --------------------------------- 
 #     cond_39: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-39_reps-200_null-TRUE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-40.rds
-# Trimming to first 200 iterations from 207 for file: S1_condition-39_reps-200_null-TRUE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-40.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-39_reps-1050_null-TRUE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-40.rds
+# Trimming to first 1000 iterations from 1058 for file: S1_condition-39_reps-1050_null-TRUE_quad-TRUE_M-binomial_Y-gaussian_nj-[50-100]_J-40.rds
 # --------------------------------- 
 #     cond_40: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-40_reps-200_null-TRUE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-10.rds
-# Trimming to first 200 iterations from 209 for file: S1_condition-40_reps-200_null-TRUE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-10.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-40_reps-1050_null-TRUE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-10.rds
+# Trimming to first 1000 iterations from 1051 for file: S1_condition-40_reps-1050_null-TRUE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-10.rds
 # --------------------------------- 
 #     cond_41: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-41_reps-200_null-TRUE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-20.rds
-# Trimming to first 200 iterations from 208 for file: S1_condition-41_reps-200_null-TRUE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-20.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-41_reps-1050_null-TRUE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-20.rds
+# Trimming to first 1000 iterations from 1059 for file: S1_condition-41_reps-1050_null-TRUE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-20.rds
 # --------------------------------- 
 #     cond_42: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-42_reps-200_null-TRUE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-40.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-42_reps-200_null-TRUE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-40.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-42_reps-1050_null-TRUE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-40.rds
+# Trimming to first 1000 iterations from 1055 for file: S1_condition-42_reps-1050_null-TRUE_quad-FALSE_M-binomial_Y-gaussian_nj-[50-100]_J-40.rds
 # --------------------------------- 
 #     cond_43: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-43_reps-200_null-TRUE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-10.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-43_reps-1050_null-TRUE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-10.rds
+# Trimming to first 1000 iterations from 1056 for file: S1_condition-43_reps-1050_null-TRUE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-10.rds
 # --------------------------------- 
 #     cond_44: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-44_reps-200_null-TRUE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-20.rds
-# Trimming to first 200 iterations from 208 for file: S1_condition-44_reps-200_null-TRUE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-20.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-44_reps-1050_null-TRUE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-20.rds
+# Trimming to first 1000 iterations from 1052 for file: S1_condition-44_reps-1050_null-TRUE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-20.rds
 # --------------------------------- 
 #     cond_45: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-45_reps-200_null-TRUE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-40.rds
-# Trimming to first 200 iterations from 207 for file: S1_condition-45_reps-200_null-TRUE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-40.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-45_reps-1050_null-TRUE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-40.rds
+# Trimming to first 1000 iterations from 1058 for file: S1_condition-45_reps-1050_null-TRUE_quad-TRUE_M-gaussian_Y-gaussian_nj-[50-100]_J-40.rds
 # --------------------------------- 
 #     cond_46: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-46_reps-200_null-TRUE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-10.rds
-# Trimming to first 200 iterations from 209 for file: S1_condition-46_reps-200_null-TRUE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-10.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-46_reps-1050_null-TRUE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-10.rds
+# Trimming to first 1000 iterations from 1051 for file: S1_condition-46_reps-1050_null-TRUE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-10.rds
 # --------------------------------- 
 #     cond_47: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-47_reps-200_null-TRUE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-20.rds
-# Trimming to first 200 iterations from 208 for file: S1_condition-47_reps-200_null-TRUE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-20.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-47_reps-1050_null-TRUE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-20.rds
+# Trimming to first 1000 iterations from 1059 for file: S1_condition-47_reps-1050_null-TRUE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-20.rds
 # --------------------------------- 
 #     cond_48: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-48_reps-200_null-TRUE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-40.rds
-# Trimming to first 200 iterations from 209 for file: S1_condition-48_reps-200_null-TRUE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-40.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-48_reps-1050_null-TRUE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-40.rds
+# Trimming to first 1000 iterations from 1055 for file: S1_condition-48_reps-1050_null-TRUE_quad-FALSE_M-gaussian_Y-gaussian_nj-[50-100]_J-40.rds
 # --------------------------------- 
 #     cond_49: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-49_reps-200_null-FALSE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-40.rds
-# Trimming to first 200 iterations from 202 for file: S1_condition-49_reps-200_null-FALSE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-40.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-49_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-40.rds
+# Trimming to first 1000 iterations from 1050 for file: S1_condition-49_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-40.rds
 # --------------------------------- 
 #     cond_50: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-50_reps-200_null-FALSE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-70.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-50_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-70.rds
+# Trimming to first 1000 iterations from 1050 for file: S1_condition-50_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-70.rds
 # --------------------------------- 
 #     cond_51: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-51_reps-200_null-FALSE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-100.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-51_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-100.rds
+# Trimming to first 1000 iterations from 1050 for file: S1_condition-51_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-100.rds
 # --------------------------------- 
 #     cond_52: 
-#     Dropping 1 iterations with error msg at indices 198: S1_condition-52_reps-200_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-40.rds
+#     Dropping 1 iterations with error msg at indices 198: S1_condition-52_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-40.rds
+# Trimming to first 1000 iterations from 1049 for file: S1_condition-52_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-40.rds
 # --------------------------------- 
 #     cond_53: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-53_reps-200_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-70.rds
-# Trimming to first 200 iterations from 201 for file: S1_condition-53_reps-200_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-70.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-53_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-70.rds
+# Trimming to first 1000 iterations from 1050 for file: S1_condition-53_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-70.rds
 # --------------------------------- 
 #     cond_54: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-54_reps-205_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-100.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-54_reps-205_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-100.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-54_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-100.rds
+# Trimming to first 1000 iterations from 1050 for file: S1_condition-54_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-100.rds
 # --------------------------------- 
 #     cond_55: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-55_reps-205_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-40.rds
-# Trimming to first 200 iterations from 206 for file: S1_condition-55_reps-205_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-40.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-55_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-40.rds
+# Trimming to first 1000 iterations from 1050 for file: S1_condition-55_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-40.rds
 # --------------------------------- 
 #     cond_56: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-56_reps-205_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-56_reps-205_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds
+#     Dropping 3 iterations with error msg at indices 403, 502, 538: S1_condition-56_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds
+# Trimming to first 1000 iterations from 1047 for file: S1_condition-56_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds
 # --------------------------------- 
 #     cond_57: 
-#     Dropping 1 iterations with error msg at indices 68: S1_condition-57_reps-205_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds
-# Trimming to first 200 iterations from 204 for file: S1_condition-57_reps-205_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds
+#     Dropping 5 iterations with error msg at indices 68, 238, 369, 458, 978: S1_condition-57_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds
+# Trimming to first 1000 iterations from 1045 for file: S1_condition-57_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds
 # --------------------------------- 
 #     cond_58: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-58_reps-205_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-40.rds
-# Trimming to first 200 iterations from 206 for file: S1_condition-58_reps-205_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-40.rds
+#     Dropping 1 iterations with error msg at indices 696: S1_condition-58_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-40.rds
+# Trimming to first 1000 iterations from 1049 for file: S1_condition-58_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-40.rds
 # --------------------------------- 
 #     cond_59: 
-#     Dropping 1 iterations with error msg at indices 159: S1_condition-59_reps-205_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds
-# Trimming to first 200 iterations from 204 for file: S1_condition-59_reps-205_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds
+#     Dropping 5 iterations with error msg at indices 159, 330, 378, 616, 696: S1_condition-59_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds
+# Trimming to first 1000 iterations from 1046 for file: S1_condition-59_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds
 # --------------------------------- 
 #     cond_60: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-60_reps-205_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-60_reps-205_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds
+#     Dropping 2 iterations with error msg at indices 485, 666: S1_condition-60_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds
+# Trimming to first 1000 iterations from 1048 for file: S1_condition-60_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds
 # --------------------------------- 
 #     cond_61: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-61_reps-205_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[5-20]_J-40.rds
-# Trimming to first 200 iterations from 206 for file: S1_condition-61_reps-205_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[5-20]_J-40.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-61_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[5-20]_J-40.rds
+# Trimming to first 1000 iterations from 1050 for file: S1_condition-61_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[5-20]_J-40.rds
 # --------------------------------- 
 #     cond_62: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-62_reps-205_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[5-20]_J-70.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-62_reps-205_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[5-20]_J-70.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-62_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[5-20]_J-70.rds
+# Trimming to first 1000 iterations from 1050 for file: S1_condition-62_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[5-20]_J-70.rds
 # --------------------------------- 
 #     cond_63: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-63_reps-205_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[5-20]_J-100.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-63_reps-205_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[5-20]_J-100.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-63_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[5-20]_J-100.rds
+# Trimming to first 1000 iterations from 1050 for file: S1_condition-63_reps-1050_null-FALSE_quad-TRUE_M-binomial_Y-gaussian_nj-[5-20]_J-100.rds
 # --------------------------------- 
 #     cond_64: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-64_reps-205_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[5-20]_J-40.rds
-# Trimming to first 200 iterations from 206 for file: S1_condition-64_reps-205_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[5-20]_J-40.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-64_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[5-20]_J-40.rds
+# Trimming to first 1000 iterations from 1050 for file: S1_condition-64_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[5-20]_J-40.rds
 # --------------------------------- 
 #     cond_65: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-65_reps-205_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[5-20]_J-70.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-65_reps-205_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[5-20]_J-70.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-65_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[5-20]_J-70.rds
+# Trimming to first 1000 iterations from 1051 for file: S1_condition-65_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[5-20]_J-70.rds
 # --------------------------------- 
 #     cond_66: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-66_reps-205_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[5-20]_J-100.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-66_reps-205_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[5-20]_J-100.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-66_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[5-20]_J-100.rds
+# Trimming to first 1000 iterations from 1050 for file: S1_condition-66_reps-1050_null-FALSE_quad-FALSE_M-binomial_Y-gaussian_nj-[5-20]_J-100.rds
 # --------------------------------- 
 #     cond_67: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-67_reps-205_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[5-20]_J-40.rds
-# Trimming to first 200 iterations from 206 for file: S1_condition-67_reps-205_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[5-20]_J-40.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-67_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[5-20]_J-40.rds
+# Trimming to first 1000 iterations from 1050 for file: S1_condition-67_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[5-20]_J-40.rds
 # --------------------------------- 
 #     cond_68: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-68_reps-205_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[5-20]_J-70.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-68_reps-205_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[5-20]_J-70.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-68_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[5-20]_J-70.rds
+# Trimming to first 1000 iterations from 1050 for file: S1_condition-68_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[5-20]_J-70.rds
 # --------------------------------- 
 #     cond_69: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-69_reps-205_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[5-20]_J-100.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-69_reps-205_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[5-20]_J-100.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-69_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[5-20]_J-100.rds
+# Trimming to first 1000 iterations from 1050 for file: S1_condition-69_reps-1050_null-FALSE_quad-TRUE_M-gaussian_Y-gaussian_nj-[5-20]_J-100.rds
 # --------------------------------- 
 #     cond_70: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-70_reps-205_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[5-20]_J-40.rds
-# Trimming to first 200 iterations from 206 for file: S1_condition-70_reps-205_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[5-20]_J-40.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-70_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[5-20]_J-40.rds
+# Trimming to first 1000 iterations from 1050 for file: S1_condition-70_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[5-20]_J-40.rds
 # --------------------------------- 
 #     cond_71: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-71_reps-205_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[5-20]_J-70.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-71_reps-205_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[5-20]_J-70.rds
+#     Dropping 0 iterations with error msg at indices : S1_condition-71_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[5-20]_J-70.rds
+# Trimming to first 1000 iterations from 1051 for file: S1_condition-71_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[5-20]_J-70.rds
 # --------------------------------- 
 #     cond_72: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-72_reps-205_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[5-20]_J-100.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-72_reps-205_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[5-20]_J-100.rds
-# --------------------------------- 
-#     cond_73: 
-#     Dropping 1 iterations with error msg at indices 79: S1_condition-73_reps-205_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-40.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-73_reps-205_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-40.rds
-# --------------------------------- 
-#     cond_74: 
-#     Dropping 2 iterations with error msg at indices 165, 205: S1_condition-74_reps-205_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-70.rds
-# Trimming to first 200 iterations from 203 for file: S1_condition-74_reps-205_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-70.rds
-# --------------------------------- 
-#     cond_75: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-75_reps-205_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-100.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-75_reps-205_null-TRUE_quad-TRUE_M-binomial_Y-binomial_nj-[5-20]_J-100.rds
-# --------------------------------- 
-#     cond_76: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-76_reps-205_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-40.rds
-# Trimming to first 200 iterations from 206 for file: S1_condition-76_reps-205_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-40.rds
-# --------------------------------- 
-#     cond_77: 
-#     Dropping 1 iterations with error msg at indices 145: S1_condition-77_reps-205_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-70.rds
-# Trimming to first 200 iterations from 204 for file: S1_condition-77_reps-205_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-70.rds
-# --------------------------------- 
-#     cond_78: 
-#     Dropping 1 iterations with error msg at indices 199: S1_condition-78_reps-205_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-100.rds
-# Trimming to first 200 iterations from 204 for file: S1_condition-78_reps-205_null-TRUE_quad-FALSE_M-binomial_Y-binomial_nj-[5-20]_J-100.rds
-# --------------------------------- 
-#     cond_79: 
-#     Dropping 1 iterations with error msg at indices 18: S1_condition-79_reps-205_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-40.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-79_reps-205_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-40.rds
-# --------------------------------- 
-#     cond_80: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-80_reps-205_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-80_reps-205_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds
-# --------------------------------- 
-#     cond_81: 
-#     Dropping 1 iterations with error msg at indices 43: S1_condition-81_reps-205_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds
-# Trimming to first 200 iterations from 204 for file: S1_condition-81_reps-205_null-TRUE_quad-TRUE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds
-# --------------------------------- 
-#     cond_82: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-82_reps-205_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-40.rds
-# Trimming to first 200 iterations from 206 for file: S1_condition-82_reps-205_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-40.rds
-# --------------------------------- 
-#     cond_83: 
-#     Dropping 1 iterations with error msg at indices 168: S1_condition-83_reps-205_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds
-# Trimming to first 200 iterations from 204 for file: S1_condition-83_reps-205_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds
-# --------------------------------- 
-#     cond_84: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-84_reps-205_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-84_reps-205_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds
-# --------------------------------- 
-#     cond_85: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-85_reps-205_null-TRUE_quad-TRUE_M-binomial_Y-gaussian_nj-[5-20]_J-40.rds
-# Trimming to first 200 iterations from 206 for file: S1_condition-85_reps-205_null-TRUE_quad-TRUE_M-binomial_Y-gaussian_nj-[5-20]_J-40.rds
-# --------------------------------- 
-#     cond_86: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-86_reps-205_null-TRUE_quad-TRUE_M-binomial_Y-gaussian_nj-[5-20]_J-70.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-86_reps-205_null-TRUE_quad-TRUE_M-binomial_Y-gaussian_nj-[5-20]_J-70.rds
-# --------------------------------- 
-#     cond_87: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-87_reps-205_null-TRUE_quad-TRUE_M-binomial_Y-gaussian_nj-[5-20]_J-100.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-87_reps-205_null-TRUE_quad-TRUE_M-binomial_Y-gaussian_nj-[5-20]_J-100.rds
-# --------------------------------- 
-#     cond_88: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-88_reps-205_null-TRUE_quad-FALSE_M-binomial_Y-gaussian_nj-[5-20]_J-40.rds
-# Trimming to first 200 iterations from 206 for file: S1_condition-88_reps-205_null-TRUE_quad-FALSE_M-binomial_Y-gaussian_nj-[5-20]_J-40.rds
-# --------------------------------- 
-#     cond_89: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-89_reps-205_null-TRUE_quad-FALSE_M-binomial_Y-gaussian_nj-[5-20]_J-70.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-89_reps-205_null-TRUE_quad-FALSE_M-binomial_Y-gaussian_nj-[5-20]_J-70.rds
-# --------------------------------- 
-#     cond_90: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-90_reps-205_null-TRUE_quad-FALSE_M-binomial_Y-gaussian_nj-[5-20]_J-100.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-90_reps-205_null-TRUE_quad-FALSE_M-binomial_Y-gaussian_nj-[5-20]_J-100.rds
-# --------------------------------- 
-#     cond_91: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-91_reps-205_null-TRUE_quad-TRUE_M-gaussian_Y-gaussian_nj-[5-20]_J-40.rds
-# Trimming to first 200 iterations from 206 for file: S1_condition-91_reps-205_null-TRUE_quad-TRUE_M-gaussian_Y-gaussian_nj-[5-20]_J-40.rds
-# --------------------------------- 
-#     cond_92: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-92_reps-205_null-TRUE_quad-TRUE_M-gaussian_Y-gaussian_nj-[5-20]_J-70.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-92_reps-205_null-TRUE_quad-TRUE_M-gaussian_Y-gaussian_nj-[5-20]_J-70.rds
-# --------------------------------- 
-#     cond_93: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-93_reps-205_null-TRUE_quad-TRUE_M-gaussian_Y-gaussian_nj-[5-20]_J-100.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-93_reps-205_null-TRUE_quad-TRUE_M-gaussian_Y-gaussian_nj-[5-20]_J-100.rds
-# --------------------------------- 
-#     cond_94: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-94_reps-205_null-TRUE_quad-FALSE_M-gaussian_Y-gaussian_nj-[5-20]_J-40.rds
-# Trimming to first 200 iterations from 206 for file: S1_condition-94_reps-205_null-TRUE_quad-FALSE_M-gaussian_Y-gaussian_nj-[5-20]_J-40.rds
-# --------------------------------- 
-#     cond_95: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-95_reps-205_null-TRUE_quad-FALSE_M-gaussian_Y-gaussian_nj-[5-20]_J-70.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-95_reps-205_null-TRUE_quad-FALSE_M-gaussian_Y-gaussian_nj-[5-20]_J-70.rds
-# --------------------------------- 
-#     cond_96: 
-#     Dropping 0 iterations with error msg at indices : S1_condition-96_reps-205_null-TRUE_quad-FALSE_M-gaussian_Y-gaussian_nj-[5-20]_J-100.rds
-# Trimming to first 200 iterations from 205 for file: S1_condition-96_reps-205_null-TRUE_quad-FALSE_M-gaussian_Y-gaussian_nj-[5-20]_J-100.rds
-# --------------------------------- 
+#     Dropping 0 iterations with error msg at indices : S1_condition-72_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[5-20]_J-100.rds
+# Trimming to first 1000 iterations from 1050 for file: S1_condition-72_reps-1050_null-FALSE_quad-FALSE_M-gaussian_Y-gaussian_nj-[5-20]_J-100.rds
+
 
 # Save 
 saveRDS(sim1_data, file = file.path(results_path, "Data", paste0("S1_overall-output-dataframe_", sim_date, ".rds")))
 
-
+# ══════════════════════════════
+#    DELETE CODE BELOW (in 02a3) 
+# ══════════════════════════════
 # Check warning & error messages ------------------------------------------
 
 # Import sim dataframe 
@@ -1136,9 +1034,9 @@ normalize_warning <- function(x) {
 # Dataset with warning messages cleaned (i.e., formatted for easy use)
 warnings_cleaned <- sim1_data  |> 
     filter(!is.na(warnings)) |> 
-    separate_rows(warnings, sep = ";") |>  # split multiple warnings
+    separate_rows(warnings, sep = ";") |>     # split multiple warnings
     # distinct(warnings) |>                   # keep unique strings
-    mutate(warnings = str_trim(warnings), # clean whitespace @ beginning & end
+    mutate(warnings = str_trim(warnings),     # clean whitespace @ beginning & end
            warning_template = normalize_warning(warnings)) 
 
 # Distinct warnings across simulation conditions 
@@ -1158,15 +1056,15 @@ warnings_cleaned |>
     arrange(desc(n)) |> 
     print(n = Inf)
 
-# Frequency of unique warning messages within each simulation conditions 
-warnings_cleaned |> 
-    group_by(condition_num, warning_template) |> 
-    summarize(n = n(), 
-              n_conditions = n_distinct(condition_num), 
-              example = dplyr::first(warnings),
-              .groups = "drop") |> 
-    arrange(desc(n)) |> 
-    print(n = Inf)
+# # Frequency of unique warning messages within each simulation conditions 
+# warnings_cleaned |> 
+#     group_by(condition_num, warning_template) |> 
+#     summarize(n = n(), 
+#               n_conditions = n_distinct(condition_num), 
+#               example = dplyr::first(warnings),
+#               .groups = "drop") |> 
+#     arrange(desc(n)) |> 
+#     print(n = Inf)
 
 
 
@@ -1228,6 +1126,7 @@ sim1_data_cleaned <- sim1_data |>
         n_warnings = map_int(warning_list_filtered, length)
     ) |>
     select(-warning_list, -warning_list_filtered) 
+
 # Table of number of warnings by model fitted
 # table(sim1_data_cleaned$model, sim1_data_cleaned$n_warnings)
 table(paste0(sim1_data_cleaned$Fit, "-", sim1_data_cleaned$cluster_opt), sim1_data_cleaned$n_warnings)
@@ -1269,52 +1168,57 @@ distinct_warnings <- unique(na.omit(warnings_generalized))
 
 # 7. View results
 print(distinct_warnings)
-# [1] "Cluster '<number>': minority count = <number> < V = <number>"                                                                          
-# [2] "not stratifying this cluster."                                                                                                         
-# [3] "non-integer #successes in a binomial glm!"                                                                                             
-# [4] "Cluster '<number>': binary outcome only has one value"                                                                                 
-# [5] "glm.fit: fitted probabilities numerically 0 or 1 occurred"                                                                             
-# [6] "glm.fit: algorithm did not converge"                                                                                                   
-# [7] "Model failed to converge with max|grad| = <number> (tol = <number>, component 1)"                                                      
-# [8] "prediction from rank-deficient fit"                                                                                                    
-# [9] "attr(*, \"non-estim\") has doubtful cases"                                                                                             
-# [10] "Model is nearly unidentifiable: large eigenvalue ratio\n - Rescale variables?"                                                         
-# [11] "Model is nearly unidentifiable: very large eigenvalue\n - Rescale variables?"                                                          
-# [12] "unable to evaluate scaled gradient"                                                                                                    
-# [13] "Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"                                                             
-# [14] "iterations terminated prematurely because of singularities"                                                                            
-# [15] "Error in algorithm SL.gam \n  The Algorithm will be removed from the Super Learner (i.e. given weight 0)"                              
-# [16] "Model failed to converge: degenerate  Hessian with 2 negative eigenvalues"                                                             
-# [17] "n (the number of units, clusters, or clusters in a specific strata) is 5 and V is 5, so using leave-one-out CV, i.e. setting V = n"    
-# [18] "Re-running estimation of coefficients removing failed algorithm(s)\nOriginal coefficients are: \n0.726183574907129, 0.273816425092871" 
-# [19] "Re-running estimation of coefficients removing failed algorithm(s)\nOriginal coefficients are: \n0.00213038987352012, 0.99786961012648"
+# [1] "Cluster '<number>': minority count = <number> < V = <number>"                                                                                                                                                                                                                                
+# [2] "not stratifying this cluster."                                                                                                                                                                                                                                                               
+# [3] "non-integer #successes in a binomial glm!"                                                                                                                                                                                                                                                   
+# [4] "Cluster '<number>': binary outcome only has one value"                                                                                                                                                                                                                                       
+# [5] "glm.fit: fitted probabilities numerically 0 or 1 occurred"                                                                                                                                                                                                                                   
+# [6] "glm.fit: algorithm did not converge"                                                                                                                                                                                                                                                         
+# [7] "Model failed to converge with max|grad| = <number> (tol = <number>, component 1)"                                                                                                                                                                                                            
+# [8] "prediction from rank-deficient fit"                                                                                                                                                                                                                                                          
+# [9] "attr(*, \"non-estim\") has doubtful cases"                                                                                                                                                                                                                                                   
+# [10] "iterations terminated prematurely because of singularities"                                                                                                                                                                                                                                  
+# [11] "Error in algorithm SL.gam \n  The Algorithm will be removed from the Super Learner (i.e. given weight 0)"                                                                                                                                                                                    
+# [12] "Model is nearly unidentifiable: very large eigenvalue\n - Rescale variables?"                                                                                                                                                                                                                
+# [13] "Model is nearly unidentifiable: large eigenvalue ratio\n - Rescale variables?"                                                                                                                                                                                                               
+# [14] "unable to evaluate scaled gradient"                                                                                                                                                                                                                                                          
+# [15] "Model failed to converge: degenerate  Hessian with 2 negative eigenvalues"                                                                                                                                                                                                                   
+# [16] "Model failed to converge: degenerate  Hessian with 1 negative eigenvalues"                                                                                                                                                                                                                   
+# [17] "convergence code 3 from bobyqa: bobyqa -- a trust region step failed to reduce q"                                                                                                                                                                                                            
+# [18] "convergence code -4 from nloptwrap: NLOPT_ROUNDOFF_LIMITED: Roundoff errors led to a breakdown of the optimization algorithm. In this case, the returned minimum may still be useful. (e.g. this error occurs in NEWUOA if one tries to achieve a tolerance too close to machine precision.)"
+# [19] "n (the number of units, clusters, or clusters in a specific strata) is 5 and V is 5, so using leave-one-out CV, i.e. setting V = n"                                                                                                                                                          
+# [20] "Model failed to converge: degenerate  Hessian with 3 negative eigenvalues"                                                                                                                                                                                                                   
+# [21] "Re-running estimation of coefficients removing failed algorithm(s)\nOriginal coefficients are: \n0.726183574907129, 0.273816425092871"                                                                                                                                                       
+# [22] "Error in algorithm SL.gam  on full data \n  The Algorithm will be removed from the Super Learner (i.e. given weight 0)"                                                                                                                                                                      
+# [23] "Re-running estimation of coefficients removing failed algorithm(s)\nOriginal coefficients are: \n0.950238145685285, 0.0497618543147149"                                                                                                                                                      
+# [24] "Model failed to converge: degenerate  Hessian with 4 negative eigenvalues"  
 
-# Unique warnings by model 
-sim1_data_cleaned |> 
-    mutate(model_key = paste(Fit, cluster_opt, sep = "-")) |> 
-    mutate(warning_list = str_split(warnings, ";\\s*")) |> 
-    mutate(
-        warning_list = map(warning_list, ~ .x[!grepl("RE\\.glm\\.rs specified.*|using random intercept only", .x)]),
-        warning_list = map(warning_list, ~ trimws(.x[.x != ""])),
-        warning_list = map(warning_list, unique),
-        warning_string = map_chr(warning_list, ~ if (length(.x) > 0) paste(.x, collapse = "; ") else NA_character_)
-    ) |> 
-    mutate(
-        warning_string = warning_string |>
-            str_replace_all("max\\|grad\\| = [0-9\\.eE+-]+", "max|grad| = <number>") |>
-            str_replace_all("tol = [0-9\\.eE+-]+", "tol = <number>")
-    ) |> 
-    filter(!is.na(warning_string)) |> 
-    # # warnings by model 
-    # count(model_key, warning_string, sort = TRUE, name = "frequency") |> 
-    # warnings by model & data generation condition
-    count(condition_num, model_key, warning_string, sort = TRUE, name = "frequency") |> 
-    # count(model_key, warning_string, sort = TRUE, name = "frequency") |> 
-    # group_by(model_key) |> 
-    # summarise(unique_warnings = unique(warning_string), .groups = "drop") |> 
-    arrange(condition_num, model_key) |> 
-    # arrange(model_key) |> 
-    print(n = Inf)
+# # Unique warnings by model 
+# sim1_data_cleaned |> 
+#     mutate(model_key = paste(Fit, cluster_opt, sep = "-")) |> 
+#     mutate(warning_list = str_split(warnings, ";\\s*")) |> 
+#     mutate(
+#         warning_list = map(warning_list, ~ .x[!grepl("RE\\.glm\\.rs specified.*|using random intercept only", .x)]),
+#         warning_list = map(warning_list, ~ trimws(.x[.x != ""])),
+#         warning_list = map(warning_list, unique),
+#         warning_string = map_chr(warning_list, ~ if (length(.x) > 0) paste(.x, collapse = "; ") else NA_character_)
+#     ) |> 
+#     mutate(
+#         warning_string = warning_string |>
+#             str_replace_all("max\\|grad\\| = [0-9\\.eE+-]+", "max|grad| = <number>") |>
+#             str_replace_all("tol = [0-9\\.eE+-]+", "tol = <number>")
+#     ) |> 
+#     filter(!is.na(warning_string)) |> 
+#     # # warnings by model 
+#     # count(model_key, warning_string, sort = TRUE, name = "frequency") |> 
+#     # warnings by model & data generation condition
+#     count(condition_num, model_key, warning_string, sort = TRUE, name = "frequency") |> 
+#     # count(model_key, warning_string, sort = TRUE, name = "frequency") |> 
+#     # group_by(model_key) |> 
+#     # summarise(unique_warnings = unique(warning_string), .groups = "drop") |> 
+#     arrange(condition_num, model_key) |> 
+#     # arrange(model_key) |> 
+#     print(n = Inf)
 
 # Commented out section below is old
 
@@ -1360,12 +1264,6 @@ sim1_data_converged <- sim1_data_cleaned |>
 
 # Save the filtered dataset (excluding convergence warnings only)
 saveRDS(sim1_data_converged, file = file.path(results_path, "Data", paste0("S1_simulation-data_", sim_date, "_converged-only.rds")))
-
-
-
-
-
-
 
 
 # # ══════════════════════════════
@@ -1518,8 +1416,8 @@ perf_summary <- as.data.frame(sim1_data) |>
         
         sig_individual_PNDE = (individual_de_CILower > 0) | (individual_de_CIUpper < 0), # indicate rejection of null
         sig_individual_TNIE = (individual_ie_CILower > 0) | (individual_ie_CIUpper < 0),
-        sig_cluster_PNDE    = (cluster_de_CILower > 0) | (cluster_de_CIUpper < 0),
-        sig_cluster_TNIE    = (cluster_ie_CILower > 0) | (cluster_ie_CIUpper < 0)
+        sig_cluster_PNDE = (cluster_de_CILower > 0) | (cluster_de_CIUpper < 0),
+        sig_cluster_TNIE = (cluster_ie_CILower > 0) | (cluster_ie_CIUpper < 0)
     ) |> 
     summarize(
         # Individual PNDE
@@ -1557,88 +1455,6 @@ perf_summary <- as.data.frame(sim1_data) |>
         true_cluster_TNIE = mean(true_cluster_TNIE)
     )
 
-
-# # Compute performance measures 
-# perf_summary <- as.data.frame(sim1_data) |>
-#     group_by(quadratic, Mfamily, Yfamily, J, nj) |> # get one true value per condition (add if.null later)
-#     mutate(true_individual_PNDE = mean(individual_pnde), 
-#            true_individual_TNIE = mean(individual_tnie), 
-#            true_cluster_PNDE = mean(cluster_pnde), 
-#            true_cluster_TNIE = mean(cluster_tnie)) |> 
-#     ungroup() |> 
-    # group_by(quadratic, Mfamily, Yfamily, J, nj, Fit, cluster_opt) |>
-#     mutate(if_cover_ind_PNDE = (individual_de_CILower < true_individual_PNDE) & (individual_de_CIUpper > true_individual_PNDE), 
-#            if_cover_ind_TNIE = (individual_ie_CILower < true_individual_TNIE) & (individual_ie_CIUpper > true_individual_TNIE), 
-#            if_cover_clust_PNDE = (cluster_de_CILower < true_cluster_PNDE) & (cluster_de_CIUpper > true_cluster_PNDE), 
-#            if_cover_clust_TNIE = (cluster_ie_CILower < true_cluster_TNIE) & (cluster_ie_CIUpper > true_cluster_TNIE) ) |> 
-#     # filter(J == 100 & cluster_opt == "cwc.FE" & Fit == "mlr3") |> 
-#     # view()
-#     summarize(cover_individual_PNDE = mean(if_cover_ind_PNDE), 
-#               cover_individual_TNIE = mean(if_cover_ind_TNIE), 
-#               bias_individual_PNDE = mean((individual_de_Estimate - true_individual_PNDE)), 
-#               bias_individual_TNIE = mean((individual_ie_Estimate - true_individual_TNIE)), 
-#               MSE_individual_PNDE = mean((individual_de_Estimate - true_individual_PNDE)^2), 
-#               MSE_individual_TNIE = mean((individual_ie_Estimate - true_individual_TNIE)^2), 
-#               rejectnull_individual_PNDE = mean((individual_de_CILower > (0)) | (individual_de_CIUpper < (0))), 
-#               rejectnull_individual_TNIE = mean((individual_ie_CILower > (0)) | (individual_ie_CIUpper < (0))),
-#               true_individual_PNDE = mean(true_individual_PNDE), 
-#               true_individual_TNIE = mean(true_individual_TNIE),
-#               # cluster-avg
-#               cover_cluster_PNDE = mean(if_cover_clust_PNDE), 
-#               cover_cluster_TNIE = mean(if_cover_clust_TNIE), 
-#               bias_cluster_PNDE = mean((cluster_de_Estimate - true_cluster_PNDE)), 
-#               bias_cluster_TNIE = mean((cluster_ie_Estimate - true_cluster_TNIE)), 
-#               MSE_cluster_PNDE = mean((cluster_de_Estimate - true_cluster_PNDE)^2), 
-#               MSE_cluster_TNIE = mean((cluster_ie_Estimate - true_cluster_TNIE)^2), 
-#               rejectnull_cluster_PNDE = mean((cluster_de_CILower > (0)) | (cluster_de_CIUpper < (0))), 
-#               rejectnull_cluster_TNIE = mean((cluster_ie_CILower > (0)) | (cluster_ie_CIUpper < (0))),
-#               true_cluster_PNDE = mean(true_cluster_PNDE), 
-#               true_cluster_TNIE = mean(true_cluster_TNIE)
-#     ) 
-
-
-
-# |>
-    # view()
-
-    # group_by(if.null, quadratic, Mfamily, Yfamily, J, Nj_low, Nj_high) |> # get one true value per condition
-    # # group_by(quadratic, condition) |> # get one true value per condition 
-    # mutate(true_individual_PNDE = mean(individual_pnde), 
-    #        true_individual_TNIE = mean(individual_tnie), 
-    #        true_cluster_PNDE = mean(cluster_pnde), 
-    #        true_cluster_TNIE = mean(cluster_tnie)) |>
-    # group_by(if.null, quadratic, Mfamily, Yfamily, J, Nj_low, Nj_high, Fit, cluster_opt) |> 
-    # # group_by(quadratic, condition, model) |> 
-    # mutate(if_cover_ind_PNDE = (individual_de_CILower < true_individual_PNDE) & (individual_de_CIUpper > true_individual_PNDE), 
-    #        if_cover_ind_TNIE = (individual_ie_CILower < true_individual_TNIE) & (individual_ie_CIUpper > true_individual_TNIE), 
-    #        if_cover_clust_PNDE = (cluster_de_CILower < true_cluster_PNDE) & (cluster_de_CIUpper > true_cluster_PNDE), 
-    #        if_cover_clust_TNIE = (cluster_ie_CILower < true_cluster_TNIE) & (cluster_ie_CIUpper > true_cluster_TNIE) ) |> 
-    # summarize(cover_individual_PNDE = mean(if_cover_ind_PNDE), 
-    #           cover_individual_TNIE = mean(if_cover_ind_TNIE), 
-    #           bias_individual_PNDE = mean((individual_de_Estimate - true_individual_PNDE)), 
-    #           bias_individual_TNIE = mean((individual_ie_Estimate - true_individual_TNIE)), 
-    #           MSE_individual_PNDE = mean((individual_de_Estimate - true_individual_PNDE)^2), 
-    #           MSE_individual_TNIE = mean((individual_ie_Estimate - true_individual_TNIE)^2), 
-    #           rejectnull_individual_PNDE = mean((individual_de_CILower > (0)) | (individual_de_CIUpper < (0))), 
-    #           rejectnull_individual_TNIE = mean((individual_ie_CILower > (0)) | (individual_ie_CIUpper < (0))),
-    #           true_individual_PNDE = mean(true_individual_PNDE), 
-    #           true_individual_TNIE = mean(true_individual_TNIE), 
-    #           # cluster-avg
-    #           cover_cluster_PNDE = mean(if_cover_clust_PNDE), 
-    #           cover_cluster_TNIE = mean(if_cover_clust_TNIE), 
-    #           bias_cluster_PNDE = mean((cluster_de_Estimate - true_cluster_PNDE)), 
-    #           bias_cluster_TNIE = mean((cluster_ie_Estimate - true_cluster_TNIE)), 
-    #           MSE_cluster_PNDE = mean((cluster_de_Estimate - true_cluster_PNDE)^2), 
-    #           MSE_cluster_TNIE = mean((cluster_ie_Estimate - true_cluster_TNIE)^2), 
-    #           rejectnull_cluster_PNDE = mean((cluster_de_CILower > (0)) | (cluster_de_CIUpper < (0))), 
-    #           rejectnull_cluster_TNIE = mean((cluster_ie_CILower > (0)) | (cluster_ie_CIUpper < (0))),
-    #           true_cluster_PNDE = mean(true_cluster_PNDE), 
-    #           true_cluster_TNIE = mean(true_cluster_TNIE)
-    # )
-
-# table(perf_summary$quadratic)
-# 
-# perf_summary
 
 # Save performance measures 
 ## Only include converged cases 
@@ -1722,7 +1538,6 @@ saveRDS(perf_summary, file = paste0(results_path, "/Tables/S1_performance-measur
                                     sim_date, ".rds")) #paste0("Output/S1_Results/Tables/S1_performance-measures_", sim_date, ".rds"))
 
 
-
 # Compute Convergence Rates -----------------------------------------------
 
 # Import data 
@@ -1766,7 +1581,6 @@ convergence_rates <- sim1_data |>
 # Save convergence rates 
 saveRDS(convergence_rates, file = paste0(results_path, "/Tables/S1_convergence-rates_", 
                                          sim_date, ".rds"))
-
 
 ############################# END OF PROCESSING ################################
 
