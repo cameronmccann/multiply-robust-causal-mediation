@@ -18,11 +18,11 @@
 #       Note: files with "updated-" in name are versions from this script
 #
 # To obtain output files from TACC, run a similar command in your terminal: 
-# scp -r "cameronmccann@ls6.tacc.utexas.edu:/home1/10384/cameronmccann/multiply-robust-causal-mediation copy/Output/S1_Simulation-Output/2025-09-03_200-reps" \
+# scp -r "cameronmccann@ls6.tacc.utexas.edu:/home1/10384/cameronmccann/multiply-robust-causal-mediation copy/Output/S1_Simulation-Output/2025-10-22_1000-reps" \
 # /Users/cameronmccann/Documents/Research-2025/multiply-robust-causal-mediation/Output/S1_Simulation-Output/
 #     
 #
-# Last Updated: 2025-12-16
+# Last Updated: 2026-01-06
 #
 #
 # Notes:
