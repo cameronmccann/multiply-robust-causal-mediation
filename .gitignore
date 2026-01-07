@@ -6,3 +6,21 @@
 .httr-oauth
 .DS_Store
 .quarto
+Functions.zip
+
+
+# Output/
+
+## Exclude entire Output_mediator_ClusterData folder 
+Output/Output_mediator_ClusterData/
+
+## Exclude Archive folder in S1_Simulation-Output/
+Output/S1_Simulation-Output/Archive/
+
+## Ignore backups & pop-data folders in 2025-10-22_1000-reps/
+Output/S1_Simulation-Output/2025-10-22_1000-reps/backups/
+Output/S1_Simulation-Output/2025-10-22_1000-reps/pop-data/
+
+## Exclude Archive folder in S1_Results/
+Output/S1_Results/Archive/
+
