@@ -10,16 +10,15 @@
 #
 #
 # Script Description: 
-#       Part 3 takes processed simulation output (either done in part 1 or 2, 
-#       depending on whether you want "problematic" cases replaced or not) and 
-#       summarizes and reports the results for the first simulation study 
-#       (i.e., obtains performance measures). 
+#       This script takes the processed simulation output and summarizes and 
+#       reports the results for the first simulation study (i.e., obtains 
+#       performance measures & convergence rates). 
 # 
 #       Note: set use_updated <- TRUE for files with "updated-" in name 
 #               (includes replaced values) otherwise set use_updated <- FALSE 
 #     
 #
-# Last Updated: 2026-01-06
+# Last Updated: 2026-01-07
 #
 #
 # Notes:

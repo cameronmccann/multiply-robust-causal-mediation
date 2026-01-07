@@ -6,7 +6,18 @@
 .httr-oauth
 .DS_Store
 .quarto
-Functions.zip
+
+README.html
+
+
+# Code/
+
+## Exclude shell script showing how to obtain simulation output from TACC
+Code/01_S1-obtain-sim-output.sh
+
+## Exclude Archive & Sandbox
+Code/Archive/
+Code/Sandbox/
 
 
 # Output/

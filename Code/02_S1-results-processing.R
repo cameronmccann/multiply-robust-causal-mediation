@@ -10,8 +10,8 @@
 #
 #
 # Script Description: 
-#       Summarize and report results for the simulation study 
-#       (i.e., compute performance measures). 
+#       This script processes and checks simulation output before saving it in 
+#       a format to obtain results from
 #
 # Inputs:
 #   - Simulation output .rds files in: "Output/S1_Simulation-Output/2025-10-22_1000-reps/"
@@ -19,18 +19,12 @@
 # Outputs: 
 #   - 
 # 
-# 
-# To obtain output files from TACC, run a similar command in your terminal: 
-#     
-# scp -r "cameronmccann@ls6.tacc.utexas.edu:/home1/10384/cameronmccann/multiply-robust-causal-mediation copy/Output/S1_Simulation-Output/2025-10-22_1000-reps" \
-# /Users/cameronmccann/Documents/Research-2025/multiply-robust-causal-mediation/Output/S1_Simulation-Output/
 #
-# Last Updated: 2026-01-06
+# Last Updated: 2026-01-07
 #
 #
 # Notes:
 #   To-Do
-#       # filter out problematic iterations (1956 & 3474 for cond 68 and 760 & 14436 for cond 69) 
 # 
 #   Done: 
 # 
@@ -69,7 +63,7 @@ reps <- 1000 #600#200
 # results_root <- "Output/S1_Results" #path <- "Output/S1_Results"
 
 # Add subdirectory, if desired (e.g., for test runs): where do you want results stored
-additional_folder_results <- "2025-10-22_1000-reps" # "2025-09-03_200-reps" 
+additional_folder_results <- NULL #"2025-10-22_1000-reps" # set to NULL on final run
 
 # # Simulation output path 
 # sim_output_path <- "Output/S1_Simulation-Output"
@@ -88,10 +82,11 @@ if (!dir.exists(results_root)) {
 }
 
 # Combine results_root + run-specific subfolder
-if (!is.null(additional_folder_results)) {
-    results_path <- file.path(results_root, additional_folder_results)
+if (is.null(additional_folder_results)) {
+    results_path <- file.path(results_root)
 } else {
-    results_path <- file.path(results_root, paste0(sim_date, "_", reps, "-reps"))
+    results_path <- file.path(results_root, additional_folder_results)
+    # results_path <- file.path(results_root, paste0(sim_date, "_", reps, "-reps"))
 }
 
 # Add subdirectory
@@ -228,6 +223,9 @@ cond_ids <- paste0("cond_", cond_ids)
 #    Create overall list (dropping iterations with error) 
 # ══════════════════════════════
 
+# Record log
+sink(file.path(logs_path, "processing-sim-output.txt"), split = TRUE)
+
 # Define once (outside imap) for efficiency and clarity
 error_msg <- "Error in internal function `v.ac()`: no applicable method for 'predict' applied to an object of class \"NULL\""
 methd <- c("mlr-cwc.FE", "mlr-cwc", "glm-cwc.FE", "glm-cwc")
@@ -301,11 +299,13 @@ overall_list <- purrr::set_names(
 # File 83: Dropping 3 iterations with error msg at indices: 168, 827, 913 (S1_condition-83_reps-1050_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-70.rds)
 # File 84: Dropping 1 iterations with error msg at indices: 651 (S1_condition-84_reps-1050_null-TRUE_quad-FALSE_M-gaussian_Y-binomial_nj-[5-20]_J-100.rds)
 
-
 # Save overall simulation output list for reference later
 saveRDS(overall_list, 
         file = file.path(results_path, "Data", 
                          paste0("S1_overall-output-list_", sim_date, ".rds")))
+
+# Close log
+sink()
 
 
 # Create dataframe version ------------------------------------------------

@@ -13,7 +13,7 @@
 #       Note: data generation creates pop data (when Mfamily & Yfamily meet "gaussian" &. "binomial") for every iteration but only saves first iteration into pop data folder. 
 #
 #
-# Last Updated: 2025-09-06
+# Last Updated: 2025-10-22
 #
 #
 # Notes:
@@ -65,9 +65,9 @@ pacman::p_load(
     dplyr, 
     readr, 
     ggplot2, 
-    fastDummies, # for Dr Liu's package/function (specifically, for dummy_cols() in fastDummies package)
-    stringr, # for str_detect() in Dr Liu's package/function
-    tibble # for rownames_to_column() in Dr Liu's package/function
+    fastDummies, # for (specifically, for dummy_cols() in fastDummies package)
+    stringr, # for str_detect() 
+    tibble # for rownames_to_column() 
 )
 
 # ══════════════════════════════
@@ -158,17 +158,8 @@ conditions <- conditions_all |>
 conditions <- conditions_all |> #[c(58, 61, 64, 67, 70,  55, 56, 57, 60), , drop = FALSE] |> #c(1:2, 49:72) #1, 3, 6, 7, 9, 12, 13, 18, 19, 21, 24, 49, 51, 52, 54, 55, 56, 57, 58, 60, 67, 69, 70, 72, 61:66 #1, 7, 13, 19, 4, 10, 16, 22, 3, 9, 15, 21, 6, 12, 18, 24
     tibble::rownames_to_column("condition_number") |>
     # filter(Nj_low == 50) |> 
-    # slice(c(1:48))
-    slice(c(49:96))
-    # # arrange(if.null) |>
-    # # filter(if.null == T) |>
-    # filter(Nj_low == 50) %>% 
-    # # slice(-c(1:33))
-    # slice(c(9, 30, 1:8, 10:29, 31:48)) #slice(c(6, 12, 27))
-
-    # slice(-c(1:37))
-    # slice(-c(1:25)) %>%
-    # slice(-c(1:85))
+    # arrange(if.null) |>
+    slice(c(12:48, 50:67, 69:96)) #slice(c(1, 49, 68, 2:48, 50:67, 69:96))                           # <------------------------- SELECT CONDITIONS TO RUN HERE
     
 conditions
 
@@ -241,7 +232,7 @@ total_conditions <- nrow(conditions)
 # }
 
 # Number of desired replications (i.e., successful reps)
-reps <- 205#200#12#600 #300 #200 # 1000
+reps <- 610 #205 # 1000
 
 # Set max number of iterations attempted (avoid infinite loop)
 max_attempts <- 500000#500#100#3000
@@ -252,7 +243,7 @@ max_attempts <- 500000#500#100#3000
 # Create parent output directory
 path <- "Output/S1_Simulation-Output"
 ## Add subdirectory, if desired (e.g., for test runs)
-additional_folder <- "2025-09-03_200-reps" #"2025-05-05-test-large-clusters_600-reps_TESTING" #"2025-02-08-test_600-reps"
+additional_folder <- "2025-10-22_600-reps" #"2025-09-03_200-reps" 
 ## Check if additional_folder is not NULL to add to path
 if (!exists("additional_folder") || !is.null(additional_folder)) {
     path <- file.path(path, additional_folder)
@@ -837,7 +828,7 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
     # Save log file
     summary_log_file <- file.path(
         cond_backup_folder,
-        glue("condition-{cond_idx_padded}_summary-log_{format(Sys.time(), '%Y-%h-%d_%H-%M')}.txt")
+        glue("condition-{cond_idx_padded}_summary-log_{format(Sys.time(), '%Y-%h-%d_%H%M')}.txt")
     )
     writeLines(summary_lines, summary_log_file)
     
