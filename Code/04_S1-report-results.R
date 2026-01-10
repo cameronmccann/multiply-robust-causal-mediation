@@ -15,7 +15,7 @@
 #       bias, MSE, coverage, and power for direct and indirect effects.
 #
 #
-# Last Updated: 2025-12-16
+# Last Updated: 2026-01-09
 #
 #
 # Notes:
@@ -42,10 +42,6 @@ pacman::p_load(
     ggplot2, 
     purrr, 
     stringr, 
-    flextable, 
-    huxtable, 
-    ggdag, 
-    dagitty, 
     glue
 )
 
@@ -55,52 +51,44 @@ pacman::p_load(
 # Date of simulation
 sim_date <- "2025-10-22" # "2025-09-03" 
 
-# Choose which results to report
-use_updated <- TRUE    # FALSE = no values replaced
-                       # TRUE  = values replaced
+# # Choose which results to report
+# use_updated <- TRUE    # FALSE = no values replaced
+#                        # TRUE  = values replaced
+# 
+# # Create prefix for file labels when saving 
+# prefix <- if (use_updated) "S1_updated" else "S1"
 
-# Create prefix for file labels when saving 
-prefix <- if (use_updated) "S1_updated" else "S1"
+# Results folder path 
+results_root <- "Output/S1_Results" 
 
-# Add subdirectory, if desired (e.g., for test runs): where do you want results stored
-additional_folder_results <- "2025-10-22_1000-reps" # "2025-09-03_200-reps" 
+# Add subdirectory for results, if desired (e.g., for test runs): where do you want results stored
+additional_folder_results <- NULL #"2025-10-22_1000-reps" # set to NULL on final run
 
 
 # Set up directory structure ----------------------------------------------
 
-# Root folder where Simulation 1 results are stored (tables, figures, data)
-results_root <- "Output/S1_Results"
+# ══════════════════════════════
+#    Check Results folder structure  
+# ══════════════════════════════
 
-if (!dir.exists(results_root)) {
-    dir.create(results_root, recursive = TRUE)
-}
-
-# Check if additional_folder is not NULL to add to path
-if (!is.null(additional_folder_results)) {
+# Form file path 
+if (is.null(additional_folder_results)) {
+    results_path <- file.path(results_root)
+} else {
     results_path <- file.path(results_root, additional_folder_results)
 }
 
-# Create directory
-results_path <- file.path(results_root, additional_folder_results)
-if (!dir.exists(results_path)) {
-    dir.create(results_path, recursive = TRUE)
-}
+# Double check that folders exist: Results, Data, Figures, & Tables
+stopifnot(dir.exists(results_path))
+stopifnot(dir.exists(file.path(results_path, "Data")))
+stopifnot(dir.exists(file.path(results_path, "Figures")))
+stopifnot(dir.exists(file.path(results_path, "Tables")))
 
-# Create Data, Figures, Tables subfolders
-results_subfolders <- c("Data", "Figures", "Tables")
-for (sf in results_subfolders) {
-    dir.create(file.path(results_path, sf), showWarnings = FALSE, recursive = TRUE)
-}
+# ══════════════════════════════
+#    Create subdirectories for figures 
+# ══════════════════════════════
 
-# Select Figures folder based on data source
-if (use_updated) {
-    figures_path <- file.path(results_path, "Figures")
-} else {
-    figures_path <- file.path(results_path, "Figures_no-values-replaced")
-}
-
-# Ensure figure folder exists 
-dir.create(figures_path, showWarnings = FALSE, recursive = TRUE)
+figures_path <- file.path(results_path, "Figures")
 
 # Create Figures subfolders 
 fig_subfolders <- c("NIE", "NDE", "Convergence", "In-text")
@@ -120,42 +108,23 @@ for (ssf in c("nonnull", "null")) {
 # Import data 
 perf_measures <- readRDS(file.path(
     results_path, "Tables",
-    paste0(prefix, "_performance-measures_", sim_date, "_converged-only.rds")
+    paste0("S1_performance-measures_", sim_date, "_converged-only.rds")
 ))
 
 sim1_data_nowarnings <- readRDS(file.path(
     results_path, "Data",
-    paste0(prefix, "_simulation-data_", sim_date, "_excludes-warnings.rds")
+    paste0("S1_simulation-data_", sim_date, "_excludes-warnings.rds")
 ))
 
 sim1_data_converged <- readRDS(file.path(
     results_path, "Data",
-    paste0(prefix, "_simulation-data_", sim_date, "_converged-only.rds")
+    paste0("S1_simulation-data_", sim_date, "_converged-only.rds")
 ))
 
 convergence_rates <- readRDS(file.path(
     results_path, "Tables", 
-    paste0(prefix, "_convergence-rates_", sim_date, ".rds")
+    paste0("S1_convergence-rates_", sim_date, ".rds")
 ))
-
-
-# # import data if needed 
-# # perf_measures <- readRDS(file = paste0(results_path, "/Tables/S1_performance-measures_", sim_date, ".rds"))
-# perf_measures <- readRDS(file = paste0(results_path, "/Tables/S1_performance-measures_", sim_date, "_converged-only.rds")) # perf_measures <- readRDS(file = paste0(results_path, "/Tables/S1_performance-measures_", sim_date, "_excludes-warnings.rds")) 
-# # sim_data <- readRDS(file = paste0(results_path, "/Data/S1_simulation-data_", sim_date, "_excludes-warnings.rds")) #"_excludes-nonconvergence.rds"))
-# sim1_data_nowarnings <- readRDS(file = paste0(results_path, "/Data/S1_simulation-data_", sim_date, "_excludes-warnings.rds")) 
-# sim1_data_converged <- readRDS(file = paste0(results_path, "/Data/S1_simulation-data_", sim_date, "_converged-only.rds")) 
-# convergence_rates <- readRDS(file = paste0(results_path, "/Tables/S1_convergence-rates_", sim_date, ".rds"))
-
-## data with replacement values 
-# perf_measures <- readRDS(file = paste0(results_path, "/Tables/S1_updated-performance-measures_", sim_date, "_converged-only.rds")) 
-# sim1_data_nowarnings <- readRDS(file = paste0(results_path, "/Data/S1_updated-simulation-data_", sim_date, "_excludes-warnings.rds")) 
-# sim1_data_converged <- readRDS(file = paste0(results_path, "/Data/S1_updated-simulation-data_", sim_date, "_converged-only.rds")) 
-
-# Which data is being reported?
-message("Reporting results using: ",
-        if (use_updated) "UPDATED (values replaced)" else "ORIGINAL (no values replaced)")
-
 
 # Set sim_data dataset for visuals
 sim_data <- sim1_data_converged # use converged iterations 
@@ -169,27 +138,6 @@ perf_measures <- perf_measures |>
         cluster_opt2 = ifelse(cluster_opt == "cwc", "mean", "mean + dummies"),
         Fit = ifelse(Fit == "mlr", "Nonparametric", ifelse(cluster_opt == "RE.glm", "Parametric: RE", "Parametric: GLM")), 
         cluster_opt = ifelse(cluster_opt == "RE.glm", "cwc", cluster_opt)
-        # Fit = ifelse(Fit == "mlr", "Nonparametric", "Parametric")#,
-        # Mfamily = factor(
-        #     Mfamily,
-        #     levels = c("binomial", "gaussian"),
-        #     labels = c("Mediator: Binomial", "Mediator: Gaussian")
-        # ),
-        # Yfamily = factor(
-        #     Yfamily,
-        #     levels = c("binomial", "gaussian"),
-        #     labels = c("Outcome: Binomial", "Outcome: Gaussian")
-        # ),
-        # quad = factor(
-        #     quad,
-        #     levels = c("linear", "nonlinear"),
-        #     labels = c("Linear", "Nonlinear")
-        # ),
-        # cluster_opt = factor(
-        #     cluster_opt,
-        #     levels = c("cwc", "cwc.FE"),
-        #     labels = c("mean", "mean + dummies")
-        # )
     )
 
 # Modify data for visuals 
@@ -214,9 +162,7 @@ perf_measures_null <- perf_measures[perf_measures$ifnull == TRUE, ]
 perf_measures_nonnull <- perf_measures[perf_measures$ifnull == FALSE, ]
 
 
-# Visuals -----------------------------------------------------------------
-
-#333f48, #bf5700, & #579d42
+# Visual themes & settings ------------------------------------------------
 
 # visual settings
 gglayer_theme <- list(theme_bw(),
@@ -239,7 +185,7 @@ gglayer_theme <- list(theme_bw(),
                             legend.position = "top" #"bottom" #"right"
                       ))
 
-# Store facet layer for reuse
+# facet layer 
 gglayer_facet <- facet_grid(
     Mfamily + Yfamily ~ quad + cluster_opt,
     labeller = labeller(
@@ -251,9 +197,7 @@ gglayer_facet <- facet_grid(
 )
 
 
-
-
-## In-text visuals ---------------------------------------------------------
+# In-text visuals ---------------------------------------------------------
 
 # ══════════════════════════════
 #    Bias  
@@ -330,7 +274,7 @@ ggsave(filename = paste0(figures_path, "/In-text/",
 # NIE coverage rate for Gaussian mediator & outcome (large clusters)
 perf_measures_nonnull |> 
     filter(Mfamily == "gaussian" & nj == "50-100") |> 
-    ggplot(aes(x = factor(J), y = cover_individual_TNIE, color = Fit, shape = nj, linetype = Fit)) +
+    ggplot(aes(x = factor(J), y = coverage_individual_TNIE, color = Fit, shape = nj, linetype = Fit)) +
     geom_hline(yintercept = 0.95) +
     geom_point(size = 2) +
     geom_line(aes(group = interaction(cluster_opt, Fit, nj)), linewidth = 0.8) +
@@ -363,7 +307,7 @@ ggsave(filename = paste0(figures_path, "/In-text/",
 # NIE coverage rate for Gaussian mediator & outcome (small clusters)
 perf_measures_nonnull |> 
     filter(Mfamily == "gaussian" & nj == "5-20") |> 
-    ggplot(aes(x = factor(J), y = cover_individual_TNIE, color = Fit, shape = nj, linetype = Fit)) +
+    ggplot(aes(x = factor(J), y = coverage_individual_TNIE, color = Fit, shape = nj, linetype = Fit)) +
     geom_hline(yintercept = 0.95) +
     geom_point(size = 2) +
     geom_line(aes(group = interaction(cluster_opt, Fit, nj)), linewidth = 0.8) +
@@ -600,9 +544,7 @@ ggsave(filename = paste0(figures_path, "/In-text/",
        dpi = 300)
 
 
-
-
-## Function for visuals ----------------------------------------------------
+# Functions to create & save visuals --------------------------------------
 
 create_plot <- function(data, 
                         y_var, 
@@ -725,10 +667,78 @@ create_plot <- function(data,
 }
 
 
+# ═══════════════════
+#    Plotting specs dataframe 
+# ═══════════════════
+# Create specs dataframe
+plot_specs <- expand.grid(
+    effect = c("NIE", "NDE"),
+    metric = c("bias", "coverage", "MSE", "power", "type1"),
+    level = c("individual", "cluster"),
+    null_status = c("nonnull", "null"),
+    outcome = c("gaussian", "binomial", "all"),
+    stringsAsFactors = FALSE
+)
 
-## Convergence Rate --------------------------------------------------------
+# Filter specs
+plot_specs <- subset(plot_specs, 
+                     !(metric == "power" & null_status == "null") &
+                     !(metric == "type1" & null_status == "nonnull") &
+                     !(metric %in% c("bias", "mse") & outcome == "all") & 
+                     !(metric == "coverage" & outcome == "gaussian") & 
+                     !(metric == "coverage" & outcome == "binomial")
+)
 
-#### Nonnull -------------------------------------------------------------------
+# Create function to create & save plot from specs
+create_and_save_plot <- function(spec_row) {
+    
+    effect_var <- if (spec_row$effect == "NIE") "TNIE" else "PNDE"
+    y_var <- paste0(spec_row$metric, "_", spec_row$level, "_", effect_var)
+    
+    data <- if (spec_row$null_status == "null") perf_measures_null else perf_measures_nonnull
+    
+    # Create plot
+    p <- create_plot(
+        data = data,
+        y_var = y_var,
+        null_status = spec_row$null_status,
+        outcome_type = spec_row$outcome
+    )
+    
+    # Filename
+    level_abbr <- if (spec_row$level == "individual") "ind" else "clus"
+    outcome_abbr <- if (spec_row$outcome == "all") "all" else substr(spec_row$outcome, 1, 5)
+    
+    filename <- file.path(figures_path, 
+                          spec_row$effect, 
+                          spec_row$null_status, 
+                          sprintf("S1_%s_%s_%s_%s_%s.png", 
+                                  spec_row$metric, 
+                                  spec_row$null_status, 
+                                  level_abbr, 
+                                  spec_row$effect, 
+                                  outcome_abbr))
+    
+    # Save
+    ggsave(filename, p, width = 10, 
+           height = if (spec_row$outcome == "all") 11 else 9, 
+           units = "in", dpi = 300)
+    
+    cat(sprintf("Saved: %s\n", basename(filename)))
+
+}
+
+
+# Non-Convergence Rate Visuals --------------------------------------------
+
+# loop through each row of plot_specs to save visuals
+invisible(lapply(1:nrow(plot_specs), function(i) {
+    create_and_save_plot(plot_specs[i, ])
+}))
+
+
+# Convergence Rate Visuals ------------------------------------------------
+
 # ═══════════════════
 #    Convergence rate for nonnull 
 # ═══════════════════
@@ -736,6 +746,7 @@ create_plot(convergence_rates,
             y_var = "convergence_rate", 
             null_status = "nonnull", 
             add_reference_line = F)
+
 # Save 
 ggsave(filename = paste0(figures_path, "/Convergence/",
                          "S1_convergence_nonnull_all_all.png"),
@@ -745,7 +756,6 @@ ggsave(filename = paste0(figures_path, "/Convergence/",
        units = "in",
        dpi = 300)
 
-#### Null -------------------------------------------------------------------
 # ═══════════════════
 #    Convergence rate for null 
 # ═══════════════════
@@ -753,6 +763,7 @@ create_plot(convergence_rates,
             y_var = "convergence_rate", 
             null_status = "null", 
             add_reference_line = F)
+
 # Save 
 ggsave(filename = paste0(figures_path, "/Convergence/",
                          "S1_convergence_null_all_all.png"),
@@ -761,6 +772,22 @@ ggsave(filename = paste0(figures_path, "/Convergence/",
        height = 11,
        units = "in",
        dpi = 300)
+
+
+
+################################# END OF CODE ##################################
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
