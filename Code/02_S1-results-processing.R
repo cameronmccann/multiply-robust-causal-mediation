@@ -20,7 +20,7 @@
 #   - 
 # 
 #
-# Last Updated: 2026-01-09
+# Last Updated: 2026-01-12
 #
 #
 # Notes:
@@ -44,10 +44,6 @@ pacman::p_load(
     ggplot2, 
     purrr, 
     stringr, 
-    flextable, 
-    huxtable, 
-    ggdag, 
-    dagitty, 
     glue
 )
 
@@ -344,6 +340,10 @@ get1 <- function(x, default = NA_real_) {
 # Record log
 sink(log_file, split = TRUE, append = TRUE)
 
+# Define error message & methods to efficiently drop those error cases 
+error_msg <- "Error in internal function `v.ac()`: no applicable method for 'predict' applied to an object of class \"NULL\""
+methd <- c("mlr-cwc.FE", "mlr-cwc", "glm-cwc.FE", "glm-cwc")
+
 # Loop
 sim1_data <- purrr::map_dfr(all_data_list, function(file_data) {
     
@@ -356,21 +356,45 @@ sim1_data <- purrr::map_dfr(all_data_list, function(file_data) {
     # Remove "file" element
     iter_data <- file_data[names(file_data) != "file"]
     
-    # Identify and drop error iterations
+    
+    # Identify iterations with error in any method
     error_iter <- which(vapply(iter_data, function(iter) {
-        msg <- iter$results$`mlr-cwc.FE`$error_message
-        !is.null(msg) && grepl(
-            "Error in internal function `v.ac()`: no applicable method for 'predict' applied to an object of class \"NULL\"",
-            msg, fixed = TRUE
-        )
+        
+        # Extract error messages for relevant methods
+        msgs <- vapply(methd, function(k) {
+            m <- iter$results[[k]]$error_message
+            if (is.null(m)) "" else m
+        }, character(1))
+        
+        # Check for the specific error
+        any(grepl(error_msg, msgs, fixed = TRUE))
     }, logical(1)))
     
+    # Drop iterations with error
     if (length(error_iter)) {
         iter_data <- iter_data[-error_iter]
     }
     
-    cat(sprintf("Dropping %d iterations with error msg at indices %s: %s\n", 
-                length(error_iter), paste(error_iter, collapse = ", "), basename(fname)))
+    # Message information 
+    cat(sprintf(
+        "Dropping %d iterations with error msg at indices %s: %s\n", 
+        length(error_iter), paste(error_iter, collapse = ", "), basename(fname)
+    ))
+    # # Identify and drop error iterations
+    # error_iter <- which(vapply(iter_data, function(iter) {
+    #     msg <- iter$results$`mlr-cwc.FE`$error_message
+    #     !is.null(msg) && grepl(
+    #         "Error in internal function `v.ac()`: no applicable method for 'predict' applied to an object of class \"NULL\"",
+    #         msg, fixed = TRUE
+    #     )
+    # }, logical(1)))
+    # 
+    # if (length(error_iter)) {
+    #     iter_data <- iter_data[-error_iter]
+    # }
+    # 
+    # cat(sprintf("Dropping %d iterations with error msg at indices %s: %s\n", 
+    #             length(error_iter), paste(error_iter, collapse = ", "), basename(fname)))
     
     # Extract condition number from filename
     condition_number <- str_extract(basename(fname), "(?<=condition-)[0-9]{2}")
@@ -694,8 +718,7 @@ sink()
 # ═══════════════════
 
 # Drop iterations where warnings != NA
-sim1_data_nowarnings <- sim1_data_cleaned |>
-    filter(n_warnings == 0) 
+sim1_data_nowarnings <- sim1_data_cleaned[sim1_data_cleaned$n_warnings == 0, ]
 
 # Save 
 saveRDS(sim1_data_nowarnings, file = file.path(
@@ -708,6 +731,10 @@ saveRDS(sim1_data_nowarnings, file = file.path(
 #    No nonconvergence dataframe 
 # ═══════════════════
 
+# Record log
+sink(file.path(logs_path, "nonconvergence-messages.txt"), split = TRUE)
+cat("\n~~~ Dropping nonconverging cases ~~~\n")
+
 # Define set of convergence-related patterns to match any of the cases 
 nonconvergence_patterns <- paste(
     c(
@@ -715,6 +742,9 @@ nonconvergence_patterns <- paste(
         "did not converge",
         "failure to converge",
         "failed to converge",
+        # PIRLS/pwrss convergence issues
+        "pwrssUpdate did not converge",
+        "PIRLS step-halvings failed to reduce deviance",
         # potetntially problematic (double check these messages)
         "Hessian is numerically singular",
         "degenerate.*Hessian"#,
@@ -725,10 +755,25 @@ nonconvergence_patterns <- paste(
     collapse = "|"
 )
 
+# Collect those with convergence issues
+convergence_issues <- sim1_data_cleaned[!is.na(sim1_data_cleaned$warnings) &
+                                            str_detect(sim1_data_cleaned$warnings,
+                                                       regex(nonconvergence_patterns, ignore_case = TRUE)), 
+                                        c("condition_num", "iteration", "Fit", "cluster_opt", "warnings")]
+
 # Filter out rows with convergence-related warnings
-sim1_data_converged <- sim1_data_cleaned |>
-    filter(is.na(warnings) |
-               !str_detect(warnings, regex(nonconvergence_patterns, ignore_case = TRUE)))
+sim1_data_converged <- sim1_data_cleaned[is.na(sim1_data_cleaned$warnings) |
+                                             !str_detect(sim1_data_cleaned$warnings,
+                                                         regex(nonconvergence_patterns, ignore_case = TRUE)), ]
+
+cat(sprintf("\nDropping %d rows due to convergence issues\n", nrow(convergence_issues)))
+cat(sprintf("Keeping %d rows in converged dataset\n", nrow(sim1_data_converged)))
+
+# See breakdown by method 
+convergence_issues |>
+    group_by(Fit, cluster_opt) |>
+    summarize(n_dropped = n(), .groups = "drop") |>
+    print(n = Inf)
 
 # Save 
 saveRDS(sim1_data_converged, file = file.path(
@@ -736,6 +781,9 @@ saveRDS(sim1_data_converged, file = file.path(
     "Data",
     paste0("S1_simulation-data_", sim_date, "_converged-only.rds")
 ))
+
+# Close log
+sink()
 
 ############################# END OF PROCESSING ################################
 
