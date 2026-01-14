@@ -24,9 +24,6 @@
 #     - Review facet labeling consistency across plots
 #
 #   Done:
-#     - Added bias and coverage plots for individual- and cluster-average TNIE
-#     - Saved all figures to /Figures directory
-#     - Generated summary tables and exported to CSV
 # 
 ################################################################################
 
@@ -51,13 +48,6 @@ pacman::p_load(
 
 # Date of simulation
 sim_date <- "2025-10-22" # "2025-09-03" 
-
-# # Choose which results to report
-# use_updated <- TRUE    # FALSE = no values replaced
-#                        # TRUE  = values replaced
-# 
-# # Create prefix for file labels when saving 
-# prefix <- if (use_updated) "S1_updated" else "S1"
 
 # Results folder path 
 results_root <- "Output/S1_Results" 
