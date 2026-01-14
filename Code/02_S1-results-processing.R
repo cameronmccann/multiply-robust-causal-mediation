@@ -20,7 +20,7 @@
 #   - 
 # 
 #
-# Last Updated: 2026-01-12
+# Last Updated: 2026-01-13
 #
 #
 # Notes:
@@ -756,20 +756,28 @@ nonconvergence_patterns <- paste(
 )
 
 # Collect those with convergence issues
-convergence_issues <- sim1_data_cleaned[!is.na(sim1_data_cleaned$warnings) &
-                                            str_detect(sim1_data_cleaned$warnings,
-                                                       regex(nonconvergence_patterns, ignore_case = TRUE)), 
-                                        c("condition_num", "iteration", "Fit", "cluster_opt", "warnings")]
+convergence_issues <- sim1_data_cleaned[(!is.na(sim1_data_cleaned$warnings) & 
+                                             str_detect(sim1_data_cleaned$warnings, 
+                                                        regex(nonconvergence_patterns, ignore_case = TRUE))) | 
+                                            (!is.na(sim1_data_cleaned$error_message) & 
+                                                 str_detect(sim1_data_cleaned$error_message, 
+                                                            regex(nonconvergence_patterns, ignore_case = TRUE))), 
+                                        c("condition_num", "iteration", "Fit", "cluster_opt", "warnings", "error_message")]
 
 # Filter out rows with convergence-related warnings
-sim1_data_converged <- sim1_data_cleaned[is.na(sim1_data_cleaned$warnings) |
-                                             !str_detect(sim1_data_cleaned$warnings,
-                                                         regex(nonconvergence_patterns, ignore_case = TRUE)), ]
+sim1_data_converged <- sim1_data_cleaned[(is.na(sim1_data_cleaned$warnings) | 
+                                              !str_detect(sim1_data_cleaned$warnings, 
+                                                          regex(nonconvergence_patterns, ignore_case = TRUE))) & 
+                                             (is.na(sim1_data_cleaned$error_message) | 
+                                                  !str_detect(sim1_data_cleaned$error_message, 
+                                                              regex(nonconvergence_patterns, ignore_case = TRUE))), 
+                                         ] 
 
-cat(sprintf("\nDropping %d rows due to convergence issues\n", nrow(convergence_issues)))
+cat(sprintf("\nDropping %d out of %d rows due to convergence issues\n", nrow(convergence_issues), nrow(sim1_data_cleaned)))
 cat(sprintf("Keeping %d rows in converged dataset\n", nrow(sim1_data_converged)))
 
 # See breakdown by method 
+cat("\n Breakdown of convergence issues by method\n")
 convergence_issues |>
     group_by(Fit, cluster_opt) |>
     summarize(n_dropped = n(), .groups = "drop") |>
