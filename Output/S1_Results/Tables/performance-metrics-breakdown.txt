@@ -1,0 +1,2036 @@
+
+==============================================================================
+Bias - Individual - NIE - Nonlinear - Nonnull
+==============================================================================
+# A tibble: 118 × 8
+    quadratic Fit             Mfamily  Yfamily  Nj         J cluster_opt     avg
+    <lgl>     <chr>           <chr>    <chr>    <chr>  <dbl> <chr>         <dbl>
+  1 TRUE      Parametric: RE  gaussian gaussian U[5, …    70 cwc         1.02e-1
+  2 TRUE      Parametric: GLM gaussian gaussian U[5, …    70 cwc.FE      9.75e-2
+  3 TRUE      Parametric: GLM gaussian gaussian U[5, …    70 cwc         9.73e-2
+  4 TRUE      Parametric: RE  gaussian gaussian U[5, …    40 cwc         9.40e-2
+  5 TRUE      Parametric: RE  gaussian gaussian U[5, …   100 cwc         8.98e-2
+  6 TRUE      Parametric: RE  gaussian gaussian U[50,…    40 cwc         8.90e-2
+  7 TRUE      Parametric: GLM gaussian gaussian U[50,…    40 cwc.FE      8.89e-2
+  8 TRUE      Parametric: RE  gaussian gaussian U[50,…    20 cwc         8.89e-2
+  9 TRUE      Parametric: GLM gaussian gaussian U[5, …    40 cwc.FE      8.89e-2
+ 10 TRUE      Parametric: GLM gaussian gaussian U[50,…    40 cwc         8.89e-2
+ 11 TRUE      Parametric: GLM gaussian gaussian U[50,…    20 cwc.FE      8.88e-2
+ 12 TRUE      Parametric: GLM gaussian gaussian U[50,…    20 cwc         8.88e-2
+ 13 TRUE      Parametric: GLM gaussian gaussian U[5, …    40 cwc         8.87e-2
+ 14 TRUE      Parametric: GLM gaussian gaussian U[5, …   100 cwc.FE      8.55e-2
+ 15 TRUE      Parametric: GLM gaussian gaussian U[5, …   100 cwc         8.53e-2
+ 16 TRUE      Parametric: RE  gaussian gaussian U[50,…    10 cwc         8.41e-2
+ 17 TRUE      Parametric: GLM gaussian gaussian U[50,…    10 cwc.FE      8.40e-2
+ 18 TRUE      Parametric: GLM gaussian gaussian U[50,…    10 cwc         8.39e-2
+ 19 TRUE      Nonparametric   gaussian gaussian U[5, …    70 cwc.FE      6.72e-2
+ 20 TRUE      Nonparametric   gaussian gaussian U[5, …    40 cwc.FE      5.97e-2
+ 21 TRUE      Nonparametric   gaussian gaussian U[5, …    70 cwc         5.94e-2
+ 22 TRUE      Nonparametric   gaussian gaussian U[5, …    40 cwc         5.27e-2
+ 23 TRUE      Nonparametric   gaussian gaussian U[5, …   100 cwc.FE      5.20e-2
+ 24 TRUE      Nonparametric   gaussian gaussian U[5, …   100 cwc         4.91e-2
+ 25 TRUE      Nonparametric   gaussian gaussian U[50,…    20 cwc         4.24e-2
+ 26 TRUE      Nonparametric   gaussian gaussian U[50,…    20 cwc.FE      4.24e-2
+ 27 TRUE      Nonparametric   gaussian gaussian U[50,…    40 cwc         4.21e-2
+ 28 TRUE      Nonparametric   gaussian gaussian U[50,…    40 cwc.FE      4.13e-2
+ 29 TRUE      Parametric: RE  binomial gaussian U[5, …    40 cwc         3.88e-2
+ 30 TRUE      Parametric: GLM binomial gaussian U[5, …    40 cwc.FE      3.69e-2
+ 31 TRUE      Parametric: GLM binomial gaussian U[5, …    40 cwc         3.68e-2
+ 32 TRUE      Nonparametric   gaussian gaussian U[50,…    10 cwc         3.60e-2
+ 33 TRUE      Parametric: RE  binomial gaussian U[5, …   100 cwc         3.59e-2
+ 34 TRUE      Parametric: RE  binomial gaussian U[5, …    70 cwc         3.50e-2
+ 35 TRUE      Parametric: GLM binomial gaussian U[5, …   100 cwc.FE      3.44e-2
+ 36 TRUE      Parametric: GLM binomial gaussian U[5, …   100 cwc         3.44e-2
+ 37 TRUE      Parametric: RE  binomial gaussian U[50,…    20 cwc         3.44e-2
+ 38 TRUE      Parametric: GLM binomial gaussian U[50,…    20 cwc.FE      3.44e-2
+ 39 TRUE      Parametric: GLM binomial gaussian U[50,…    20 cwc         3.44e-2
+ 40 TRUE      Parametric: RE  binomial gaussian U[50,…    10 cwc         3.43e-2
+ 41 TRUE      Parametric: GLM binomial gaussian U[50,…    10 cwc.FE      3.43e-2
+ 42 TRUE      Parametric: GLM binomial gaussian U[50,…    10 cwc         3.42e-2
+ 43 TRUE      Nonparametric   gaussian gaussian U[50,…    10 cwc.FE      3.41e-2
+ 44 TRUE      Parametric: RE  binomial gaussian U[50,…    40 cwc         3.40e-2
+ 45 TRUE      Parametric: GLM binomial gaussian U[50,…    40 cwc.FE      3.40e-2
+ 46 TRUE      Parametric: GLM binomial gaussian U[50,…    40 cwc         3.40e-2
+ 47 TRUE      Parametric: GLM binomial gaussian U[5, …    70 cwc.FE      3.35e-2
+ 48 TRUE      Parametric: GLM binomial gaussian U[5, …    70 cwc         3.34e-2
+ 49 TRUE      Nonparametric   binomial gaussian U[5, …    40 cwc.FE      2.47e-2
+ 50 TRUE      Nonparametric   binomial gaussian U[5, …    40 cwc         2.41e-2
+ 51 TRUE      Nonparametric   binomial gaussian U[5, …    70 cwc.FE      2.39e-2
+ 52 TRUE      Nonparametric   binomial gaussian U[5, …   100 cwc.FE      2.29e-2
+ 53 TRUE      Nonparametric   binomial gaussian U[5, …   100 cwc         2.09e-2
+ 54 TRUE      Nonparametric   binomial gaussian U[5, …    70 cwc         2.03e-2
+ 55 TRUE      Parametric: RE  gaussian binomial U[5, …    70 cwc         1.90e-2
+ 56 TRUE      Parametric: GLM gaussian binomial U[5, …    70 cwc         1.83e-2
+ 57 TRUE      Parametric: RE  gaussian binomial U[5, …    40 cwc         1.72e-2
+ 58 TRUE      Nonparametric   binomial gaussian U[50,…    10 cwc         1.69e-2
+ 59 TRUE      Parametric: GLM gaussian binomial U[5, …    70 cwc.FE      1.68e-2
+ 60 TRUE      Parametric: RE  gaussian binomial U[5, …   100 cwc         1.67e-2
+ 61 TRUE      Nonparametric   binomial gaussian U[50,…    20 cwc         1.67e-2
+ 62 TRUE      Nonparametric   binomial gaussian U[50,…    40 cwc         1.66e-2
+ 63 TRUE      Parametric: GLM gaussian binomial U[5, …   100 cwc         1.66e-2
+ 64 TRUE      Nonparametric   binomial gaussian U[50,…    20 cwc.FE      1.65e-2
+ 65 TRUE      Parametric: GLM gaussian binomial U[5, …    40 cwc         1.65e-2
+ 66 TRUE      Nonparametric   binomial gaussian U[50,…    10 cwc.FE      1.63e-2
+ 67 TRUE      Nonparametric   binomial gaussian U[50,…    40 cwc.FE      1.61e-2
+ 68 TRUE      Parametric: GLM gaussian binomial U[50,…    20 cwc         1.59e-2
+ 69 TRUE      Parametric: GLM gaussian binomial U[50,…    40 cwc         1.58e-2
+ 70 TRUE      Parametric: GLM gaussian binomial U[50,…    20 cwc.FE      1.57e-2
+ 71 TRUE      Parametric: GLM gaussian binomial U[50,…    40 cwc.FE      1.55e-2
+ 72 TRUE      Parametric: RE  gaussian binomial U[50,…    20 cwc         1.55e-2
+ 73 TRUE      Parametric: RE  gaussian binomial U[50,…    40 cwc         1.55e-2
+ 74 TRUE      Parametric: GLM gaussian binomial U[50,…    10 cwc         1.52e-2
+ 75 TRUE      Parametric: GLM gaussian binomial U[5, …   100 cwc.FE      1.51e-2
+ 76 TRUE      Parametric: GLM gaussian binomial U[5, …    40 cwc.FE      1.49e-2
+ 77 TRUE      Parametric: RE  gaussian binomial U[50,…    10 cwc         1.48e-2
+ 78 TRUE      Parametric: GLM gaussian binomial U[50,…    10 cwc.FE      1.47e-2
+ 79 TRUE      Nonparametric   gaussian binomial U[5, …    70 cwc         1.11e-2
+ 80 TRUE      Nonparametric   gaussian binomial U[5, …   100 cwc         9.90e-3
+ 81 TRUE      Parametric: GLM binomial binomial U[5, …    40 cwc.FE      9.59e-3
+ 82 TRUE      Nonparametric   gaussian binomial U[5, …    40 cwc         9.48e-3
+ 83 TRUE      Parametric: GLM binomial binomial U[5, …    40 cwc         9.30e-3
+ 84 TRUE      Parametric: GLM binomial binomial U[5, …   100 cwc         7.94e-3
+ 85 TRUE      Nonparametric   gaussian binomial U[5, …    70 cwc.FE      7.90e-3
+ 86 TRUE      Parametric: RE  binomial binomial U[5, …   100 cwc         7.68e-3
+ 87 TRUE      Parametric: RE  binomial binomial U[50,…    20 cwc         7.62e-3
+ 88 TRUE      Nonparametric   gaussian binomial U[50,…    20 cwc         7.56e-3
+ 89 TRUE      Nonparametric   gaussian binomial U[50,…    40 cwc         7.54e-3
+ 90 TRUE      Parametric: GLM binomial binomial U[50,…    20 cwc         7.51e-3
+ 91 TRUE      Parametric: GLM binomial binomial U[50,…    40 cwc         7.48e-3
+ 92 TRUE      Parametric: GLM binomial binomial U[50,…    20 cwc.FE      7.44e-3
+ 93 TRUE      Parametric: GLM binomial binomial U[50,…    10 cwc.FE      7.42e-3
+ 94 TRUE      Parametric: GLM binomial binomial U[50,…    10 cwc         7.36e-3
+ 95 TRUE      Parametric: RE  binomial binomial U[50,…    40 cwc         7.35e-3
+ 96 TRUE      Parametric: RE  binomial binomial U[5, …    70 cwc         7.34e-3
+ 97 TRUE      Parametric: GLM binomial binomial U[50,…    40 cwc.FE      7.33e-3
+ 98 TRUE      Parametric: GLM binomial binomial U[5, …    70 cwc         7.25e-3
+ 99 TRUE      Parametric: GLM binomial binomial U[5, …   100 cwc.FE      7.18e-3
+100 TRUE      Nonparametric   gaussian binomial U[50,…    20 cwc.FE      7.06e-3
+101 TRUE      Nonparametric   gaussian binomial U[50,…    40 cwc.FE      6.95e-3
+102 TRUE      Parametric: GLM binomial binomial U[5, …    70 cwc.FE      6.87e-3
+103 TRUE      Nonparametric   gaussian binomial U[50,…    10 cwc         6.39e-3
+104 TRUE      Nonparametric   binomial binomial U[5, …    40 cwc         6.22e-3
+105 TRUE      Nonparametric   gaussian binomial U[5, …   100 cwc.FE      6.05e-3
+106 TRUE      Nonparametric   gaussian binomial U[50,…    10 cwc.FE      5.50e-3
+107 TRUE      Nonparametric   binomial binomial U[5, …   100 cwc         5.15e-3
+108 TRUE      Nonparametric   gaussian binomial U[5, …    40 cwc.FE      4.95e-3
+109 TRUE      Nonparametric   binomial binomial U[5, …    70 cwc         4.54e-3
+110 TRUE      Nonparametric   binomial binomial U[50,…    20 cwc         3.71e-3
+111 TRUE      Nonparametric   binomial binomial U[50,…    40 cwc         3.68e-3
+112 TRUE      Nonparametric   binomial binomial U[50,…    20 cwc.FE      3.47e-3
+113 TRUE      Nonparametric   binomial binomial U[50,…    40 cwc.FE      3.40e-3
+114 TRUE      Nonparametric   binomial binomial U[50,…    10 cwc         3.16e-3
+115 TRUE      Nonparametric   binomial binomial U[5, …    40 cwc.FE      3.02e-3
+116 TRUE      Nonparametric   binomial binomial U[50,…    10 cwc.FE      2.87e-3
+117 TRUE      Nonparametric   binomial binomial U[5, …   100 cwc.FE      1.25e-3
+118 TRUE      Nonparametric   binomial binomial U[5, …    70 cwc.FE      5.55e-4
+
+
+==============================================================================
+Coverage - Individual - NIE - Nonlinear - Nonnull
+==============================================================================
+# A tibble: 118 × 8
+    quadratic Fit             Mfamily  Yfamily  Nj           J cluster_opt   avg
+    <lgl>     <chr>           <chr>    <chr>    <chr>    <dbl> <chr>       <dbl>
+  1 TRUE      Nonparametric   binomial gaussian U[50, 1…    10 cwc.FE      0.98 
+  2 TRUE      Nonparametric   gaussian gaussian U[50, 1…    10 cwc.FE      0.977
+  3 TRUE      Nonparametric   binomial gaussian U[50, 1…    10 cwc         0.976
+  4 TRUE      Nonparametric   gaussian binomial U[50, 1…    10 cwc         0.976
+  5 TRUE      Nonparametric   gaussian binomial U[50, 1…    10 cwc.FE      0.976
+  6 TRUE      Parametric: GLM gaussian binomial U[50, 1…    10 cwc.FE      0.975
+  7 TRUE      Parametric: RE  gaussian binomial U[50, 1…    10 cwc         0.974
+  8 TRUE      Parametric: GLM binomial binomial U[50, 1…    10 cwc.FE      0.972
+  9 TRUE      Nonparametric   binomial gaussian U[50, 1…    20 cwc.FE      0.972
+ 10 TRUE      Parametric: GLM gaussian binomial U[50, 1…    10 cwc         0.97 
+ 11 TRUE      Nonparametric   gaussian gaussian U[50, 1…    10 cwc         0.969
+ 12 TRUE      Parametric: GLM binomial binomial U[50, 1…    10 cwc         0.968
+ 13 TRUE      Parametric: RE  binomial gaussian U[50, 1…    10 cwc         0.968
+ 14 TRUE      Nonparametric   binomial binomial U[5, 20]    40 cwc.FE      0.967
+ 15 TRUE      Nonparametric   binomial gaussian U[50, 1…    20 cwc         0.967
+ 16 TRUE      Nonparametric   binomial gaussian U[5, 20]    40 cwc.FE      0.966
+ 17 TRUE      Parametric: GLM binomial gaussian U[50, 1…    10 cwc         0.966
+ 18 TRUE      Parametric: GLM binomial gaussian U[50, 1…    10 cwc.FE      0.966
+ 19 TRUE      Nonparametric   gaussian binomial U[5, 20]    40 cwc.FE      0.964
+ 20 TRUE      Nonparametric   binomial binomial U[5, 20]   100 cwc.FE      0.962
+ 21 TRUE      Nonparametric   gaussian binomial U[5, 20]   100 cwc.FE      0.962
+ 22 TRUE      Nonparametric   gaussian binomial U[5, 20]    70 cwc.FE      0.96 
+ 23 TRUE      Nonparametric   gaussian binomial U[50, 1…    20 cwc.FE      0.96 
+ 24 TRUE      Nonparametric   binomial binomial U[50, 1…    10 cwc.FE      0.959
+ 25 TRUE      Nonparametric   binomial binomial U[50, 1…    20 cwc         0.959
+ 26 TRUE      Nonparametric   gaussian gaussian U[5, 20]    40 cwc.FE      0.959
+ 27 TRUE      Nonparametric   binomial binomial U[50, 1…    20 cwc.FE      0.958
+ 28 TRUE      Nonparametric   binomial gaussian U[5, 20]    40 cwc         0.958
+ 29 TRUE      Nonparametric   binomial binomial U[50, 1…    10 cwc         0.957
+ 30 TRUE      Nonparametric   binomial binomial U[50, 1…    40 cwc.FE      0.957
+ 31 TRUE      Nonparametric   binomial gaussian U[5, 20]    70 cwc.FE      0.957
+ 32 TRUE      Nonparametric   gaussian binomial U[50, 1…    20 cwc         0.956
+ 33 TRUE      Nonparametric   gaussian gaussian U[50, 1…    20 cwc         0.956
+ 34 TRUE      Parametric: RE  binomial binomial U[50, 1…    20 cwc         0.956
+ 35 TRUE      Nonparametric   binomial binomial U[5, 20]    70 cwc.FE      0.954
+ 36 TRUE      Nonparametric   gaussian gaussian U[50, 1…    20 cwc.FE      0.953
+ 37 TRUE      Nonparametric   binomial binomial U[50, 1…    40 cwc         0.952
+ 38 TRUE      Parametric: GLM binomial binomial U[50, 1…    20 cwc         0.952
+ 39 TRUE      Parametric: RE  gaussian binomial U[5, 20]    40 cwc         0.951
+ 40 TRUE      Nonparametric   binomial binomial U[5, 20]    40 cwc         0.951
+ 41 TRUE      Nonparametric   gaussian binomial U[5, 20]    40 cwc         0.949
+ 42 TRUE      Parametric: GLM binomial binomial U[5, 20]    40 cwc         0.949
+ 43 TRUE      Nonparametric   binomial binomial U[5, 20]    70 cwc         0.948
+ 44 TRUE      Nonparametric   gaussian gaussian U[5, 20]    70 cwc.FE      0.947
+ 45 TRUE      Parametric: RE  binomial gaussian U[5, 20]    40 cwc         0.947
+ 46 TRUE      Parametric: RE  gaussian gaussian U[50, 1…    10 cwc         0.947
+ 47 TRUE      Parametric: GLM binomial binomial U[5, 20]    70 cwc.FE      0.946
+ 48 TRUE      Parametric: GLM binomial binomial U[50, 1…    20 cwc.FE      0.946
+ 49 TRUE      Nonparametric   gaussian binomial U[50, 1…    40 cwc.FE      0.946
+ 50 TRUE      Parametric: GLM gaussian gaussian U[50, 1…    10 cwc         0.945
+ 51 TRUE      Parametric: GLM gaussian gaussian U[50, 1…    10 cwc.FE      0.945
+ 52 TRUE      Parametric: RE  binomial binomial U[5, 20]    70 cwc         0.944
+ 53 TRUE      Nonparametric   binomial gaussian U[5, 20]   100 cwc.FE      0.943
+ 54 TRUE      Nonparametric   gaussian gaussian U[5, 20]    40 cwc         0.943
+ 55 TRUE      Parametric: GLM binomial binomial U[5, 20]    40 cwc.FE      0.943
+ 56 TRUE      Parametric: GLM gaussian binomial U[5, 20]    40 cwc.FE      0.943
+ 57 TRUE      Parametric: GLM binomial binomial U[5, 20]    70 cwc         0.942
+ 58 TRUE      Parametric: GLM binomial gaussian U[5, 20]    40 cwc         0.94 
+ 59 TRUE      Parametric: GLM binomial gaussian U[5, 20]    40 cwc.FE      0.94 
+ 60 TRUE      Nonparametric   binomial binomial U[5, 20]   100 cwc         0.939
+ 61 TRUE      Nonparametric   gaussian binomial U[5, 20]   100 cwc         0.939
+ 62 TRUE      Nonparametric   gaussian binomial U[5, 20]    70 cwc         0.938
+ 63 TRUE      Nonparametric   gaussian gaussian U[5, 20]   100 cwc.FE      0.938
+ 64 TRUE      Parametric: GLM gaussian binomial U[5, 20]    40 cwc         0.938
+ 65 TRUE      Nonparametric   binomial gaussian U[5, 20]    70 cwc         0.936
+ 66 TRUE      Nonparametric   gaussian binomial U[50, 1…    40 cwc         0.936
+ 67 TRUE      Parametric: RE  binomial binomial U[5, 20]   100 cwc         0.936
+ 68 TRUE      Nonparametric   binomial gaussian U[50, 1…    40 cwc.FE      0.931
+ 69 TRUE      Nonparametric   binomial gaussian U[5, 20]   100 cwc         0.93 
+ 70 TRUE      Parametric: RE  gaussian binomial U[50, 1…    20 cwc         0.924
+ 71 TRUE      Parametric: GLM binomial binomial U[5, 20]   100 cwc.FE      0.922
+ 72 TRUE      Nonparametric   binomial gaussian U[50, 1…    40 cwc         0.921
+ 73 TRUE      Nonparametric   gaussian gaussian U[5, 20]   100 cwc         0.919
+ 74 TRUE      Parametric: GLM gaussian binomial U[50, 1…    20 cwc.FE      0.918
+ 75 TRUE      Nonparametric   gaussian gaussian U[5, 20]    70 cwc         0.918
+ 76 TRUE      Parametric: GLM gaussian binomial U[50, 1…    20 cwc         0.918
+ 77 TRUE      Parametric: GLM gaussian gaussian U[5, 20]    40 cwc.FE      0.918
+ 78 TRUE      Parametric: GLM gaussian gaussian U[5, 20]    40 cwc         0.917
+ 79 TRUE      Parametric: RE  gaussian gaussian U[5, 20]    40 cwc         0.913
+ 80 TRUE      Nonparametric   gaussian gaussian U[50, 1…    40 cwc.FE      0.911
+ 81 TRUE      Parametric: GLM binomial binomial U[5, 20]   100 cwc         0.906
+ 82 TRUE      Nonparametric   gaussian gaussian U[50, 1…    40 cwc         0.905
+ 83 TRUE      Parametric: GLM gaussian binomial U[5, 20]    70 cwc.FE      0.905
+ 84 TRUE      Parametric: RE  binomial gaussian U[5, 20]    70 cwc         0.903
+ 85 TRUE      Parametric: GLM binomial gaussian U[5, 20]    70 cwc         0.9  
+ 86 TRUE      Parametric: GLM binomial gaussian U[5, 20]    70 cwc.FE      0.899
+ 87 TRUE      Parametric: RE  binomial gaussian U[50, 1…    20 cwc         0.899
+ 88 TRUE      Parametric: GLM binomial gaussian U[50, 1…    20 cwc         0.896
+ 89 TRUE      Parametric: GLM binomial gaussian U[50, 1…    20 cwc.FE      0.896
+ 90 TRUE      Parametric: RE  binomial binomial U[50, 1…    40 cwc         0.895
+ 91 TRUE      Parametric: RE  gaussian binomial U[5, 20]   100 cwc         0.893
+ 92 TRUE      Parametric: GLM gaussian binomial U[5, 20]   100 cwc.FE      0.892
+ 93 TRUE      Parametric: GLM binomial binomial U[50, 1…    40 cwc.FE      0.888
+ 94 TRUE      Parametric: RE  gaussian binomial U[5, 20]    70 cwc         0.885
+ 95 TRUE      Parametric: GLM binomial binomial U[50, 1…    40 cwc         0.881
+ 96 TRUE      Parametric: GLM gaussian binomial U[5, 20]    70 cwc         0.88 
+ 97 TRUE      Parametric: GLM gaussian binomial U[5, 20]   100 cwc         0.873
+ 98 TRUE      Parametric: RE  binomial gaussian U[5, 20]   100 cwc         0.869
+ 99 TRUE      Parametric: GLM binomial gaussian U[5, 20]   100 cwc.FE      0.865
+100 TRUE      Parametric: GLM binomial gaussian U[5, 20]   100 cwc         0.864
+101 TRUE      Parametric: GLM gaussian gaussian U[50, 1…    20 cwc.FE      0.838
+102 TRUE      Parametric: RE  gaussian gaussian U[50, 1…    20 cwc         0.838
+103 TRUE      Parametric: GLM gaussian gaussian U[5, 20]    70 cwc         0.837
+104 TRUE      Parametric: GLM gaussian gaussian U[5, 20]    70 cwc.FE      0.837
+105 TRUE      Parametric: GLM gaussian gaussian U[50, 1…    20 cwc         0.837
+106 TRUE      Parametric: RE  gaussian gaussian U[5, 20]    70 cwc         0.836
+107 TRUE      Parametric: GLM gaussian gaussian U[5, 20]   100 cwc         0.827
+108 TRUE      Parametric: GLM gaussian gaussian U[5, 20]   100 cwc.FE      0.827
+109 TRUE      Parametric: RE  gaussian binomial U[50, 1…    40 cwc         0.824
+110 TRUE      Parametric: RE  gaussian gaussian U[5, 20]   100 cwc         0.822
+111 TRUE      Parametric: GLM gaussian binomial U[50, 1…    40 cwc.FE      0.816
+112 TRUE      Parametric: GLM gaussian binomial U[50, 1…    40 cwc         0.793
+113 TRUE      Parametric: RE  binomial gaussian U[50, 1…    40 cwc         0.764
+114 TRUE      Parametric: GLM binomial gaussian U[50, 1…    40 cwc         0.758
+115 TRUE      Parametric: GLM binomial gaussian U[50, 1…    40 cwc.FE      0.757
+116 TRUE      Parametric: RE  gaussian gaussian U[50, 1…    40 cwc         0.615
+117 TRUE      Parametric: GLM gaussian gaussian U[50, 1…    40 cwc.FE      0.611
+118 TRUE      Parametric: GLM gaussian gaussian U[50, 1…    40 cwc         0.61 
+
+
+==============================================================================
+MSE - Individual - NIE - Nonlinear - Nonnull
+==============================================================================
+# A tibble: 118 × 8
+    quadratic Fit             Mfamily  Yfamily  Nj         J cluster_opt     avg
+    <lgl>     <chr>           <chr>    <chr>    <chr>  <dbl> <chr>         <dbl>
+  1 TRUE      Nonparametric   gaussian gaussian U[5, …    70 cwc.FE      2.88e-2
+  2 TRUE      Nonparametric   gaussian gaussian U[5, …    40 cwc.FE      2.43e-2
+  3 TRUE      Nonparametric   gaussian gaussian U[5, …   100 cwc.FE      2.30e-2
+  4 TRUE      Parametric: RE  gaussian gaussian U[5, …    40 cwc         2.16e-2
+  5 TRUE      Parametric: GLM gaussian gaussian U[5, …    40 cwc.FE      2.02e-2
+  6 TRUE      Parametric: GLM gaussian gaussian U[5, …    40 cwc         2.01e-2
+  7 TRUE      Parametric: RE  gaussian gaussian U[5, …    70 cwc         1.78e-2
+  8 TRUE      Parametric: GLM gaussian gaussian U[5, …    70 cwc.FE      1.66e-2
+  9 TRUE      Parametric: GLM gaussian gaussian U[5, …    70 cwc         1.65e-2
+ 10 TRUE      Parametric: RE  gaussian gaussian U[50,…    10 cwc         1.55e-2
+ 11 TRUE      Parametric: GLM gaussian gaussian U[50,…    10 cwc.FE      1.55e-2
+ 12 TRUE      Parametric: GLM gaussian gaussian U[50,…    10 cwc         1.54e-2
+ 13 TRUE      Nonparametric   gaussian gaussian U[5, …    40 cwc         1.48e-2
+ 14 TRUE      Parametric: RE  gaussian gaussian U[5, …   100 cwc         1.29e-2
+ 15 TRUE      Parametric: RE  gaussian gaussian U[50,…    20 cwc         1.21e-2
+ 16 TRUE      Parametric: GLM gaussian gaussian U[50,…    20 cwc.FE      1.21e-2
+ 17 TRUE      Parametric: GLM gaussian gaussian U[50,…    20 cwc         1.20e-2
+ 18 TRUE      Parametric: GLM gaussian gaussian U[5, …   100 cwc.FE      1.20e-2
+ 19 TRUE      Parametric: GLM gaussian gaussian U[5, …   100 cwc         1.20e-2
+ 20 TRUE      Nonparametric   gaussian gaussian U[5, …    70 cwc         1.02e-2
+ 21 TRUE      Parametric: RE  gaussian gaussian U[50,…    40 cwc         1.01e-2
+ 22 TRUE      Parametric: GLM gaussian gaussian U[50,…    40 cwc.FE      1.00e-2
+ 23 TRUE      Parametric: GLM gaussian gaussian U[50,…    40 cwc         1.00e-2
+ 24 TRUE      Nonparametric   gaussian gaussian U[50,…    10 cwc.FE      9.09e-3
+ 25 TRUE      Nonparametric   gaussian gaussian U[50,…    10 cwc         8.85e-3
+ 26 TRUE      Nonparametric   binomial gaussian U[5, …    70 cwc.FE      8.67e-3
+ 27 TRUE      Nonparametric   binomial gaussian U[5, …    40 cwc.FE      7.69e-3
+ 28 TRUE      Nonparametric   gaussian gaussian U[5, …   100 cwc         6.80e-3
+ 29 TRUE      Nonparametric   gaussian gaussian U[50,…    20 cwc.FE      5.92e-3
+ 30 TRUE      Nonparametric   gaussian gaussian U[50,…    20 cwc         5.51e-3
+ 31 TRUE      Parametric: RE  binomial gaussian U[5, …    40 cwc         4.80e-3
+ 32 TRUE      Parametric: GLM binomial gaussian U[5, …    40 cwc.FE      4.48e-3
+ 33 TRUE      Parametric: GLM binomial gaussian U[5, …    40 cwc         4.46e-3
+ 34 TRUE      Nonparametric   binomial gaussian U[5, …    40 cwc         3.74e-3
+ 35 TRUE      Nonparametric   gaussian gaussian U[50,…    40 cwc.FE      3.65e-3
+ 36 TRUE      Nonparametric   gaussian gaussian U[50,…    40 cwc         3.65e-3
+ 37 TRUE      Parametric: RE  binomial gaussian U[50,…    10 cwc         3.37e-3
+ 38 TRUE      Parametric: GLM binomial gaussian U[50,…    10 cwc.FE      3.36e-3
+ 39 TRUE      Parametric: GLM binomial gaussian U[50,…    10 cwc         3.35e-3
+ 40 TRUE      Parametric: RE  binomial gaussian U[5, …    70 cwc         3.15e-3
+ 41 TRUE      Nonparametric   binomial gaussian U[5, …   100 cwc.FE      2.96e-3
+ 42 TRUE      Parametric: GLM binomial gaussian U[5, …    70 cwc.FE      2.95e-3
+ 43 TRUE      Parametric: GLM binomial gaussian U[5, …    70 cwc         2.95e-3
+ 44 TRUE      Parametric: RE  binomial gaussian U[5, …   100 cwc         2.64e-3
+ 45 TRUE      Parametric: GLM binomial gaussian U[5, …   100 cwc.FE      2.48e-3
+ 46 TRUE      Parametric: GLM binomial gaussian U[5, …   100 cwc         2.47e-3
+ 47 TRUE      Nonparametric   binomial gaussian U[50,…    10 cwc.FE      2.36e-3
+ 48 TRUE      Nonparametric   binomial gaussian U[50,…    10 cwc         2.30e-3
+ 49 TRUE      Parametric: RE  binomial gaussian U[50,…    20 cwc         2.17e-3
+ 50 TRUE      Nonparametric   binomial gaussian U[5, …    70 cwc         2.17e-3
+ 51 TRUE      Parametric: GLM binomial gaussian U[50,…    20 cwc.FE      2.17e-3
+ 52 TRUE      Parametric: GLM binomial gaussian U[50,…    20 cwc         2.17e-3
+ 53 TRUE      Parametric: RE  binomial gaussian U[50,…    40 cwc         1.74e-3
+ 54 TRUE      Parametric: GLM binomial gaussian U[50,…    40 cwc.FE      1.74e-3
+ 55 TRUE      Parametric: GLM binomial gaussian U[50,…    40 cwc         1.74e-3
+ 56 TRUE      Nonparametric   binomial gaussian U[5, …   100 cwc         1.62e-3
+ 57 TRUE      Nonparametric   binomial gaussian U[50,…    20 cwc.FE      1.20e-3
+ 58 TRUE      Nonparametric   gaussian binomial U[5, …    40 cwc.FE      1.17e-3
+ 59 TRUE      Nonparametric   binomial gaussian U[50,…    20 cwc         1.17e-3
+ 60 TRUE      Parametric: RE  gaussian binomial U[5, …    40 cwc         1.04e-3
+ 61 TRUE      Parametric: GLM gaussian binomial U[5, …    40 cwc.FE      9.66e-4
+ 62 TRUE      Parametric: GLM gaussian binomial U[5, …    40 cwc         9.57e-4
+ 63 TRUE      Nonparametric   binomial gaussian U[50,…    40 cwc.FE      8.13e-4
+ 64 TRUE      Parametric: GLM gaussian binomial U[50,…    10 cwc.FE      8.12e-4
+ 65 TRUE      Parametric: RE  gaussian binomial U[50,…    10 cwc         8.11e-4
+ 66 TRUE      Parametric: GLM gaussian binomial U[50,…    10 cwc         8.10e-4
+ 67 TRUE      Nonparametric   gaussian binomial U[5, …    40 cwc         8.09e-4
+ 68 TRUE      Parametric: RE  gaussian binomial U[5, …    70 cwc         8.05e-4
+ 69 TRUE      Nonparametric   binomial gaussian U[50,…    40 cwc         7.73e-4
+ 70 TRUE      Parametric: GLM gaussian binomial U[5, …    70 cwc         7.43e-4
+ 71 TRUE      Nonparametric   gaussian binomial U[5, …    70 cwc.FE      7.21e-4
+ 72 TRUE      Parametric: GLM gaussian binomial U[5, …    70 cwc.FE      7.18e-4
+ 73 TRUE      Nonparametric   gaussian binomial U[50,…    10 cwc.FE      6.07e-4
+ 74 TRUE      Nonparametric   gaussian binomial U[50,…    10 cwc         5.71e-4
+ 75 TRUE      Parametric: RE  gaussian binomial U[5, …   100 cwc         5.71e-4
+ 76 TRUE      Parametric: GLM gaussian binomial U[5, …   100 cwc         5.44e-4
+ 77 TRUE      Parametric: GLM gaussian binomial U[50,…    20 cwc.FE      5.32e-4
+ 78 TRUE      Nonparametric   binomial binomial U[5, …    40 cwc.FE      5.31e-4
+ 79 TRUE      Nonparametric   gaussian binomial U[5, …    70 cwc         5.26e-4
+ 80 TRUE      Parametric: RE  gaussian binomial U[50,…    20 cwc         5.26e-4
+ 81 TRUE      Parametric: GLM gaussian binomial U[5, …   100 cwc.FE      5.25e-4
+ 82 TRUE      Parametric: GLM gaussian binomial U[50,…    20 cwc         5.25e-4
+ 83 TRUE      Nonparametric   gaussian binomial U[5, …   100 cwc.FE      4.74e-4
+ 84 TRUE      Parametric: GLM binomial binomial U[5, …    40 cwc.FE      4.22e-4
+ 85 TRUE      Parametric: GLM gaussian binomial U[50,…    40 cwc         4.00e-4
+ 86 TRUE      Parametric: GLM gaussian binomial U[50,…    40 cwc.FE      3.93e-4
+ 87 TRUE      Parametric: RE  gaussian binomial U[50,…    40 cwc         3.92e-4
+ 88 TRUE      Parametric: GLM binomial binomial U[5, …    40 cwc         3.72e-4
+ 89 TRUE      Nonparametric   binomial binomial U[5, …    40 cwc         3.62e-4
+ 90 TRUE      Nonparametric   gaussian binomial U[5, …   100 cwc         3.59e-4
+ 91 TRUE      Nonparametric   gaussian binomial U[50,…    20 cwc.FE      3.27e-4
+ 92 TRUE      Nonparametric   gaussian binomial U[50,…    20 cwc         3.13e-4
+ 93 TRUE      Parametric: GLM binomial binomial U[50,…    10 cwc.FE      2.88e-4
+ 94 TRUE      Parametric: GLM binomial binomial U[50,…    10 cwc         2.74e-4
+ 95 TRUE      Nonparametric   binomial binomial U[5, …    70 cwc.FE      2.74e-4
+ 96 TRUE      Nonparametric   binomial binomial U[50,…    10 cwc.FE      2.48e-4
+ 97 TRUE      Nonparametric   binomial binomial U[50,…    10 cwc         2.27e-4
+ 98 TRUE      Parametric: GLM binomial binomial U[5, …    70 cwc.FE      2.12e-4
+ 99 TRUE      Parametric: RE  binomial binomial U[5, …    70 cwc         2.12e-4
+100 TRUE      Parametric: GLM binomial binomial U[5, …    70 cwc         2.02e-4
+101 TRUE      Nonparametric   gaussian binomial U[50,…    40 cwc.FE      1.97e-4
+102 TRUE      Nonparametric   binomial binomial U[5, …   100 cwc.FE      1.92e-4
+103 TRUE      Nonparametric   gaussian binomial U[50,…    40 cwc         1.91e-4
+104 TRUE      Parametric: GLM binomial binomial U[5, …   100 cwc         1.72e-4
+105 TRUE      Parametric: RE  binomial binomial U[5, …   100 cwc         1.71e-4
+106 TRUE      Parametric: GLM binomial binomial U[5, …   100 cwc.FE      1.69e-4
+107 TRUE      Nonparametric   binomial binomial U[5, …    70 cwc         1.67e-4
+108 TRUE      Parametric: RE  binomial binomial U[50,…    20 cwc         1.59e-4
+109 TRUE      Parametric: GLM binomial binomial U[50,…    20 cwc.FE      1.54e-4
+110 TRUE      Parametric: GLM binomial binomial U[50,…    20 cwc         1.53e-4
+111 TRUE      Nonparametric   binomial binomial U[5, …   100 cwc         1.33e-4
+112 TRUE      Nonparametric   binomial binomial U[50,…    20 cwc.FE      1.11e-4
+113 TRUE      Parametric: GLM binomial binomial U[50,…    40 cwc.FE      1.07e-4
+114 TRUE      Parametric: GLM binomial binomial U[50,…    40 cwc         1.07e-4
+115 TRUE      Nonparametric   binomial binomial U[50,…    20 cwc         1.07e-4
+116 TRUE      Parametric: RE  binomial binomial U[50,…    40 cwc         1.07e-4
+117 TRUE      Nonparametric   binomial binomial U[50,…    40 cwc.FE      6.05e-5
+118 TRUE      Nonparametric   binomial binomial U[50,…    40 cwc         5.92e-5
+
+
+==============================================================================
+Power - Individual - NIE - Nonlinear - Nonnull
+==============================================================================
+# A tibble: 118 × 8
+    quadratic Fit             Mfamily  Yfamily  Nj           J cluster_opt   avg
+    <lgl>     <chr>           <chr>    <chr>    <chr>    <dbl> <chr>       <dbl>
+  1 TRUE      Nonparametric   binomial gaussian U[50, 1…    40 cwc         1    
+  2 TRUE      Nonparametric   gaussian gaussian U[5, 20]   100 cwc         1    
+  3 TRUE      Nonparametric   gaussian gaussian U[50, 1…    40 cwc         1    
+  4 TRUE      Parametric: GLM binomial binomial U[50, 1…    40 cwc         1    
+  5 TRUE      Parametric: GLM binomial binomial U[50, 1…    40 cwc.FE      1    
+  6 TRUE      Parametric: GLM binomial gaussian U[50, 1…    40 cwc         1    
+  7 TRUE      Parametric: GLM binomial gaussian U[50, 1…    40 cwc.FE      1    
+  8 TRUE      Parametric: GLM gaussian gaussian U[5, 20]   100 cwc         1    
+  9 TRUE      Parametric: GLM gaussian gaussian U[5, 20]   100 cwc.FE      1    
+ 10 TRUE      Parametric: GLM gaussian gaussian U[50, 1…    40 cwc         1    
+ 11 TRUE      Parametric: GLM gaussian gaussian U[50, 1…    40 cwc.FE      1    
+ 12 TRUE      Parametric: RE  binomial gaussian U[50, 1…    40 cwc         1    
+ 13 TRUE      Parametric: RE  gaussian gaussian U[5, 20]   100 cwc         1    
+ 14 TRUE      Parametric: RE  gaussian gaussian U[50, 1…    40 cwc         1    
+ 15 TRUE      Nonparametric   gaussian binomial U[50, 1…    40 cwc         0.999
+ 16 TRUE      Nonparametric   gaussian binomial U[50, 1…    40 cwc.FE      0.999
+ 17 TRUE      Nonparametric   gaussian gaussian U[50, 1…    20 cwc         0.999
+ 18 TRUE      Nonparametric   gaussian gaussian U[50, 1…    40 cwc.FE      0.999
+ 19 TRUE      Parametric: GLM gaussian binomial U[50, 1…    40 cwc         0.999
+ 20 TRUE      Parametric: GLM gaussian gaussian U[50, 1…    20 cwc         0.999
+ 21 TRUE      Parametric: GLM gaussian gaussian U[50, 1…    20 cwc.FE      0.999
+ 22 TRUE      Parametric: RE  gaussian gaussian U[50, 1…    20 cwc         0.999
+ 23 TRUE      Parametric: RE  binomial binomial U[50, 1…    40 cwc         0.999
+ 24 TRUE      Parametric: GLM gaussian binomial U[50, 1…    40 cwc.FE      0.999
+ 25 TRUE      Parametric: RE  gaussian binomial U[50, 1…    40 cwc         0.999
+ 26 TRUE      Parametric: GLM gaussian binomial U[5, 20]   100 cwc         0.997
+ 27 TRUE      Parametric: GLM gaussian gaussian U[5, 20]    70 cwc         0.997
+ 28 TRUE      Parametric: GLM gaussian gaussian U[5, 20]    70 cwc.FE      0.997
+ 29 TRUE      Nonparametric   gaussian gaussian U[5, 20]    70 cwc         0.996
+ 30 TRUE      Parametric: RE  gaussian gaussian U[5, 20]    70 cwc         0.996
+ 31 TRUE      Nonparametric   gaussian gaussian U[50, 1…    20 cwc.FE      0.995
+ 32 TRUE      Nonparametric   binomial binomial U[50, 1…    40 cwc         0.994
+ 33 TRUE      Nonparametric   binomial gaussian U[50, 1…    40 cwc.FE      0.994
+ 34 TRUE      Parametric: GLM gaussian binomial U[50, 1…    20 cwc         0.994
+ 35 TRUE      Nonparametric   gaussian binomial U[5, 20]   100 cwc         0.993
+ 36 TRUE      Parametric: GLM gaussian binomial U[5, 20]   100 cwc.FE      0.992
+ 37 TRUE      Parametric: GLM gaussian binomial U[50, 1…    20 cwc.FE      0.991
+ 38 TRUE      Parametric: RE  gaussian binomial U[5, 20]   100 cwc         0.991
+ 39 TRUE      Parametric: RE  gaussian binomial U[50, 1…    20 cwc         0.989
+ 40 TRUE      Parametric: GLM binomial gaussian U[50, 1…    20 cwc         0.987
+ 41 TRUE      Parametric: GLM binomial gaussian U[50, 1…    20 cwc.FE      0.987
+ 42 TRUE      Parametric: RE  binomial gaussian U[50, 1…    20 cwc         0.987
+ 43 TRUE      Parametric: GLM binomial gaussian U[5, 20]   100 cwc         0.985
+ 44 TRUE      Parametric: GLM binomial gaussian U[5, 20]   100 cwc.FE      0.985
+ 45 TRUE      Parametric: GLM gaussian binomial U[5, 20]    70 cwc         0.984
+ 46 TRUE      Nonparametric   gaussian binomial U[50, 1…    20 cwc         0.983
+ 47 TRUE      Nonparametric   binomial binomial U[50, 1…    40 cwc.FE      0.982
+ 48 TRUE      Nonparametric   gaussian gaussian U[5, 20]   100 cwc.FE      0.979
+ 49 TRUE      Parametric: RE  binomial gaussian U[5, 20]   100 cwc         0.978
+ 50 TRUE      Nonparametric   binomial gaussian U[5, 20]   100 cwc         0.971
+ 51 TRUE      Nonparametric   gaussian binomial U[50, 1…    20 cwc.FE      0.968
+ 52 TRUE      Parametric: RE  gaussian binomial U[5, 20]    70 cwc         0.967
+ 53 TRUE      Parametric: GLM gaussian binomial U[5, 20]    70 cwc.FE      0.964
+ 54 TRUE      Nonparametric   gaussian binomial U[5, 20]    70 cwc         0.962
+ 55 TRUE      Parametric: GLM gaussian gaussian U[5, 20]    40 cwc         0.958
+ 56 TRUE      Parametric: GLM gaussian gaussian U[5, 20]    40 cwc.FE      0.958
+ 57 TRUE      Nonparametric   binomial gaussian U[50, 1…    20 cwc         0.952
+ 58 TRUE      Parametric: RE  gaussian gaussian U[5, 20]    40 cwc         0.944
+ 59 TRUE      Nonparametric   gaussian gaussian U[5, 20]    70 cwc.FE      0.943
+ 60 TRUE      Parametric: GLM binomial binomial U[5, 20]   100 cwc         0.939
+ 61 TRUE      Nonparametric   binomial gaussian U[50, 1…    20 cwc.FE      0.932
+ 62 TRUE      Parametric: GLM gaussian gaussian U[50, 1…    10 cwc         0.921
+ 63 TRUE      Parametric: RE  gaussian gaussian U[50, 1…    10 cwc         0.920
+ 64 TRUE      Parametric: GLM gaussian gaussian U[50, 1…    10 cwc.FE      0.919
+ 65 TRUE      Parametric: GLM binomial gaussian U[5, 20]    70 cwc         0.917
+ 66 TRUE      Parametric: GLM binomial gaussian U[5, 20]    70 cwc.FE      0.916
+ 67 TRUE      Parametric: GLM binomial binomial U[50, 1…    20 cwc         0.914
+ 68 TRUE      Nonparametric   gaussian gaussian U[5, 20]    40 cwc         0.911
+ 69 TRUE      Parametric: GLM binomial binomial U[50, 1…    20 cwc.FE      0.889
+ 70 TRUE      Parametric: RE  binomial gaussian U[5, 20]    70 cwc         0.889
+ 71 TRUE      Parametric: GLM binomial binomial U[5, 20]   100 cwc.FE      0.885
+ 72 TRUE      Nonparametric   gaussian binomial U[5, 20]   100 cwc.FE      0.884
+ 73 TRUE      Parametric: RE  binomial binomial U[5, 20]   100 cwc         0.882
+ 74 TRUE      Parametric: RE  binomial binomial U[50, 1…    20 cwc         0.878
+ 75 TRUE      Nonparametric   gaussian gaussian U[50, 1…    10 cwc         0.87 
+ 76 TRUE      Nonparametric   binomial binomial U[5, 20]   100 cwc         0.867
+ 77 TRUE      Nonparametric   binomial gaussian U[5, 20]    70 cwc         0.854
+ 78 TRUE      Nonparametric   gaussian gaussian U[50, 1…    10 cwc.FE      0.845
+ 79 TRUE      Parametric: GLM gaussian binomial U[5, 20]    40 cwc         0.835
+ 80 TRUE      Nonparametric   binomial gaussian U[5, 20]   100 cwc.FE      0.821
+ 81 TRUE      Nonparametric   binomial binomial U[50, 1…    20 cwc         0.82 
+ 82 TRUE      Parametric: GLM binomial binomial U[5, 20]    70 cwc         0.797
+ 83 TRUE      Parametric: GLM gaussian binomial U[5, 20]    40 cwc.FE      0.776
+ 84 TRUE      Nonparametric   gaussian binomial U[5, 20]    70 cwc.FE      0.768
+ 85 TRUE      Nonparametric   gaussian gaussian U[5, 20]    40 cwc.FE      0.763
+ 86 TRUE      Parametric: RE  gaussian binomial U[5, 20]    40 cwc         0.762
+ 87 TRUE      Nonparametric   binomial binomial U[50, 1…    20 cwc.FE      0.756
+ 88 TRUE      Nonparametric   gaussian binomial U[5, 20]    40 cwc         0.737
+ 89 TRUE      Parametric: GLM binomial gaussian U[5, 20]    40 cwc         0.733
+ 90 TRUE      Parametric: GLM binomial gaussian U[5, 20]    40 cwc.FE      0.733
+ 91 TRUE      Parametric: GLM gaussian binomial U[50, 1…    10 cwc         0.722
+ 92 TRUE      Parametric: GLM binomial binomial U[5, 20]    70 cwc.FE      0.721
+ 93 TRUE      Parametric: RE  binomial binomial U[5, 20]    70 cwc         0.718
+ 94 TRUE      Parametric: RE  binomial gaussian U[5, 20]    40 cwc         0.693
+ 95 TRUE      Nonparametric   binomial binomial U[5, 20]    70 cwc         0.688
+ 96 TRUE      Parametric: GLM gaussian binomial U[50, 1…    10 cwc.FE      0.683
+ 97 TRUE      Parametric: RE  gaussian binomial U[50, 1…    10 cwc         0.664
+ 98 TRUE      Nonparametric   binomial gaussian U[5, 20]    70 cwc.FE      0.663
+ 99 TRUE      Parametric: GLM binomial gaussian U[50, 1…    10 cwc         0.638
+100 TRUE      Parametric: GLM binomial gaussian U[50, 1…    10 cwc.FE      0.637
+101 TRUE      Nonparametric   binomial gaussian U[5, 20]    40 cwc         0.631
+102 TRUE      Parametric: RE  binomial gaussian U[50, 1…    10 cwc         0.621
+103 TRUE      Nonparametric   gaussian binomial U[50, 1…    10 cwc         0.615
+104 TRUE      Nonparametric   gaussian binomial U[50, 1…    10 cwc.FE      0.559
+105 TRUE      Parametric: GLM binomial binomial U[5, 20]    40 cwc         0.545
+106 TRUE      Nonparametric   binomial gaussian U[50, 1…    10 cwc         0.507
+107 TRUE      Nonparametric   binomial gaussian U[50, 1…    10 cwc.FE      0.489
+108 TRUE      Nonparametric   binomial binomial U[5, 20]   100 cwc.FE      0.481
+109 TRUE      Parametric: GLM binomial binomial U[5, 20]    40 cwc.FE      0.473
+110 TRUE      Nonparametric   gaussian binomial U[5, 20]    40 cwc.FE      0.434
+111 TRUE      Nonparametric   binomial gaussian U[5, 20]    40 cwc.FE      0.415
+112 TRUE      Nonparametric   binomial binomial U[5, 20]    40 cwc         0.399
+113 TRUE      Parametric: GLM binomial binomial U[50, 1…    10 cwc         0.385
+114 TRUE      Parametric: GLM binomial binomial U[50, 1…    10 cwc.FE      0.354
+115 TRUE      Nonparametric   binomial binomial U[5, 20]    70 cwc.FE      0.316
+116 TRUE      Nonparametric   binomial binomial U[50, 1…    10 cwc         0.257
+117 TRUE      Nonparametric   binomial binomial U[50, 1…    10 cwc.FE      0.215
+118 TRUE      Nonparametric   binomial binomial U[5, 20]    40 cwc.FE      0.172
+
+
+==============================================================================
+Bias - Individual - NIE - Nonlinear - Null
+==============================================================================
+# A tibble: 120 × 8
+    quadratic Fit             Mfamily  Yfamily  Nj         J cluster_opt     avg
+    <lgl>     <chr>           <chr>    <chr>    <chr>  <dbl> <chr>         <dbl>
+  1 TRUE      Parametric: RE  gaussian gaussian U[5, …    70 cwc         0.0391 
+  2 TRUE      Parametric: RE  gaussian gaussian U[5, …    40 cwc         0.0373 
+  3 TRUE      Parametric: RE  gaussian gaussian U[5, …   100 cwc         0.0371 
+  4 TRUE      Parametric: GLM gaussian gaussian U[5, …    70 cwc.FE      0.0347 
+  5 TRUE      Parametric: GLM gaussian gaussian U[5, …    70 cwc         0.0347 
+  6 TRUE      Parametric: GLM gaussian gaussian U[5, …   100 cwc.FE      0.0329 
+  7 TRUE      Parametric: GLM gaussian gaussian U[5, …   100 cwc         0.0329 
+  8 TRUE      Parametric: GLM gaussian gaussian U[5, …    40 cwc.FE      0.0327 
+  9 TRUE      Parametric: GLM gaussian gaussian U[5, …    40 cwc         0.0326 
+ 10 TRUE      Parametric: RE  gaussian gaussian U[50,…    40 cwc         0.0322 
+ 11 TRUE      Parametric: GLM gaussian gaussian U[50,…    40 cwc.FE      0.0321 
+ 12 TRUE      Parametric: GLM gaussian gaussian U[50,…    40 cwc         0.0321 
+ 13 TRUE      Parametric: RE  gaussian gaussian U[50,…    20 cwc         0.0315 
+ 14 TRUE      Parametric: GLM gaussian gaussian U[50,…    20 cwc.FE      0.0312 
+ 15 TRUE      Parametric: GLM gaussian gaussian U[50,…    20 cwc         0.0312 
+ 16 TRUE      Parametric: RE  gaussian gaussian U[50,…    10 cwc         0.0300 
+ 17 TRUE      Parametric: GLM gaussian gaussian U[50,…    10 cwc.FE      0.0295 
+ 18 TRUE      Parametric: GLM gaussian gaussian U[50,…    10 cwc         0.0295 
+ 19 TRUE      Nonparametric   gaussian gaussian U[5, …    70 cwc         0.0204 
+ 20 TRUE      Nonparametric   gaussian gaussian U[5, …    70 cwc.FE      0.0200 
+ 21 TRUE      Nonparametric   gaussian gaussian U[5, …   100 cwc         0.0199 
+ 22 TRUE      Nonparametric   gaussian gaussian U[5, …    40 cwc         0.0192 
+ 23 TRUE      Nonparametric   gaussian gaussian U[5, …   100 cwc.FE      0.0190 
+ 24 TRUE      Nonparametric   gaussian gaussian U[5, …    40 cwc.FE      0.0182 
+ 25 TRUE      Parametric: RE  binomial gaussian U[5, …   100 cwc         0.0182 
+ 26 TRUE      Parametric: RE  binomial gaussian U[5, …    40 cwc         0.0181 
+ 27 TRUE      Parametric: RE  binomial gaussian U[5, …    70 cwc         0.0173 
+ 28 TRUE      Parametric: GLM binomial gaussian U[5, …   100 cwc.FE      0.0167 
+ 29 TRUE      Parametric: GLM binomial gaussian U[5, …   100 cwc         0.0167 
+ 30 TRUE      Parametric: RE  binomial gaussian U[50,…    20 cwc         0.0167 
+ 31 TRUE      Parametric: RE  binomial gaussian U[50,…    40 cwc         0.0164 
+ 32 TRUE      Parametric: GLM binomial gaussian U[50,…    40 cwc.FE      0.0163 
+ 33 TRUE      Parametric: GLM binomial gaussian U[50,…    40 cwc         0.0163 
+ 34 TRUE      Parametric: GLM binomial gaussian U[50,…    20 cwc.FE      0.0163 
+ 35 TRUE      Parametric: GLM binomial gaussian U[50,…    20 cwc         0.0163 
+ 36 TRUE      Parametric: GLM binomial gaussian U[5, …    40 cwc.FE      0.0162 
+ 37 TRUE      Parametric: GLM binomial gaussian U[5, …    40 cwc         0.0162 
+ 38 TRUE      Parametric: RE  binomial gaussian U[50,…    10 cwc         0.0161 
+ 39 TRUE      Parametric: GLM binomial gaussian U[5, …    70 cwc.FE      0.0159 
+ 40 TRUE      Parametric: GLM binomial gaussian U[5, …    70 cwc         0.0159 
+ 41 TRUE      Nonparametric   gaussian gaussian U[50,…    40 cwc         0.0156 
+ 42 TRUE      Nonparametric   gaussian gaussian U[50,…    20 cwc.FE      0.0154 
+ 43 TRUE      Nonparametric   gaussian gaussian U[50,…    40 cwc.FE      0.0154 
+ 44 TRUE      Parametric: GLM binomial gaussian U[50,…    10 cwc.FE      0.0153 
+ 45 TRUE      Parametric: GLM binomial gaussian U[50,…    10 cwc         0.0153 
+ 46 TRUE      Nonparametric   gaussian gaussian U[50,…    20 cwc         0.0152 
+ 47 TRUE      Parametric: RE  gaussian binomial U[5, …    70 cwc         0.0134 
+ 48 TRUE      Parametric: RE  gaussian binomial U[5, …    40 cwc         0.0132 
+ 49 TRUE      Nonparametric   gaussian gaussian U[50,…    10 cwc         0.0128 
+ 50 TRUE      Parametric: RE  gaussian binomial U[5, …   100 cwc         0.0127 
+ 51 TRUE      Nonparametric   gaussian gaussian U[50,…    10 cwc.FE      0.0117 
+ 52 TRUE      Nonparametric   binomial gaussian U[5, …    40 cwc         0.0109 
+ 53 TRUE      Nonparametric   binomial gaussian U[5, …   100 cwc         0.0106 
+ 54 TRUE      Nonparametric   binomial gaussian U[5, …    70 cwc.FE      0.0104 
+ 55 TRUE      Parametric: GLM gaussian binomial U[5, …    70 cwc.FE      0.0104 
+ 56 TRUE      Nonparametric   binomial gaussian U[5, …   100 cwc.FE      0.0103 
+ 57 TRUE      Parametric: GLM gaussian binomial U[5, …    70 cwc         0.0101 
+ 58 TRUE      Nonparametric   binomial gaussian U[5, …    70 cwc         0.0101 
+ 59 TRUE      Parametric: RE  gaussian binomial U[50,…    20 cwc         0.0100 
+ 60 TRUE      Parametric: RE  gaussian binomial U[50,…    40 cwc         0.00987
+ 61 TRUE      Parametric: RE  gaussian binomial U[50,…    10 cwc         0.00983
+ 62 TRUE      Parametric: GLM gaussian binomial U[5, …   100 cwc.FE      0.00981
+ 63 TRUE      Parametric: GLM gaussian binomial U[50,…    20 cwc.FE      0.00980
+ 64 TRUE      Parametric: GLM gaussian binomial U[50,…    20 cwc         0.00979
+ 65 TRUE      Parametric: GLM gaussian binomial U[50,…    40 cwc         0.00974
+ 66 TRUE      Parametric: GLM gaussian binomial U[50,…    40 cwc.FE      0.00974
+ 67 TRUE      Parametric: GLM gaussian binomial U[5, …   100 cwc         0.00972
+ 68 TRUE      Parametric: GLM gaussian binomial U[5, …    40 cwc         0.00965
+ 69 TRUE      Parametric: GLM gaussian binomial U[5, …    40 cwc.FE      0.00964
+ 70 TRUE      Parametric: GLM gaussian binomial U[50,…    10 cwc.FE      0.00935
+ 71 TRUE      Parametric: GLM gaussian binomial U[50,…    10 cwc         0.00935
+ 72 TRUE      Nonparametric   binomial gaussian U[50,…    40 cwc         0.00853
+ 73 TRUE      Nonparametric   binomial gaussian U[50,…    40 cwc.FE      0.00831
+ 74 TRUE      Nonparametric   binomial gaussian U[50,…    20 cwc         0.00817
+ 75 TRUE      Nonparametric   binomial gaussian U[50,…    20 cwc.FE      0.00814
+ 76 TRUE      Parametric: RE  binomial binomial U[5, …    40 cwc         0.00761
+ 77 TRUE      Nonparametric   binomial gaussian U[50,…    10 cwc         0.00740
+ 78 TRUE      Parametric: RE  binomial binomial U[5, …    70 cwc         0.00675
+ 79 TRUE      Nonparametric   binomial gaussian U[50,…    10 cwc.FE      0.00667
+ 80 TRUE      Parametric: RE  binomial binomial U[5, …   100 cwc         0.00658
+ 81 TRUE      Nonparametric   binomial gaussian U[5, …    40 cwc.FE      0.00616
+ 82 TRUE      Parametric: GLM binomial binomial U[5, …    40 cwc.FE      0.00585
+ 83 TRUE      Nonparametric   gaussian binomial U[5, …    70 cwc         0.00576
+ 84 TRUE      Parametric: GLM binomial binomial U[5, …    40 cwc         0.00571
+ 85 TRUE      Parametric: RE  binomial binomial U[50,…    10 cwc         0.00555
+ 86 TRUE      Nonparametric   gaussian binomial U[5, …   100 cwc         0.00553
+ 87 TRUE      Nonparametric   gaussian binomial U[5, …    40 cwc         0.00551
+ 88 TRUE      Parametric: RE  binomial binomial U[50,…    20 cwc         0.00545
+ 89 TRUE      Parametric: GLM binomial binomial U[5, …    70 cwc.FE      0.00532
+ 90 TRUE      Parametric: GLM binomial binomial U[50,…    20 cwc.FE      0.00531
+ 91 TRUE      Parametric: GLM binomial binomial U[50,…    20 cwc         0.00530
+ 92 TRUE      Parametric: RE  binomial binomial U[50,…    40 cwc         0.00527
+ 93 TRUE      Parametric: GLM binomial binomial U[5, …    70 cwc         0.00527
+ 94 TRUE      Parametric: GLM binomial binomial U[5, …   100 cwc.FE      0.00526
+ 95 TRUE      Parametric: GLM binomial binomial U[5, …   100 cwc         0.00524
+ 96 TRUE      Nonparametric   gaussian binomial U[5, …    70 cwc.FE      0.00522
+ 97 TRUE      Parametric: GLM binomial binomial U[50,…    40 cwc         0.00521
+ 98 TRUE      Parametric: GLM binomial binomial U[50,…    40 cwc.FE      0.00519
+ 99 TRUE      Parametric: GLM binomial binomial U[50,…    10 cwc.FE      0.00512
+100 TRUE      Parametric: GLM binomial binomial U[50,…    10 cwc         0.00512
+101 TRUE      Nonparametric   gaussian binomial U[50,…    20 cwc         0.00480
+102 TRUE      Nonparametric   gaussian binomial U[50,…    20 cwc.FE      0.00474
+103 TRUE      Nonparametric   gaussian binomial U[50,…    40 cwc         0.00472
+104 TRUE      Nonparametric   gaussian binomial U[50,…    40 cwc.FE      0.00461
+105 TRUE      Nonparametric   gaussian binomial U[50,…    10 cwc.FE      0.00459
+106 TRUE      Nonparametric   gaussian binomial U[50,…    10 cwc         0.00454
+107 TRUE      Nonparametric   gaussian binomial U[5, …   100 cwc.FE      0.00430
+108 TRUE      Nonparametric   gaussian binomial U[5, …    40 cwc.FE      0.00419
+109 TRUE      Nonparametric   binomial binomial U[5, …    40 cwc         0.00392
+110 TRUE      Nonparametric   binomial binomial U[5, …   100 cwc         0.00333
+111 TRUE      Nonparametric   binomial binomial U[5, …    70 cwc         0.00319
+112 TRUE      Nonparametric   binomial binomial U[50,…    20 cwc         0.00271
+113 TRUE      Nonparametric   binomial binomial U[50,…    40 cwc         0.00268
+114 TRUE      Nonparametric   binomial binomial U[50,…    40 cwc.FE      0.00266
+115 TRUE      Nonparametric   binomial binomial U[5, …    40 cwc.FE      0.00259
+116 TRUE      Nonparametric   binomial binomial U[50,…    20 cwc.FE      0.00258
+117 TRUE      Nonparametric   binomial binomial U[50,…    10 cwc.FE      0.00251
+118 TRUE      Nonparametric   binomial binomial U[50,…    10 cwc         0.00249
+119 TRUE      Nonparametric   binomial binomial U[5, …   100 cwc.FE      0.00208
+120 TRUE      Nonparametric   binomial binomial U[5, …    70 cwc.FE      0.00184
+
+
+==============================================================================
+Coverage - Individual - NIE - Nonlinear - Null
+==============================================================================
+# A tibble: 120 × 8
+    quadratic Fit             Mfamily  Yfamily  Nj           J cluster_opt   avg
+    <lgl>     <chr>           <chr>    <chr>    <chr>    <dbl> <chr>       <dbl>
+  1 TRUE      Parametric: RE  binomial binomial U[50, 1…    10 cwc         0.982
+  2 TRUE      Nonparametric   binomial binomial U[50, 1…    10 cwc.FE      0.98 
+  3 TRUE      Nonparametric   binomial gaussian U[50, 1…    10 cwc.FE      0.98 
+  4 TRUE      Nonparametric   binomial binomial U[50, 1…    10 cwc         0.977
+  5 TRUE      Nonparametric   binomial gaussian U[50, 1…    10 cwc         0.977
+  6 TRUE      Parametric: GLM binomial binomial U[50, 1…    10 cwc         0.977
+  7 TRUE      Parametric: GLM binomial binomial U[50, 1…    10 cwc.FE      0.976
+  8 TRUE      Nonparametric   binomial gaussian U[5, 20]    40 cwc.FE      0.972
+  9 TRUE      Nonparametric   gaussian gaussian U[50, 1…    10 cwc.FE      0.971
+ 10 TRUE      Nonparametric   gaussian binomial U[50, 1…    10 cwc.FE      0.968
+ 11 TRUE      Nonparametric   gaussian binomial U[50, 1…    10 cwc         0.966
+ 12 TRUE      Nonparametric   binomial binomial U[5, 20]    40 cwc.FE      0.964
+ 13 TRUE      Nonparametric   binomial binomial U[50, 1…    20 cwc         0.962
+ 14 TRUE      Nonparametric   binomial binomial U[50, 1…    20 cwc.FE      0.961
+ 15 TRUE      Nonparametric   gaussian gaussian U[50, 1…    10 cwc         0.961
+ 16 TRUE      Nonparametric   binomial gaussian U[5, 20]    70 cwc.FE      0.96 
+ 17 TRUE      Parametric: RE  binomial gaussian U[50, 1…    10 cwc         0.955
+ 18 TRUE      Nonparametric   binomial binomial U[5, 20]    70 cwc.FE      0.955
+ 19 TRUE      Nonparametric   binomial gaussian U[50, 1…    20 cwc.FE      0.954
+ 20 TRUE      Parametric: GLM binomial gaussian U[50, 1…    10 cwc.FE      0.953
+ 21 TRUE      Parametric: GLM binomial gaussian U[50, 1…    10 cwc         0.952
+ 22 TRUE      Nonparametric   binomial gaussian U[50, 1…    20 cwc         0.949
+ 23 TRUE      Nonparametric   binomial binomial U[5, 20]    40 cwc         0.948
+ 24 TRUE      Nonparametric   binomial binomial U[5, 20]   100 cwc.FE      0.948
+ 25 TRUE      Nonparametric   gaussian binomial U[5, 20]    40 cwc.FE      0.948
+ 26 TRUE      Parametric: GLM gaussian binomial U[50, 1…    10 cwc         0.946
+ 27 TRUE      Parametric: GLM gaussian binomial U[50, 1…    10 cwc.FE      0.944
+ 28 TRUE      Parametric: RE  gaussian binomial U[50, 1…    10 cwc         0.943
+ 29 TRUE      Parametric: RE  binomial binomial U[5, 20]    40 cwc         0.941
+ 30 TRUE      Nonparametric   gaussian binomial U[50, 1…    20 cwc         0.937
+ 31 TRUE      Nonparametric   binomial binomial U[5, 20]    70 cwc         0.936
+ 32 TRUE      Nonparametric   gaussian binomial U[50, 1…    20 cwc.FE      0.936
+ 33 TRUE      Nonparametric   gaussian gaussian U[5, 20]    40 cwc.FE      0.935
+ 34 TRUE      Parametric: GLM binomial binomial U[5, 20]    40 cwc.FE      0.934
+ 35 TRUE      Nonparametric   binomial gaussian U[5, 20]    40 cwc         0.934
+ 36 TRUE      Parametric: GLM binomial binomial U[5, 20]    40 cwc         0.934
+ 37 TRUE      Nonparametric   binomial gaussian U[5, 20]   100 cwc.FE      0.932
+ 38 TRUE      Nonparametric   gaussian binomial U[5, 20]   100 cwc.FE      0.93 
+ 39 TRUE      Nonparametric   binomial binomial U[50, 1…    40 cwc.FE      0.928
+ 40 TRUE      Nonparametric   binomial binomial U[5, 20]   100 cwc         0.927
+ 41 TRUE      Nonparametric   gaussian binomial U[5, 20]    70 cwc.FE      0.926
+ 42 TRUE      Nonparametric   binomial gaussian U[5, 20]    70 cwc         0.923
+ 43 TRUE      Parametric: GLM binomial gaussian U[5, 20]    40 cwc         0.923
+ 44 TRUE      Parametric: GLM binomial gaussian U[5, 20]    40 cwc.FE      0.922
+ 45 TRUE      Parametric: RE  binomial binomial U[50, 1…    20 cwc         0.921
+ 46 TRUE      Parametric: RE  binomial gaussian U[5, 20]    40 cwc         0.918
+ 47 TRUE      Nonparametric   gaussian gaussian U[5, 20]    70 cwc.FE      0.916
+ 48 TRUE      Parametric: GLM binomial binomial U[50, 1…    20 cwc.FE      0.913
+ 49 TRUE      Nonparametric   gaussian binomial U[5, 20]    40 cwc         0.911
+ 50 TRUE      Parametric: GLM binomial binomial U[50, 1…    20 cwc         0.911
+ 51 TRUE      Parametric: RE  binomial binomial U[5, 20]    70 cwc         0.911
+ 52 TRUE      Nonparametric   binomial binomial U[50, 1…    40 cwc         0.91 
+ 53 TRUE      Parametric: GLM binomial binomial U[5, 20]    70 cwc         0.904
+ 54 TRUE      Parametric: GLM binomial binomial U[5, 20]    70 cwc.FE      0.903
+ 55 TRUE      Nonparametric   gaussian gaussian U[5, 20]    40 cwc         0.897
+ 56 TRUE      Nonparametric   gaussian binomial U[5, 20]    70 cwc         0.896
+ 57 TRUE      Nonparametric   gaussian gaussian U[50, 1…    20 cwc.FE      0.895
+ 58 TRUE      Nonparametric   gaussian gaussian U[5, 20]   100 cwc.FE      0.893
+ 59 TRUE      Nonparametric   gaussian gaussian U[50, 1…    20 cwc         0.891
+ 60 TRUE      Nonparametric   gaussian binomial U[50, 1…    40 cwc.FE      0.89 
+ 61 TRUE      Parametric: GLM gaussian binomial U[5, 20]    40 cwc         0.887
+ 62 TRUE      Parametric: RE  gaussian gaussian U[50, 1…    10 cwc         0.886
+ 63 TRUE      Parametric: GLM gaussian binomial U[5, 20]    40 cwc.FE      0.884
+ 64 TRUE      Nonparametric   binomial gaussian U[5, 20]   100 cwc         0.884
+ 65 TRUE      Nonparametric   binomial gaussian U[50, 1…    40 cwc.FE      0.884
+ 66 TRUE      Parametric: GLM gaussian gaussian U[50, 1…    10 cwc         0.882
+ 67 TRUE      Parametric: GLM gaussian gaussian U[50, 1…    10 cwc.FE      0.88 
+ 68 TRUE      Parametric: RE  binomial binomial U[5, 20]   100 cwc         0.874
+ 69 TRUE      Parametric: RE  gaussian binomial U[5, 20]    40 cwc         0.871
+ 70 TRUE      Parametric: RE  binomial gaussian U[5, 20]    70 cwc         0.869
+ 71 TRUE      Nonparametric   gaussian binomial U[5, 20]   100 cwc         0.865
+ 72 TRUE      Parametric: GLM binomial binomial U[5, 20]   100 cwc         0.864
+ 73 TRUE      Nonparametric   gaussian binomial U[50, 1…    40 cwc         0.863
+ 74 TRUE      Nonparametric   binomial gaussian U[50, 1…    40 cwc         0.862
+ 75 TRUE      Parametric: GLM binomial binomial U[5, 20]   100 cwc.FE      0.859
+ 76 TRUE      Parametric: GLM binomial gaussian U[5, 20]    70 cwc.FE      0.847
+ 77 TRUE      Parametric: GLM binomial gaussian U[5, 20]    70 cwc         0.846
+ 78 TRUE      Nonparametric   gaussian gaussian U[5, 20]    70 cwc         0.828
+ 79 TRUE      Parametric: GLM gaussian gaussian U[5, 20]    40 cwc         0.823
+ 80 TRUE      Parametric: GLM gaussian gaussian U[5, 20]    40 cwc.FE      0.823
+ 81 TRUE      Parametric: RE  binomial gaussian U[50, 1…    20 cwc         0.822
+ 82 TRUE      Parametric: RE  gaussian binomial U[50, 1…    20 cwc         0.811
+ 83 TRUE      Parametric: GLM gaussian binomial U[5, 20]    70 cwc         0.805
+ 84 TRUE      Parametric: GLM binomial gaussian U[50, 1…    20 cwc.FE      0.803
+ 85 TRUE      Parametric: GLM binomial gaussian U[50, 1…    20 cwc         0.802
+ 86 TRUE      Parametric: GLM gaussian binomial U[50, 1…    20 cwc.FE      0.802
+ 87 TRUE      Parametric: GLM gaussian binomial U[5, 20]    70 cwc.FE      0.801
+ 88 TRUE      Parametric: GLM gaussian binomial U[50, 1…    20 cwc         0.799
+ 89 TRUE      Parametric: RE  binomial binomial U[50, 1…    40 cwc         0.785
+ 90 TRUE      Nonparametric   gaussian gaussian U[50, 1…    40 cwc.FE      0.781
+ 91 TRUE      Parametric: RE  binomial gaussian U[5, 20]   100 cwc         0.771
+ 92 TRUE      Parametric: RE  gaussian gaussian U[5, 20]    40 cwc         0.77 
+ 93 TRUE      Nonparametric   gaussian gaussian U[5, 20]   100 cwc         0.759
+ 94 TRUE      Parametric: GLM binomial binomial U[50, 1…    40 cwc         0.759
+ 95 TRUE      Parametric: GLM binomial binomial U[50, 1…    40 cwc.FE      0.758
+ 96 TRUE      Parametric: GLM binomial gaussian U[5, 20]   100 cwc         0.75 
+ 97 TRUE      Parametric: GLM binomial gaussian U[5, 20]   100 cwc.FE      0.750
+ 98 TRUE      Nonparametric   gaussian gaussian U[50, 1…    40 cwc         0.742
+ 99 TRUE      Parametric: RE  gaussian binomial U[5, 20]    70 cwc         0.735
+100 TRUE      Parametric: GLM gaussian binomial U[5, 20]   100 cwc         0.729
+101 TRUE      Parametric: GLM gaussian binomial U[5, 20]   100 cwc.FE      0.728
+102 TRUE      Parametric: RE  gaussian binomial U[5, 20]   100 cwc         0.625
+103 TRUE      Parametric: RE  gaussian gaussian U[50, 1…    20 cwc         0.613
+104 TRUE      Parametric: GLM gaussian gaussian U[50, 1…    20 cwc.FE      0.609
+105 TRUE      Parametric: GLM gaussian gaussian U[5, 20]    70 cwc.FE      0.608
+106 TRUE      Parametric: GLM gaussian gaussian U[50, 1…    20 cwc         0.608
+107 TRUE      Parametric: GLM gaussian gaussian U[5, 20]    70 cwc         0.607
+108 TRUE      Parametric: RE  gaussian binomial U[50, 1…    40 cwc         0.565
+109 TRUE      Parametric: GLM gaussian binomial U[50, 1…    40 cwc         0.56 
+110 TRUE      Parametric: GLM gaussian binomial U[50, 1…    40 cwc.FE      0.556
+111 TRUE      Parametric: RE  binomial gaussian U[50, 1…    40 cwc         0.550
+112 TRUE      Parametric: RE  gaussian gaussian U[5, 20]    70 cwc         0.533
+113 TRUE      Parametric: GLM binomial gaussian U[50, 1…    40 cwc         0.524
+114 TRUE      Parametric: GLM binomial gaussian U[50, 1…    40 cwc.FE      0.522
+115 TRUE      Parametric: GLM gaussian gaussian U[5, 20]   100 cwc.FE      0.497
+116 TRUE      Parametric: GLM gaussian gaussian U[5, 20]   100 cwc         0.496
+117 TRUE      Parametric: RE  gaussian gaussian U[5, 20]   100 cwc         0.41 
+118 TRUE      Parametric: RE  gaussian gaussian U[50, 1…    40 cwc         0.234
+119 TRUE      Parametric: GLM gaussian gaussian U[50, 1…    40 cwc         0.233
+120 TRUE      Parametric: GLM gaussian gaussian U[50, 1…    40 cwc.FE      0.232
+
+
+==============================================================================
+MSE - Individual - NIE - Nonlinear - Null
+==============================================================================
+# A tibble: 120 × 8
+    quadratic Fit             Mfamily  Yfamily  Nj         J cluster_opt     avg
+    <lgl>     <chr>           <chr>    <chr>    <chr>  <dbl> <chr>         <dbl>
+  1 TRUE      Nonparametric   binomial gaussian U[5, …    40 cwc.FE      1.18e-2
+  2 TRUE      Nonparametric   gaussian gaussian U[5, …    40 cwc.FE      2.57e-3
+  3 TRUE      Parametric: RE  gaussian gaussian U[5, …    40 cwc         2.25e-3
+  4 TRUE      Parametric: RE  gaussian gaussian U[5, …    70 cwc         2.04e-3
+  5 TRUE      Parametric: GLM gaussian gaussian U[5, …    40 cwc.FE      1.91e-3
+  6 TRUE      Parametric: GLM gaussian gaussian U[5, …    40 cwc         1.91e-3
+  7 TRUE      Parametric: RE  gaussian gaussian U[5, …   100 cwc         1.73e-3
+  8 TRUE      Parametric: GLM gaussian gaussian U[5, …    70 cwc.FE      1.71e-3
+  9 TRUE      Parametric: GLM gaussian gaussian U[5, …    70 cwc         1.71e-3
+ 10 TRUE      Nonparametric   gaussian gaussian U[5, …    70 cwc.FE      1.58e-3
+ 11 TRUE      Parametric: RE  gaussian gaussian U[50,…    10 cwc         1.47e-3
+ 12 TRUE      Parametric: GLM gaussian gaussian U[50,…    10 cwc.FE      1.45e-3
+ 13 TRUE      Parametric: GLM gaussian gaussian U[50,…    10 cwc         1.45e-3
+ 14 TRUE      Parametric: GLM gaussian gaussian U[5, …   100 cwc.FE      1.44e-3
+ 15 TRUE      Parametric: GLM gaussian gaussian U[5, …   100 cwc         1.44e-3
+ 16 TRUE      Nonparametric   gaussian gaussian U[5, …    40 cwc         1.43e-3
+ 17 TRUE      Parametric: RE  gaussian gaussian U[50,…    20 cwc         1.28e-3
+ 18 TRUE      Parametric: GLM gaussian gaussian U[50,…    20 cwc.FE      1.26e-3
+ 19 TRUE      Parametric: GLM gaussian gaussian U[50,…    20 cwc         1.26e-3
+ 20 TRUE      Parametric: RE  gaussian gaussian U[50,…    40 cwc         1.17e-3
+ 21 TRUE      Parametric: GLM gaussian gaussian U[50,…    40 cwc.FE      1.17e-3
+ 22 TRUE      Parametric: GLM gaussian gaussian U[50,…    40 cwc         1.17e-3
+ 23 TRUE      Nonparametric   gaussian gaussian U[5, …   100 cwc.FE      1.11e-3
+ 24 TRUE      Nonparametric   binomial gaussian U[5, …    70 cwc.FE      1.01e-3
+ 25 TRUE      Nonparametric   gaussian gaussian U[5, …    70 cwc         9.39e-4
+ 26 TRUE      Nonparametric   gaussian gaussian U[50,…    10 cwc         8.37e-4
+ 27 TRUE      Parametric: RE  binomial gaussian U[5, …    40 cwc         8.35e-4
+ 28 TRUE      Nonparametric   gaussian gaussian U[50,…    10 cwc.FE      8.16e-4
+ 29 TRUE      Nonparametric   binomial gaussian U[5, …    40 cwc         7.56e-4
+ 30 TRUE      Parametric: GLM binomial gaussian U[5, …    40 cwc.FE      7.55e-4
+ 31 TRUE      Parametric: GLM binomial gaussian U[5, …    40 cwc         7.54e-4
+ 32 TRUE      Nonparametric   gaussian gaussian U[5, …   100 cwc         7.47e-4
+ 33 TRUE      Nonparametric   gaussian gaussian U[50,…    20 cwc.FE      6.77e-4
+ 34 TRUE      Nonparametric   binomial gaussian U[5, …   100 cwc.FE      5.95e-4
+ 35 TRUE      Parametric: RE  binomial gaussian U[50,…    10 cwc         5.76e-4
+ 36 TRUE      Parametric: RE  binomial gaussian U[5, …    70 cwc         5.67e-4
+ 37 TRUE      Parametric: GLM binomial gaussian U[50,…    10 cwc         5.52e-4
+ 38 TRUE      Parametric: GLM binomial gaussian U[50,…    10 cwc.FE      5.52e-4
+ 39 TRUE      Parametric: RE  binomial gaussian U[5, …   100 cwc         5.18e-4
+ 40 TRUE      Parametric: GLM binomial gaussian U[5, …    70 cwc.FE      5.08e-4
+ 41 TRUE      Parametric: GLM binomial gaussian U[5, …    70 cwc         5.07e-4
+ 42 TRUE      Nonparametric   gaussian gaussian U[50,…    20 cwc         5.03e-4
+ 43 TRUE      Nonparametric   gaussian binomial U[5, …    40 cwc.FE      4.71e-4
+ 44 TRUE      Parametric: GLM binomial gaussian U[5, …   100 cwc.FE      4.59e-4
+ 45 TRUE      Parametric: GLM binomial gaussian U[5, …   100 cwc         4.59e-4
+ 46 TRUE      Nonparametric   binomial gaussian U[50,…    10 cwc.FE      4.31e-4
+ 47 TRUE      Nonparametric   binomial gaussian U[50,…    10 cwc         4.27e-4
+ 48 TRUE      Parametric: RE  binomial gaussian U[50,…    20 cwc         4.21e-4
+ 49 TRUE      Parametric: GLM binomial gaussian U[50,…    20 cwc.FE      4.11e-4
+ 50 TRUE      Parametric: GLM binomial gaussian U[50,…    20 cwc         4.11e-4
+ 51 TRUE      Nonparametric   binomial gaussian U[5, …    70 cwc         3.74e-4
+ 52 TRUE      Nonparametric   gaussian gaussian U[50,…    40 cwc.FE      3.67e-4
+ 53 TRUE      Parametric: RE  gaussian binomial U[5, …    40 cwc         3.65e-4
+ 54 TRUE      Nonparametric   gaussian gaussian U[50,…    40 cwc         3.60e-4
+ 55 TRUE      Parametric: RE  binomial gaussian U[50,…    40 cwc         3.42e-4
+ 56 TRUE      Parametric: GLM binomial gaussian U[50,…    40 cwc.FE      3.39e-4
+ 57 TRUE      Parametric: GLM binomial gaussian U[50,…    40 cwc         3.39e-4
+ 58 TRUE      Nonparametric   binomial binomial U[5, …    40 cwc.FE      2.90e-4
+ 59 TRUE      Parametric: RE  gaussian binomial U[5, …    70 cwc         2.89e-4
+ 60 TRUE      Nonparametric   binomial gaussian U[5, …   100 cwc         2.83e-4
+ 61 TRUE      Parametric: GLM gaussian binomial U[5, …    40 cwc.FE      2.80e-4
+ 62 TRUE      Parametric: GLM gaussian binomial U[5, …    40 cwc         2.78e-4
+ 63 TRUE      Nonparametric   gaussian binomial U[5, …    40 cwc         2.76e-4
+ 64 TRUE      Nonparametric   gaussian binomial U[5, …    70 cwc.FE      2.48e-4
+ 65 TRUE      Parametric: RE  gaussian binomial U[5, …   100 cwc         2.27e-4
+ 66 TRUE      Nonparametric   binomial gaussian U[50,…    20 cwc.FE      2.19e-4
+ 67 TRUE      Parametric: RE  gaussian binomial U[50,…    10 cwc         2.17e-4
+ 68 TRUE      Parametric: GLM gaussian binomial U[5, …    70 cwc.FE      2.08e-4
+ 69 TRUE      Parametric: GLM gaussian binomial U[5, …    70 cwc         2.04e-4
+ 70 TRUE      Parametric: GLM gaussian binomial U[50,…    10 cwc.FE      2.02e-4
+ 71 TRUE      Nonparametric   binomial gaussian U[50,…    20 cwc         2.02e-4
+ 72 TRUE      Parametric: GLM gaussian binomial U[50,…    10 cwc         2.02e-4
+ 73 TRUE      Parametric: RE  binomial binomial U[5, …    40 cwc         1.85e-4
+ 74 TRUE      Nonparametric   binomial binomial U[5, …    40 cwc         1.66e-4
+ 75 TRUE      Nonparametric   gaussian binomial U[50,…    10 cwc.FE      1.64e-4
+ 76 TRUE      Parametric: RE  gaussian binomial U[50,…    20 cwc         1.62e-4
+ 77 TRUE      Parametric: GLM gaussian binomial U[5, …   100 cwc.FE      1.60e-4
+ 78 TRUE      Nonparametric   gaussian binomial U[5, …   100 cwc.FE      1.59e-4
+ 79 TRUE      Parametric: GLM gaussian binomial U[5, …   100 cwc         1.58e-4
+ 80 TRUE      Nonparametric   gaussian binomial U[50,…    10 cwc         1.58e-4
+ 81 TRUE      Parametric: GLM gaussian binomial U[50,…    20 cwc.FE      1.56e-4
+ 82 TRUE      Parametric: GLM gaussian binomial U[50,…    20 cwc         1.55e-4
+ 83 TRUE      Parametric: GLM binomial binomial U[5, …    40 cwc.FE      1.54e-4
+ 84 TRUE      Parametric: GLM binomial binomial U[5, …    40 cwc         1.49e-4
+ 85 TRUE      Nonparametric   binomial binomial U[5, …    70 cwc.FE      1.47e-4
+ 86 TRUE      Nonparametric   gaussian binomial U[5, …    70 cwc         1.43e-4
+ 87 TRUE      Nonparametric   binomial gaussian U[50,…    40 cwc.FE      1.39e-4
+ 88 TRUE      Nonparametric   binomial gaussian U[50,…    40 cwc         1.33e-4
+ 89 TRUE      Parametric: RE  gaussian binomial U[50,…    40 cwc         1.25e-4
+ 90 TRUE      Parametric: GLM gaussian binomial U[50,…    40 cwc.FE      1.22e-4
+ 91 TRUE      Parametric: GLM gaussian binomial U[50,…    40 cwc         1.22e-4
+ 92 TRUE      Parametric: RE  binomial binomial U[50,…    10 cwc         1.10e-4
+ 93 TRUE      Parametric: RE  binomial binomial U[5, …    70 cwc         1.08e-4
+ 94 TRUE      Nonparametric   binomial binomial U[5, …   100 cwc.FE      1.07e-4
+ 95 TRUE      Parametric: GLM binomial binomial U[50,…    10 cwc.FE      1.02e-4
+ 96 TRUE      Parametric: GLM binomial binomial U[50,…    10 cwc         1.02e-4
+ 97 TRUE      Nonparametric   binomial binomial U[50,…    10 cwc.FE      9.85e-5
+ 98 TRUE      Nonparametric   gaussian binomial U[5, …   100 cwc         9.82e-5
+ 99 TRUE      Nonparametric   binomial binomial U[50,…    10 cwc         9.61e-5
+100 TRUE      Nonparametric   gaussian binomial U[50,…    20 cwc.FE      8.62e-5
+101 TRUE      Parametric: GLM binomial binomial U[5, …    70 cwc.FE      8.48e-5
+102 TRUE      Parametric: GLM binomial binomial U[5, …    70 cwc         8.39e-5
+103 TRUE      Parametric: RE  binomial binomial U[5, …   100 cwc         8.36e-5
+104 TRUE      Nonparametric   gaussian binomial U[50,…    20 cwc         8.33e-5
+105 TRUE      Nonparametric   binomial binomial U[5, …    70 cwc         7.14e-5
+106 TRUE      Parametric: GLM binomial binomial U[5, …   100 cwc.FE      6.59e-5
+107 TRUE      Parametric: GLM binomial binomial U[5, …   100 cwc         6.45e-5
+108 TRUE      Parametric: RE  binomial binomial U[50,…    20 cwc         6.33e-5
+109 TRUE      Parametric: GLM binomial binomial U[50,…    20 cwc         6.03e-5
+110 TRUE      Parametric: GLM binomial binomial U[50,…    20 cwc.FE      6.02e-5
+111 TRUE      Nonparametric   binomial binomial U[5, …   100 cwc         4.80e-5
+112 TRUE      Nonparametric   gaussian binomial U[50,…    40 cwc.FE      4.78e-5
+113 TRUE      Nonparametric   gaussian binomial U[50,…    40 cwc         4.74e-5
+114 TRUE      Parametric: RE  binomial binomial U[50,…    40 cwc         4.37e-5
+115 TRUE      Parametric: GLM binomial binomial U[50,…    40 cwc         4.26e-5
+116 TRUE      Parametric: GLM binomial binomial U[50,…    40 cwc.FE      4.24e-5
+117 TRUE      Nonparametric   binomial binomial U[50,…    20 cwc.FE      4.07e-5
+118 TRUE      Nonparametric   binomial binomial U[50,…    20 cwc         3.86e-5
+119 TRUE      Nonparametric   binomial binomial U[50,…    40 cwc.FE      2.19e-5
+120 TRUE      Nonparametric   binomial binomial U[50,…    40 cwc         2.11e-5
+
+
+==============================================================================
+Type1 - Individual - NIE - Nonlinear - Null
+==============================================================================
+# A tibble: 120 × 8
+    quadratic Fit             Mfamily  Yfamily  Nj          J cluster_opt    avg
+    <lgl>     <chr>           <chr>    <chr>    <chr>   <dbl> <chr>        <dbl>
+  1 TRUE      Parametric: GLM gaussian gaussian U[50, …    40 cwc.FE      0.768 
+  2 TRUE      Parametric: GLM gaussian gaussian U[50, …    40 cwc         0.767 
+  3 TRUE      Parametric: RE  gaussian gaussian U[50, …    40 cwc         0.766 
+  4 TRUE      Parametric: RE  gaussian gaussian U[5, 2…   100 cwc         0.59  
+  5 TRUE      Parametric: GLM gaussian gaussian U[5, 2…   100 cwc         0.504 
+  6 TRUE      Parametric: GLM gaussian gaussian U[5, 2…   100 cwc.FE      0.503 
+  7 TRUE      Parametric: GLM binomial gaussian U[50, …    40 cwc.FE      0.478 
+  8 TRUE      Parametric: GLM binomial gaussian U[50, …    40 cwc         0.476 
+  9 TRUE      Parametric: RE  gaussian gaussian U[5, 2…    70 cwc         0.467 
+ 10 TRUE      Parametric: RE  binomial gaussian U[50, …    40 cwc         0.450 
+ 11 TRUE      Parametric: GLM gaussian binomial U[50, …    40 cwc.FE      0.444 
+ 12 TRUE      Parametric: GLM gaussian binomial U[50, …    40 cwc         0.44  
+ 13 TRUE      Parametric: RE  gaussian binomial U[50, …    40 cwc         0.435 
+ 14 TRUE      Parametric: GLM gaussian gaussian U[5, 2…    70 cwc         0.393 
+ 15 TRUE      Parametric: GLM gaussian gaussian U[5, 2…    70 cwc.FE      0.392 
+ 16 TRUE      Parametric: GLM gaussian gaussian U[50, …    20 cwc         0.392 
+ 17 TRUE      Parametric: GLM gaussian gaussian U[50, …    20 cwc.FE      0.391 
+ 18 TRUE      Parametric: RE  gaussian gaussian U[50, …    20 cwc         0.387 
+ 19 TRUE      Parametric: RE  gaussian binomial U[5, 2…   100 cwc         0.375 
+ 20 TRUE      Parametric: GLM gaussian binomial U[5, 2…   100 cwc.FE      0.272 
+ 21 TRUE      Parametric: GLM gaussian binomial U[5, 2…   100 cwc         0.271 
+ 22 TRUE      Parametric: RE  gaussian binomial U[5, 2…    70 cwc         0.265 
+ 23 TRUE      Nonparametric   gaussian gaussian U[50, …    40 cwc         0.258 
+ 24 TRUE      Parametric: GLM binomial gaussian U[5, 2…   100 cwc.FE      0.250 
+ 25 TRUE      Parametric: GLM binomial gaussian U[5, 2…   100 cwc         0.25  
+ 26 TRUE      Parametric: GLM binomial binomial U[50, …    40 cwc.FE      0.242 
+ 27 TRUE      Nonparametric   gaussian gaussian U[5, 2…   100 cwc         0.241 
+ 28 TRUE      Parametric: GLM binomial binomial U[50, …    40 cwc         0.241 
+ 29 TRUE      Parametric: RE  gaussian gaussian U[5, 2…    40 cwc         0.23  
+ 30 TRUE      Parametric: RE  binomial gaussian U[5, 2…   100 cwc         0.229 
+ 31 TRUE      Nonparametric   gaussian gaussian U[50, …    40 cwc.FE      0.219 
+ 32 TRUE      Parametric: RE  binomial binomial U[50, …    40 cwc         0.215 
+ 33 TRUE      Parametric: GLM gaussian binomial U[50, …    20 cwc         0.201 
+ 34 TRUE      Parametric: GLM gaussian binomial U[5, 2…    70 cwc.FE      0.199 
+ 35 TRUE      Parametric: GLM gaussian binomial U[50, …    20 cwc.FE      0.198 
+ 36 TRUE      Parametric: GLM binomial gaussian U[50, …    20 cwc         0.198 
+ 37 TRUE      Parametric: GLM binomial gaussian U[50, …    20 cwc.FE      0.197 
+ 38 TRUE      Parametric: GLM gaussian binomial U[5, 2…    70 cwc         0.195 
+ 39 TRUE      Parametric: RE  gaussian binomial U[50, …    20 cwc         0.189 
+ 40 TRUE      Parametric: RE  binomial gaussian U[50, …    20 cwc         0.178 
+ 41 TRUE      Parametric: GLM gaussian gaussian U[5, 2…    40 cwc         0.177 
+ 42 TRUE      Parametric: GLM gaussian gaussian U[5, 2…    40 cwc.FE      0.177 
+ 43 TRUE      Nonparametric   gaussian gaussian U[5, 2…    70 cwc         0.172 
+ 44 TRUE      Parametric: GLM binomial gaussian U[5, 2…    70 cwc         0.154 
+ 45 TRUE      Parametric: GLM binomial gaussian U[5, 2…    70 cwc.FE      0.153 
+ 46 TRUE      Parametric: GLM binomial binomial U[5, 2…   100 cwc.FE      0.141 
+ 47 TRUE      Nonparametric   binomial gaussian U[50, …    40 cwc         0.138 
+ 48 TRUE      Nonparametric   gaussian binomial U[50, …    40 cwc         0.137 
+ 49 TRUE      Parametric: GLM binomial binomial U[5, 2…   100 cwc         0.136 
+ 50 TRUE      Nonparametric   gaussian binomial U[5, 2…   100 cwc         0.135 
+ 51 TRUE      Parametric: RE  binomial gaussian U[5, 2…    70 cwc         0.131 
+ 52 TRUE      Parametric: RE  gaussian binomial U[5, 2…    40 cwc         0.129 
+ 53 TRUE      Parametric: RE  binomial binomial U[5, 2…   100 cwc         0.126 
+ 54 TRUE      Parametric: GLM gaussian gaussian U[50, …    10 cwc.FE      0.12  
+ 55 TRUE      Parametric: GLM gaussian gaussian U[50, …    10 cwc         0.118 
+ 56 TRUE      Nonparametric   binomial gaussian U[5, 2…   100 cwc         0.116 
+ 57 TRUE      Nonparametric   binomial gaussian U[50, …    40 cwc.FE      0.116 
+ 58 TRUE      Parametric: GLM gaussian binomial U[5, 2…    40 cwc.FE      0.116 
+ 59 TRUE      Parametric: RE  gaussian gaussian U[50, …    10 cwc         0.114 
+ 60 TRUE      Parametric: GLM gaussian binomial U[5, 2…    40 cwc         0.113 
+ 61 TRUE      Nonparametric   gaussian binomial U[50, …    40 cwc.FE      0.11  
+ 62 TRUE      Nonparametric   gaussian gaussian U[50, …    20 cwc         0.109 
+ 63 TRUE      Nonparametric   gaussian gaussian U[5, 2…   100 cwc.FE      0.107 
+ 64 TRUE      Nonparametric   gaussian gaussian U[50, …    20 cwc.FE      0.105 
+ 65 TRUE      Nonparametric   gaussian binomial U[5, 2…    70 cwc         0.104 
+ 66 TRUE      Nonparametric   gaussian gaussian U[5, 2…    40 cwc         0.103 
+ 67 TRUE      Parametric: GLM binomial binomial U[5, 2…    70 cwc.FE      0.0969
+ 68 TRUE      Parametric: GLM binomial binomial U[5, 2…    70 cwc         0.096 
+ 69 TRUE      Nonparametric   binomial binomial U[50, …    40 cwc         0.09  
+ 70 TRUE      Parametric: RE  binomial binomial U[5, 2…    70 cwc         0.0893
+ 71 TRUE      Nonparametric   gaussian binomial U[5, 2…    40 cwc         0.089 
+ 72 TRUE      Parametric: GLM binomial binomial U[50, …    20 cwc         0.089 
+ 73 TRUE      Parametric: GLM binomial binomial U[50, …    20 cwc.FE      0.0871
+ 74 TRUE      Nonparametric   gaussian gaussian U[5, 2…    70 cwc.FE      0.084 
+ 75 TRUE      Parametric: RE  binomial gaussian U[5, 2…    40 cwc         0.0825
+ 76 TRUE      Parametric: RE  binomial binomial U[50, …    20 cwc         0.0795
+ 77 TRUE      Parametric: GLM binomial gaussian U[5, 2…    40 cwc.FE      0.078 
+ 78 TRUE      Nonparametric   binomial gaussian U[5, 2…    70 cwc         0.077 
+ 79 TRUE      Parametric: GLM binomial gaussian U[5, 2…    40 cwc         0.077 
+ 80 TRUE      Nonparametric   gaussian binomial U[5, 2…    70 cwc.FE      0.074 
+ 81 TRUE      Nonparametric   binomial binomial U[5, 2…   100 cwc         0.073 
+ 82 TRUE      Nonparametric   binomial binomial U[50, …    40 cwc.FE      0.072 
+ 83 TRUE      Nonparametric   gaussian binomial U[5, 2…   100 cwc.FE      0.07  
+ 84 TRUE      Nonparametric   binomial gaussian U[5, 2…   100 cwc.FE      0.068 
+ 85 TRUE      Nonparametric   binomial gaussian U[5, 2…    40 cwc         0.066 
+ 86 TRUE      Parametric: GLM binomial binomial U[5, 2…    40 cwc         0.066 
+ 87 TRUE      Parametric: GLM binomial binomial U[5, 2…    40 cwc.FE      0.0658
+ 88 TRUE      Nonparametric   gaussian gaussian U[5, 2…    40 cwc.FE      0.065 
+ 89 TRUE      Nonparametric   binomial binomial U[5, 2…    70 cwc         0.064 
+ 90 TRUE      Nonparametric   gaussian binomial U[50, …    20 cwc.FE      0.064 
+ 91 TRUE      Nonparametric   gaussian binomial U[50, …    20 cwc         0.063 
+ 92 TRUE      Parametric: RE  binomial binomial U[5, 2…    40 cwc         0.0588
+ 93 TRUE      Parametric: RE  gaussian binomial U[50, …    10 cwc         0.0575
+ 94 TRUE      Parametric: GLM gaussian binomial U[50, …    10 cwc.FE      0.056 
+ 95 TRUE      Parametric: GLM gaussian binomial U[50, …    10 cwc         0.054 
+ 96 TRUE      Nonparametric   binomial binomial U[5, 2…    40 cwc         0.052 
+ 97 TRUE      Nonparametric   binomial binomial U[5, 2…   100 cwc.FE      0.052 
+ 98 TRUE      Nonparametric   gaussian binomial U[5, 2…    40 cwc.FE      0.052 
+ 99 TRUE      Nonparametric   binomial gaussian U[50, …    20 cwc         0.051 
+100 TRUE      Parametric: GLM binomial gaussian U[50, …    10 cwc         0.048 
+101 TRUE      Parametric: GLM binomial gaussian U[50, …    10 cwc.FE      0.047 
+102 TRUE      Nonparametric   binomial gaussian U[50, …    20 cwc.FE      0.046 
+103 TRUE      Nonparametric   binomial binomial U[5, 2…    70 cwc.FE      0.045 
+104 TRUE      Parametric: RE  binomial gaussian U[50, …    10 cwc         0.0447
+105 TRUE      Nonparametric   binomial gaussian U[5, 2…    70 cwc.FE      0.04  
+106 TRUE      Nonparametric   binomial binomial U[50, …    20 cwc.FE      0.039 
+107 TRUE      Nonparametric   gaussian gaussian U[50, …    10 cwc         0.039 
+108 TRUE      Nonparametric   binomial binomial U[50, …    20 cwc         0.038 
+109 TRUE      Nonparametric   binomial binomial U[5, 2…    40 cwc.FE      0.036 
+110 TRUE      Nonparametric   gaussian binomial U[50, …    10 cwc         0.034 
+111 TRUE      Nonparametric   gaussian binomial U[50, …    10 cwc.FE      0.032 
+112 TRUE      Nonparametric   gaussian gaussian U[50, …    10 cwc.FE      0.029 
+113 TRUE      Nonparametric   binomial gaussian U[5, 2…    40 cwc.FE      0.028 
+114 TRUE      Parametric: GLM binomial binomial U[50, …    10 cwc.FE      0.0240
+115 TRUE      Nonparametric   binomial binomial U[50, …    10 cwc         0.023 
+116 TRUE      Nonparametric   binomial gaussian U[50, …    10 cwc         0.023 
+117 TRUE      Parametric: GLM binomial binomial U[50, …    10 cwc         0.023 
+118 TRUE      Nonparametric   binomial binomial U[50, …    10 cwc.FE      0.02  
+119 TRUE      Nonparametric   binomial gaussian U[50, …    10 cwc.FE      0.02  
+120 TRUE      Parametric: RE  binomial binomial U[50, …    10 cwc         0.0181
+
+
+==============================================================================
+Bias - Individual - NIE - Linear - Nonnull
+==============================================================================
+# A tibble: 119 × 8
+    quadratic Fit             Mfamily  Yfamily  Nj        J cluster_opt      avg
+    <lgl>     <chr>           <chr>    <chr>    <chr> <dbl> <chr>          <dbl>
+  1 FALSE     Nonparametric   gaussian gaussian U[5,…    70 cwc.FE       2.05e-2
+  2 FALSE     Nonparametric   gaussian gaussian U[5,…    40 cwc.FE       9.96e-3
+  3 FALSE     Parametric: RE  gaussian gaussian U[5,…    70 cwc          8.74e-3
+  4 FALSE     Nonparametric   binomial gaussian U[5,…   100 cwc.FE       7.07e-3
+  5 FALSE     Nonparametric   binomial gaussian U[5,…    40 cwc.FE       5.16e-3
+  6 FALSE     Nonparametric   gaussian gaussian U[5,…   100 cwc.FE       4.90e-3
+  7 FALSE     Parametric: GLM gaussian gaussian U[5,…    70 cwc.FE       4.73e-3
+  8 FALSE     Nonparametric   gaussian gaussian U[5,…    70 cwc          4.66e-3
+  9 FALSE     Parametric: GLM gaussian gaussian U[5,…    70 cwc          4.37e-3
+ 10 FALSE     Nonparametric   binomial gaussian U[5,…    70 cwc.FE       3.99e-3
+ 11 FALSE     Parametric: RE  binomial gaussian U[5,…    70 cwc          3.29e-3
+ 12 FALSE     Parametric: RE  gaussian gaussian U[5,…   100 cwc          3.13e-3
+ 13 FALSE     Parametric: RE  gaussian gaussian U[5,…    40 cwc          2.81e-3
+ 14 FALSE     Parametric: RE  binomial gaussian U[5,…    40 cwc          2.43e-3
+ 15 FALSE     Parametric: GLM binomial gaussian U[5,…    70 cwc.FE       2.04e-3
+ 16 FALSE     Parametric: GLM binomial gaussian U[5,…    70 cwc          2.04e-3
+ 17 FALSE     Parametric: GLM gaussian binomial U[5,…    70 cwc          1.87e-3
+ 18 FALSE     Parametric: RE  binomial gaussian U[5,…   100 cwc          1.84e-3
+ 19 FALSE     Nonparametric   binomial gaussian U[5,…    70 cwc          1.84e-3
+ 20 FALSE     Parametric: RE  gaussian binomial U[5,…    70 cwc          1.83e-3
+ 21 FALSE     Parametric: GLM gaussian binomial U[5,…    70 cwc.FE       1.70e-3
+ 22 FALSE     Nonparametric   gaussian binomial U[5,…    70 cwc          1.49e-3
+ 23 FALSE     Parametric: GLM gaussian binomial U[5,…   100 cwc          1.41e-3
+ 24 FALSE     Parametric: GLM binomial gaussian U[5,…    40 cwc.FE       1.17e-3
+ 25 FALSE     Parametric: GLM binomial gaussian U[5,…    40 cwc          1.01e-3
+ 26 FALSE     Nonparametric   gaussian binomial U[5,…   100 cwc          1.00e-3
+ 27 FALSE     Parametric: GLM gaussian binomial U[5,…   100 cwc.FE       8.74e-4
+ 28 FALSE     Nonparametric   binomial binomial U[5,…   100 cwc          7.52e-4
+ 29 FALSE     Parametric: GLM binomial binomial U[5,…   100 cwc          6.57e-4
+ 30 FALSE     Nonparametric   binomial gaussian U[5,…    40 cwc          6.51e-4
+ 31 FALSE     Parametric: GLM binomial gaussian U[5,…   100 cwc.FE       6.23e-4
+ 32 FALSE     Parametric: RE  binomial binomial U[50…    20 cwc          6.22e-4
+ 33 FALSE     Parametric: RE  binomial binomial U[50…    40 cwc          5.99e-4
+ 34 FALSE     Parametric: GLM binomial binomial U[5,…    40 cwc          5.96e-4
+ 35 FALSE     Nonparametric   binomial gaussian U[50…    20 cwc.FE       5.96e-4
+ 36 FALSE     Parametric: GLM binomial gaussian U[5,…   100 cwc          5.70e-4
+ 37 FALSE     Nonparametric   binomial binomial U[50…    20 cwc          5.22e-4
+ 38 FALSE     Parametric: GLM binomial binomial U[50…    20 cwc          5.20e-4
+ 39 FALSE     Parametric: RE  binomial binomial U[5,…    40 cwc          5.19e-4
+ 40 FALSE     Parametric: GLM binomial binomial U[50…    40 cwc          5.10e-4
+ 41 FALSE     Nonparametric   binomial binomial U[50…    40 cwc          4.78e-4
+ 42 FALSE     Parametric: RE  gaussian binomial U[5,…    40 cwc          4.76e-4
+ 43 FALSE     Parametric: GLM binomial binomial U[5,…    40 cwc.FE       4.59e-4
+ 44 FALSE     Parametric: GLM binomial binomial U[5,…   100 cwc.FE       4.34e-4
+ 45 FALSE     Nonparametric   binomial binomial U[50…    10 cwc          4.07e-4
+ 46 FALSE     Nonparametric   binomial gaussian U[5,…   100 cwc          3.95e-4
+ 47 FALSE     Parametric: GLM binomial binomial U[50…    10 cwc          3.93e-4
+ 48 FALSE     Parametric: RE  binomial binomial U[5,…   100 cwc          3.82e-4
+ 49 FALSE     Parametric: GLM gaussian binomial U[5,…    40 cwc          3.81e-4
+ 50 FALSE     Nonparametric   binomial gaussian U[50…    10 cwc.FE       3.67e-4
+ 51 FALSE     Parametric: GLM binomial binomial U[50…    40 cwc.FE       3.44e-4
+ 52 FALSE     Nonparametric   binomial binomial U[5,…    40 cwc          3.32e-4
+ 53 FALSE     Parametric: GLM binomial binomial U[50…    20 cwc.FE       3.19e-4
+ 54 FALSE     Parametric: GLM binomial binomial U[50…    10 cwc.FE       2.99e-4
+ 55 FALSE     Nonparametric   binomial binomial U[50…    20 cwc.FE       2.77e-4
+ 56 FALSE     Parametric: RE  binomial gaussian U[50…    40 cwc          2.76e-4
+ 57 FALSE     Nonparametric   binomial binomial U[50…    40 cwc.FE       2.59e-4
+ 58 FALSE     Parametric: GLM binomial binomial U[5,…    70 cwc          2.52e-4
+ 59 FALSE     Parametric: GLM binomial gaussian U[50…    40 cwc          2.34e-4
+ 60 FALSE     Parametric: GLM binomial gaussian U[50…    40 cwc.FE       2.32e-4
+ 61 FALSE     Parametric: GLM gaussian binomial U[5,…    40 cwc.FE       2.32e-4
+ 62 FALSE     Nonparametric   binomial gaussian U[50…    40 cwc.FE       2.25e-4
+ 63 FALSE     Nonparametric   gaussian binomial U[50…    10 cwc          2.23e-4
+ 64 FALSE     Parametric: RE  binomial gaussian U[50…    20 cwc          2.18e-4
+ 65 FALSE     Parametric: GLM binomial gaussian U[50…    20 cwc          1.91e-4
+ 66 FALSE     Parametric: GLM binomial gaussian U[50…    20 cwc.FE       1.89e-4
+ 67 FALSE     Nonparametric   binomial gaussian U[50…    40 cwc          1.77e-4
+ 68 FALSE     Parametric: GLM gaussian binomial U[50…    10 cwc          1.76e-4
+ 69 FALSE     Parametric: RE  gaussian binomial U[5,…   100 cwc          1.37e-4
+ 70 FALSE     Nonparametric   binomial gaussian U[50…    20 cwc          8.51e-5
+ 71 FALSE     Nonparametric   binomial binomial U[5,…    70 cwc          8.47e-5
+ 72 FALSE     Parametric: RE  binomial binomial U[5,…    70 cwc          7.98e-5
+ 73 FALSE     Parametric: GLM gaussian binomial U[50…    20 cwc          7.94e-5
+ 74 FALSE     Nonparametric   binomial binomial U[50…    10 cwc.FE       5.93e-5
+ 75 FALSE     Parametric: GLM binomial gaussian U[50…    10 cwc          4.81e-5
+ 76 FALSE     Parametric: GLM binomial gaussian U[50…    10 cwc.FE       4.67e-5
+ 77 FALSE     Parametric: RE  binomial gaussian U[50…    10 cwc          3.25e-5
+ 78 FALSE     Nonparametric   gaussian binomial U[50…    20 cwc          2.98e-5
+ 79 FALSE     Nonparametric   gaussian binomial U[50…    10 cwc.FE       4.85e-6
+ 80 FALSE     Nonparametric   binomial gaussian U[50…    10 cwc         -1.50e-5
+ 81 FALSE     Parametric: RE  gaussian binomial U[50…    10 cwc         -2.01e-5
+ 82 FALSE     Parametric: GLM gaussian binomial U[50…    20 cwc.FE      -4.07e-5
+ 83 FALSE     Nonparametric   gaussian binomial U[5,…    40 cwc         -9.05e-5
+ 84 FALSE     Parametric: RE  gaussian binomial U[50…    20 cwc         -1.29e-4
+ 85 FALSE     Parametric: GLM gaussian binomial U[50…    10 cwc.FE      -1.35e-4
+ 86 FALSE     Parametric: GLM binomial binomial U[5,…    70 cwc.FE      -1.83e-4
+ 87 FALSE     Parametric: GLM gaussian binomial U[50…    40 cwc         -2.12e-4
+ 88 FALSE     Nonparametric   gaussian binomial U[50…    40 cwc         -2.45e-4
+ 89 FALSE     Nonparametric   gaussian binomial U[50…    20 cwc.FE      -2.88e-4
+ 90 FALSE     Parametric: GLM gaussian binomial U[50…    40 cwc.FE      -3.52e-4
+ 91 FALSE     Nonparametric   gaussian binomial U[50…    40 cwc.FE      -3.69e-4
+ 92 FALSE     Parametric: RE  gaussian binomial U[50…    40 cwc         -4.18e-4
+ 93 FALSE     Parametric: GLM gaussian gaussian U[5,…   100 cwc.FE      -8.31e-4
+ 94 FALSE     Nonparametric   gaussian binomial U[5,…   100 cwc.FE      -9.94e-4
+ 95 FALSE     Parametric: GLM gaussian gaussian U[5,…   100 cwc         -1.05e-3
+ 96 FALSE     Nonparametric   gaussian gaussian U[5,…    40 cwc         -1.17e-3
+ 97 FALSE     Nonparametric   gaussian gaussian U[5,…   100 cwc         -1.23e-3
+ 98 FALSE     Nonparametric   gaussian binomial U[5,…    70 cwc.FE      -1.44e-3
+ 99 FALSE     Parametric: GLM gaussian gaussian U[5,…    40 cwc.FE      -1.60e-3
+100 FALSE     Parametric: GLM gaussian gaussian U[5,…    40 cwc         -1.87e-3
+101 FALSE     Nonparametric   gaussian gaussian U[50…    10 cwc         -2.03e-3
+102 FALSE     Nonparametric   binomial binomial U[5,…   100 cwc.FE      -2.05e-3
+103 FALSE     Nonparametric   gaussian gaussian U[50…    20 cwc         -2.17e-3
+104 FALSE     Nonparametric   gaussian gaussian U[50…    20 cwc.FE      -2.20e-3
+105 FALSE     Parametric: RE  gaussian gaussian U[50…    10 cwc         -2.30e-3
+106 FALSE     Parametric: RE  gaussian gaussian U[50…    40 cwc         -2.37e-3
+107 FALSE     Parametric: GLM gaussian gaussian U[50…    40 cwc.FE      -2.44e-3
+108 FALSE     Parametric: GLM gaussian gaussian U[50…    10 cwc.FE      -2.46e-3
+109 FALSE     Parametric: GLM gaussian gaussian U[50…    10 cwc         -2.46e-3
+110 FALSE     Parametric: GLM gaussian gaussian U[50…    40 cwc         -2.50e-3
+111 FALSE     Parametric: RE  gaussian gaussian U[50…    20 cwc         -2.55e-3
+112 FALSE     Nonparametric   gaussian gaussian U[50…    40 cwc         -2.59e-3
+113 FALSE     Nonparametric   binomial binomial U[5,…    70 cwc.FE      -2.64e-3
+114 FALSE     Nonparametric   gaussian gaussian U[50…    10 cwc.FE      -2.65e-3
+115 FALSE     Parametric: GLM gaussian gaussian U[50…    20 cwc.FE      -2.66e-3
+116 FALSE     Nonparametric   gaussian gaussian U[50…    40 cwc.FE      -2.69e-3
+117 FALSE     Parametric: GLM gaussian gaussian U[50…    20 cwc         -2.70e-3
+118 FALSE     Nonparametric   binomial binomial U[5,…    40 cwc.FE      -2.86e-3
+119 FALSE     Nonparametric   gaussian binomial U[5,…    40 cwc.FE      -3.27e-3
+
+
+==============================================================================
+Coverage - Individual - NIE - Linear - Nonnull
+==============================================================================
+# A tibble: 119 × 8
+    quadratic Fit             Mfamily  Yfamily  Nj           J cluster_opt   avg
+    <lgl>     <chr>           <chr>    <chr>    <chr>    <dbl> <chr>       <dbl>
+  1 FALSE     Nonparametric   gaussian gaussian U[50, 1…    10 cwc.FE      0.986
+  2 FALSE     Parametric: RE  gaussian gaussian U[50, 1…    10 cwc         0.986
+  3 FALSE     Parametric: GLM gaussian gaussian U[50, 1…    10 cwc         0.984
+  4 FALSE     Parametric: GLM gaussian gaussian U[50, 1…    10 cwc.FE      0.984
+  5 FALSE     Nonparametric   gaussian gaussian U[50, 1…    10 cwc         0.982
+  6 FALSE     Nonparametric   binomial gaussian U[50, 1…    10 cwc.FE      0.98 
+  7 FALSE     Nonparametric   gaussian gaussian U[5, 20]    70 cwc.FE      0.978
+  8 FALSE     Parametric: RE  gaussian gaussian U[5, 20]    70 cwc         0.978
+  9 FALSE     Parametric: GLM gaussian gaussian U[5, 20]    70 cwc         0.976
+ 10 FALSE     Parametric: RE  gaussian gaussian U[50, 1…    40 cwc         0.976
+ 11 FALSE     Parametric: GLM gaussian gaussian U[5, 20]    70 cwc.FE      0.976
+ 12 FALSE     Nonparametric   gaussian gaussian U[50, 1…    20 cwc.FE      0.975
+ 13 FALSE     Nonparametric   gaussian gaussian U[50, 1…    40 cwc.FE      0.975
+ 14 FALSE     Nonparametric   binomial gaussian U[50, 1…    10 cwc         0.974
+ 15 FALSE     Parametric: GLM gaussian gaussian U[50, 1…    40 cwc         0.974
+ 16 FALSE     Parametric: GLM gaussian gaussian U[50, 1…    40 cwc.FE      0.974
+ 17 FALSE     Nonparametric   gaussian gaussian U[5, 20]    70 cwc         0.973
+ 18 FALSE     Nonparametric   gaussian gaussian U[5, 20]   100 cwc.FE      0.973
+ 19 FALSE     Nonparametric   gaussian gaussian U[50, 1…    40 cwc         0.973
+ 20 FALSE     Parametric: RE  gaussian gaussian U[50, 1…    20 cwc         0.972
+ 21 FALSE     Nonparametric   binomial gaussian U[5, 20]    40 cwc.FE      0.971
+ 22 FALSE     Parametric: GLM gaussian gaussian U[50, 1…    20 cwc         0.971
+ 23 FALSE     Parametric: GLM gaussian gaussian U[50, 1…    20 cwc.FE      0.971
+ 24 FALSE     Parametric: RE  binomial gaussian U[50, 1…    10 cwc         0.971
+ 25 FALSE     Nonparametric   gaussian gaussian U[5, 20]    40 cwc.FE      0.97 
+ 26 FALSE     Parametric: GLM binomial gaussian U[50, 1…    10 cwc         0.97 
+ 27 FALSE     Parametric: GLM binomial gaussian U[50, 1…    10 cwc.FE      0.97 
+ 28 FALSE     Nonparametric   gaussian gaussian U[50, 1…    20 cwc         0.969
+ 29 FALSE     Parametric: GLM gaussian binomial U[50, 1…    20 cwc         0.968
+ 30 FALSE     Parametric: RE  binomial gaussian U[5, 20]   100 cwc         0.968
+ 31 FALSE     Parametric: RE  gaussian gaussian U[5, 20]   100 cwc         0.968
+ 32 FALSE     Parametric: RE  gaussian binomial U[50, 1…    20 cwc         0.968
+ 33 FALSE     Nonparametric   gaussian binomial U[5, 20]    70 cwc.FE      0.967
+ 34 FALSE     Nonparametric   gaussian binomial U[50, 1…    20 cwc.FE      0.967
+ 35 FALSE     Nonparametric   gaussian gaussian U[5, 20]    40 cwc         0.966
+ 36 FALSE     Parametric: RE  gaussian binomial U[5, 20]   100 cwc         0.966
+ 37 FALSE     Parametric: GLM gaussian binomial U[50, 1…    20 cwc.FE      0.966
+ 38 FALSE     Nonparametric   binomial gaussian U[5, 20]    70 cwc.FE      0.965
+ 39 FALSE     Parametric: RE  binomial gaussian U[50, 1…    40 cwc         0.965
+ 40 FALSE     Nonparametric   gaussian gaussian U[5, 20]   100 cwc         0.964
+ 41 FALSE     Parametric: GLM gaussian gaussian U[5, 20]   100 cwc         0.964
+ 42 FALSE     Parametric: GLM gaussian gaussian U[5, 20]   100 cwc.FE      0.964
+ 43 FALSE     Parametric: RE  binomial binomial U[50, 1…    20 cwc         0.964
+ 44 FALSE     Parametric: RE  binomial binomial U[5, 20]    70 cwc         0.963
+ 45 FALSE     Parametric: RE  binomial binomial U[5, 20]    40 cwc         0.963
+ 46 FALSE     Nonparametric   binomial gaussian U[5, 20]   100 cwc.FE      0.962
+ 47 FALSE     Parametric: RE  gaussian gaussian U[5, 20]    40 cwc         0.962
+ 48 FALSE     Parametric: GLM gaussian gaussian U[5, 20]    40 cwc.FE      0.962
+ 49 FALSE     Parametric: RE  binomial binomial U[5, 20]   100 cwc         0.962
+ 50 FALSE     Parametric: RE  gaussian binomial U[50, 1…    10 cwc         0.962
+ 51 FALSE     Parametric: RE  gaussian binomial U[5, 20]    70 cwc         0.962
+ 52 FALSE     Parametric: GLM gaussian binomial U[5, 20]    70 cwc.FE      0.961
+ 53 FALSE     Nonparametric   binomial gaussian U[50, 1…    40 cwc         0.961
+ 54 FALSE     Nonparametric   gaussian binomial U[50, 1…    10 cwc         0.961
+ 55 FALSE     Nonparametric   gaussian binomial U[50, 1…    10 cwc.FE      0.961
+ 56 FALSE     Nonparametric   gaussian binomial U[50, 1…    20 cwc         0.961
+ 57 FALSE     Parametric: GLM binomial gaussian U[50, 1…    40 cwc         0.961
+ 58 FALSE     Parametric: GLM binomial gaussian U[50, 1…    40 cwc.FE      0.961
+ 59 FALSE     Parametric: GLM gaussian binomial U[5, 20]    70 cwc         0.961
+ 60 FALSE     Nonparametric   binomial gaussian U[50, 1…    20 cwc.FE      0.96 
+ 61 FALSE     Nonparametric   binomial gaussian U[50, 1…    40 cwc.FE      0.96 
+ 62 FALSE     Nonparametric   gaussian binomial U[50, 1…    40 cwc.FE      0.96 
+ 63 FALSE     Parametric: GLM gaussian gaussian U[5, 20]    40 cwc         0.96 
+ 64 FALSE     Parametric: RE  binomial gaussian U[5, 20]    40 cwc         0.96 
+ 65 FALSE     Parametric: RE  gaussian binomial U[50, 1…    40 cwc         0.960
+ 66 FALSE     Parametric: RE  gaussian binomial U[5, 20]    40 cwc         0.959
+ 67 FALSE     Parametric: GLM gaussian binomial U[50, 1…    40 cwc         0.959
+ 68 FALSE     Parametric: RE  binomial gaussian U[5, 20]    70 cwc         0.959
+ 69 FALSE     Nonparametric   binomial binomial U[5, 20]   100 cwc         0.958
+ 70 FALSE     Parametric: GLM binomial gaussian U[5, 20]   100 cwc         0.958
+ 71 FALSE     Parametric: GLM binomial gaussian U[5, 20]   100 cwc.FE      0.958
+ 72 FALSE     Parametric: GLM binomial binomial U[5, 20]   100 cwc.FE      0.957
+ 73 FALSE     Nonparametric   binomial binomial U[50, 1…    20 cwc         0.957
+ 74 FALSE     Nonparametric   binomial binomial U[50, 1…    20 cwc.FE      0.957
+ 75 FALSE     Nonparametric   gaussian binomial U[5, 20]    40 cwc.FE      0.957
+ 76 FALSE     Nonparametric   gaussian binomial U[50, 1…    40 cwc         0.957
+ 77 FALSE     Parametric: GLM gaussian binomial U[50, 1…    10 cwc         0.957
+ 78 FALSE     Parametric: RE  binomial gaussian U[50, 1…    20 cwc         0.956
+ 79 FALSE     Nonparametric   gaussian binomial U[5, 20]   100 cwc         0.955
+ 80 FALSE     Parametric: GLM binomial gaussian U[50, 1…    20 cwc         0.955
+ 81 FALSE     Parametric: GLM binomial gaussian U[50, 1…    20 cwc.FE      0.955
+ 82 FALSE     Parametric: GLM gaussian binomial U[50, 1…    10 cwc.FE      0.955
+ 83 FALSE     Parametric: GLM gaussian binomial U[50, 1…    40 cwc.FE      0.955
+ 84 FALSE     Nonparametric   binomial gaussian U[5, 20]   100 cwc         0.954
+ 85 FALSE     Nonparametric   binomial gaussian U[50, 1…    20 cwc         0.954
+ 86 FALSE     Parametric: GLM binomial binomial U[50, 1…    20 cwc         0.954
+ 87 FALSE     Parametric: GLM gaussian binomial U[5, 20]   100 cwc         0.954
+ 88 FALSE     Nonparametric   gaussian binomial U[5, 20]    70 cwc         0.953
+ 89 FALSE     Parametric: GLM binomial gaussian U[5, 20]    40 cwc         0.953
+ 90 FALSE     Parametric: RE  binomial binomial U[50, 1…    40 cwc         0.953
+ 91 FALSE     Parametric: GLM gaussian binomial U[5, 20]    40 cwc.FE      0.952
+ 92 FALSE     Nonparametric   binomial binomial U[50, 1…    10 cwc.FE      0.952
+ 93 FALSE     Nonparametric   binomial binomial U[50, 1…    40 cwc         0.952
+ 94 FALSE     Nonparametric   binomial gaussian U[5, 20]    40 cwc         0.952
+ 95 FALSE     Parametric: GLM binomial gaussian U[5, 20]    40 cwc.FE      0.952
+ 96 FALSE     Nonparametric   gaussian binomial U[5, 20]   100 cwc.FE      0.951
+ 97 FALSE     Nonparametric   binomial gaussian U[5, 20]    70 cwc         0.95 
+ 98 FALSE     Parametric: GLM binomial binomial U[50, 1…    20 cwc.FE      0.950
+ 99 FALSE     Parametric: GLM gaussian binomial U[5, 20]   100 cwc.FE      0.950
+100 FALSE     Nonparametric   binomial binomial U[50, 1…    10 cwc         0.949
+101 FALSE     Nonparametric   gaussian binomial U[5, 20]    40 cwc         0.949
+102 FALSE     Parametric: GLM gaussian binomial U[5, 20]    40 cwc         0.948
+103 FALSE     Parametric: GLM binomial binomial U[5, 20]    70 cwc.FE      0.948
+104 FALSE     Nonparametric   binomial binomial U[5, 20]    40 cwc.FE      0.947
+105 FALSE     Nonparametric   binomial binomial U[5, 20]   100 cwc.FE      0.947
+106 FALSE     Parametric: GLM binomial gaussian U[5, 20]    70 cwc         0.947
+107 FALSE     Parametric: GLM binomial gaussian U[5, 20]    70 cwc.FE      0.947
+108 FALSE     Parametric: GLM binomial binomial U[5, 20]   100 cwc         0.946
+109 FALSE     Parametric: GLM binomial binomial U[50, 1…    10 cwc         0.946
+110 FALSE     Parametric: GLM binomial binomial U[50, 1…    10 cwc.FE      0.945
+111 FALSE     Nonparametric   binomial binomial U[5, 20]    70 cwc         0.944
+112 FALSE     Nonparametric   binomial binomial U[50, 1…    40 cwc.FE      0.944
+113 FALSE     Nonparametric   binomial binomial U[5, 20]    40 cwc         0.943
+114 FALSE     Parametric: GLM binomial binomial U[50, 1…    40 cwc.FE      0.943
+115 FALSE     Nonparametric   binomial binomial U[5, 20]    70 cwc.FE      0.942
+116 FALSE     Parametric: GLM binomial binomial U[5, 20]    40 cwc         0.94 
+117 FALSE     Parametric: GLM binomial binomial U[50, 1…    40 cwc         0.94 
+118 FALSE     Parametric: GLM binomial binomial U[5, 20]    40 cwc.FE      0.933
+119 FALSE     Parametric: GLM binomial binomial U[5, 20]    70 cwc         0.932
+
+
+==============================================================================
+MSE - Individual - NIE - Linear - Nonnull
+==============================================================================
+# A tibble: 119 × 8
+    quadratic Fit             Mfamily  Yfamily  Nj         J cluster_opt     avg
+    <lgl>     <chr>           <chr>    <chr>    <chr>  <dbl> <chr>         <dbl>
+  1 FALSE     Nonparametric   gaussian gaussian U[5, …    40 cwc.FE      2.60e-2
+  2 FALSE     Nonparametric   gaussian gaussian U[5, …    70 cwc.FE      2.36e-2
+  3 FALSE     Nonparametric   gaussian gaussian U[5, …    40 cwc         1.06e-2
+  4 FALSE     Nonparametric   binomial gaussian U[5, …    40 cwc.FE      1.02e-2
+  5 FALSE     Parametric: RE  gaussian gaussian U[5, …    40 cwc         1.02e-2
+  6 FALSE     Parametric: GLM gaussian gaussian U[5, …    40 cwc.FE      9.74e-3
+  7 FALSE     Parametric: GLM gaussian gaussian U[5, …    40 cwc         9.72e-3
+  8 FALSE     Nonparametric   gaussian gaussian U[5, …   100 cwc.FE      8.21e-3
+  9 FALSE     Nonparametric   gaussian gaussian U[50,…    10 cwc.FE      7.07e-3
+ 10 FALSE     Nonparametric   gaussian gaussian U[50,…    10 cwc         6.96e-3
+ 11 FALSE     Parametric: RE  gaussian gaussian U[50,…    10 cwc         6.48e-3
+ 12 FALSE     Parametric: GLM gaussian gaussian U[50,…    10 cwc         6.46e-3
+ 13 FALSE     Parametric: GLM gaussian gaussian U[50,…    10 cwc.FE      6.46e-3
+ 14 FALSE     Parametric: RE  gaussian gaussian U[5, …    70 cwc         5.50e-3
+ 15 FALSE     Nonparametric   gaussian gaussian U[5, …    70 cwc         5.37e-3
+ 16 FALSE     Parametric: GLM gaussian gaussian U[5, …    70 cwc.FE      5.25e-3
+ 17 FALSE     Parametric: GLM gaussian gaussian U[5, …    70 cwc         5.22e-3
+ 18 FALSE     Parametric: RE  gaussian gaussian U[5, …   100 cwc         3.94e-3
+ 19 FALSE     Nonparametric   gaussian gaussian U[5, …   100 cwc         3.87e-3
+ 20 FALSE     Parametric: GLM gaussian gaussian U[5, …   100 cwc.FE      3.78e-3
+ 21 FALSE     Parametric: GLM gaussian gaussian U[5, …   100 cwc         3.77e-3
+ 22 FALSE     Nonparametric   gaussian gaussian U[50,…    20 cwc.FE      3.66e-3
+ 23 FALSE     Nonparametric   gaussian gaussian U[50,…    20 cwc         3.36e-3
+ 24 FALSE     Parametric: RE  gaussian gaussian U[50,…    20 cwc         3.25e-3
+ 25 FALSE     Parametric: GLM gaussian gaussian U[50,…    20 cwc.FE      3.25e-3
+ 26 FALSE     Parametric: GLM gaussian gaussian U[50,…    20 cwc         3.24e-3
+ 27 FALSE     Nonparametric   binomial gaussian U[5, …    40 cwc         2.80e-3
+ 28 FALSE     Parametric: RE  binomial gaussian U[5, …    40 cwc         2.54e-3
+ 29 FALSE     Nonparametric   binomial gaussian U[5, …    70 cwc.FE      2.52e-3
+ 30 FALSE     Parametric: GLM binomial gaussian U[5, …    40 cwc.FE      2.39e-3
+ 31 FALSE     Parametric: GLM binomial gaussian U[5, …    40 cwc         2.37e-3
+ 32 FALSE     Nonparametric   binomial gaussian U[5, …   100 cwc.FE      2.21e-3
+ 33 FALSE     Nonparametric   binomial gaussian U[50,…    10 cwc.FE      1.75e-3
+ 34 FALSE     Nonparametric   binomial gaussian U[50,…    10 cwc         1.72e-3
+ 35 FALSE     Nonparametric   gaussian gaussian U[50,…    40 cwc.FE      1.69e-3
+ 36 FALSE     Nonparametric   gaussian gaussian U[50,…    40 cwc         1.61e-3
+ 37 FALSE     Parametric: RE  gaussian gaussian U[50,…    40 cwc         1.58e-3
+ 38 FALSE     Parametric: GLM gaussian gaussian U[50,…    40 cwc.FE      1.58e-3
+ 39 FALSE     Parametric: GLM gaussian gaussian U[50,…    40 cwc         1.58e-3
+ 40 FALSE     Parametric: RE  binomial gaussian U[50,…    10 cwc         1.55e-3
+ 41 FALSE     Parametric: GLM binomial gaussian U[50,…    10 cwc         1.54e-3
+ 42 FALSE     Parametric: GLM binomial gaussian U[50,…    10 cwc.FE      1.54e-3
+ 43 FALSE     Nonparametric   binomial gaussian U[5, …    70 cwc         1.42e-3
+ 44 FALSE     Parametric: RE  binomial gaussian U[5, …    70 cwc         1.37e-3
+ 45 FALSE     Parametric: GLM binomial gaussian U[5, …    70 cwc.FE      1.30e-3
+ 46 FALSE     Parametric: GLM binomial gaussian U[5, …    70 cwc         1.29e-3
+ 47 FALSE     Nonparametric   gaussian binomial U[5, …    40 cwc.FE      1.08e-3
+ 48 FALSE     Nonparametric   binomial gaussian U[5, …   100 cwc         9.17e-4
+ 49 FALSE     Parametric: RE  binomial gaussian U[5, …   100 cwc         9.03e-4
+ 50 FALSE     Nonparametric   binomial gaussian U[50,…    20 cwc.FE      8.89e-4
+ 51 FALSE     Nonparametric   binomial gaussian U[50,…    20 cwc         8.72e-4
+ 52 FALSE     Parametric: GLM binomial gaussian U[5, …   100 cwc.FE      8.46e-4
+ 53 FALSE     Parametric: GLM binomial gaussian U[5, …   100 cwc         8.44e-4
+ 54 FALSE     Parametric: RE  binomial gaussian U[50,…    20 cwc         8.20e-4
+ 55 FALSE     Parametric: GLM binomial gaussian U[50,…    20 cwc         8.16e-4
+ 56 FALSE     Parametric: GLM binomial gaussian U[50,…    20 cwc.FE      8.15e-4
+ 57 FALSE     Parametric: RE  gaussian binomial U[5, …    40 cwc         6.18e-4
+ 58 FALSE     Nonparametric   gaussian binomial U[5, …    40 cwc         6.03e-4
+ 59 FALSE     Nonparametric   gaussian binomial U[5, …    70 cwc.FE      5.97e-4
+ 60 FALSE     Parametric: GLM gaussian binomial U[5, …    40 cwc.FE      5.80e-4
+ 61 FALSE     Parametric: GLM gaussian binomial U[5, …    40 cwc         5.20e-4
+ 62 FALSE     Nonparametric   gaussian binomial U[50,…    10 cwc.FE      5.01e-4
+ 63 FALSE     Nonparametric   gaussian binomial U[50,…    10 cwc         4.57e-4
+ 64 FALSE     Nonparametric   binomial binomial U[5, …    40 cwc.FE      4.49e-4
+ 65 FALSE     Parametric: RE  gaussian binomial U[50,…    10 cwc         4.42e-4
+ 66 FALSE     Parametric: GLM gaussian binomial U[50,…    10 cwc.FE      4.41e-4
+ 67 FALSE     Nonparametric   gaussian binomial U[5, …   100 cwc.FE      4.32e-4
+ 68 FALSE     Parametric: GLM gaussian binomial U[50,…    10 cwc         4.29e-4
+ 69 FALSE     Nonparametric   binomial gaussian U[50,…    40 cwc.FE      4.24e-4
+ 70 FALSE     Nonparametric   binomial gaussian U[50,…    40 cwc         4.14e-4
+ 71 FALSE     Parametric: RE  binomial gaussian U[50,…    40 cwc         4.09e-4
+ 72 FALSE     Parametric: GLM binomial gaussian U[50,…    40 cwc         4.06e-4
+ 73 FALSE     Parametric: GLM binomial gaussian U[50,…    40 cwc.FE      4.06e-4
+ 74 FALSE     Parametric: RE  gaussian binomial U[5, …    70 cwc         3.49e-4
+ 75 FALSE     Parametric: GLM gaussian binomial U[5, …    70 cwc.FE      3.48e-4
+ 76 FALSE     Nonparametric   gaussian binomial U[5, …    70 cwc         3.27e-4
+ 77 FALSE     Parametric: GLM gaussian binomial U[5, …    70 cwc         3.07e-4
+ 78 FALSE     Nonparametric   binomial binomial U[5, …    70 cwc.FE      2.64e-4
+ 79 FALSE     Parametric: RE  gaussian binomial U[5, …   100 cwc         2.52e-4
+ 80 FALSE     Parametric: GLM gaussian binomial U[5, …   100 cwc.FE      2.52e-4
+ 81 FALSE     Nonparametric   binomial binomial U[5, …    40 cwc         2.48e-4
+ 82 FALSE     Nonparametric   gaussian binomial U[5, …   100 cwc         2.36e-4
+ 83 FALSE     Parametric: RE  binomial binomial U[5, …    40 cwc         2.28e-4
+ 84 FALSE     Nonparametric   gaussian binomial U[50,…    20 cwc.FE      2.26e-4
+ 85 FALSE     Parametric: GLM gaussian binomial U[5, …   100 cwc         2.25e-4
+ 86 FALSE     Parametric: GLM binomial binomial U[5, …    40 cwc.FE      2.16e-4
+ 87 FALSE     Nonparametric   gaussian binomial U[50,…    20 cwc         2.08e-4
+ 88 FALSE     Parametric: GLM gaussian binomial U[50,…    20 cwc.FE      2.03e-4
+ 89 FALSE     Parametric: RE  gaussian binomial U[50,…    20 cwc         2.03e-4
+ 90 FALSE     Nonparametric   binomial binomial U[50,…    10 cwc.FE      1.99e-4
+ 91 FALSE     Parametric: GLM binomial binomial U[5, …    40 cwc         1.98e-4
+ 92 FALSE     Parametric: GLM gaussian binomial U[50,…    20 cwc         1.94e-4
+ 93 FALSE     Nonparametric   binomial binomial U[5, …   100 cwc.FE      1.90e-4
+ 94 FALSE     Nonparametric   binomial binomial U[50,…    10 cwc         1.76e-4
+ 95 FALSE     Parametric: GLM binomial binomial U[50,…    10 cwc.FE      1.51e-4
+ 96 FALSE     Parametric: GLM binomial binomial U[50,…    10 cwc         1.43e-4
+ 97 FALSE     Parametric: RE  binomial binomial U[5, …    70 cwc         1.33e-4
+ 98 FALSE     Nonparametric   binomial binomial U[5, …    70 cwc         1.29e-4
+ 99 FALSE     Parametric: GLM binomial binomial U[5, …    70 cwc.FE      1.19e-4
+100 FALSE     Nonparametric   gaussian binomial U[50,…    40 cwc.FE      1.17e-4
+101 FALSE     Parametric: GLM binomial binomial U[5, …    70 cwc         1.16e-4
+102 FALSE     Parametric: GLM gaussian binomial U[50,…    40 cwc.FE      1.07e-4
+103 FALSE     Parametric: RE  gaussian binomial U[50,…    40 cwc         1.07e-4
+104 FALSE     Nonparametric   gaussian binomial U[50,…    40 cwc         1.05e-4
+105 FALSE     Parametric: GLM gaussian binomial U[50,…    40 cwc         1.01e-4
+106 FALSE     Parametric: RE  binomial binomial U[5, …   100 cwc         8.84e-5
+107 FALSE     Parametric: GLM binomial binomial U[5, …   100 cwc.FE      8.67e-5
+108 FALSE     Nonparametric   binomial binomial U[5, …   100 cwc         8.44e-5
+109 FALSE     Nonparametric   binomial binomial U[50,…    20 cwc.FE      8.40e-5
+110 FALSE     Parametric: GLM binomial binomial U[5, …   100 cwc         7.98e-5
+111 FALSE     Nonparametric   binomial binomial U[50,…    20 cwc         7.97e-5
+112 FALSE     Parametric: RE  binomial binomial U[50,…    20 cwc         7.73e-5
+113 FALSE     Parametric: GLM binomial binomial U[50,…    20 cwc.FE      7.67e-5
+114 FALSE     Parametric: GLM binomial binomial U[50,…    20 cwc         7.29e-5
+115 FALSE     Nonparametric   binomial binomial U[50,…    40 cwc.FE      4.56e-5
+116 FALSE     Parametric: RE  binomial binomial U[50,…    40 cwc         4.25e-5
+117 FALSE     Parametric: GLM binomial binomial U[50,…    40 cwc.FE      4.15e-5
+118 FALSE     Nonparametric   binomial binomial U[50,…    40 cwc         4.12e-5
+119 FALSE     Parametric: GLM binomial binomial U[50,…    40 cwc         3.93e-5
+
+
+==============================================================================
+Power - Individual - NIE - Linear - Nonnull
+==============================================================================
+# A tibble: 119 × 8
+    quadratic Fit             Mfamily  Yfamily  Nj           J cluster_opt   avg
+    <lgl>     <chr>           <chr>    <chr>    <chr>    <dbl> <chr>       <dbl>
+  1 FALSE     Nonparametric   binomial gaussian U[50, 1…    40 cwc         1    
+  2 FALSE     Nonparametric   gaussian binomial U[50, 1…    40 cwc         1    
+  3 FALSE     Nonparametric   gaussian gaussian U[5, 20]   100 cwc         1    
+  4 FALSE     Nonparametric   gaussian gaussian U[50, 1…    40 cwc         1    
+  5 FALSE     Parametric: GLM binomial gaussian U[50, 1…    40 cwc         1    
+  6 FALSE     Parametric: GLM binomial gaussian U[50, 1…    40 cwc.FE      1    
+  7 FALSE     Parametric: GLM gaussian binomial U[50, 1…    40 cwc         1    
+  8 FALSE     Parametric: GLM gaussian binomial U[50, 1…    40 cwc.FE      1    
+  9 FALSE     Parametric: GLM gaussian gaussian U[5, 20]   100 cwc         1    
+ 10 FALSE     Parametric: GLM gaussian gaussian U[5, 20]   100 cwc.FE      1    
+ 11 FALSE     Parametric: GLM gaussian gaussian U[50, 1…    40 cwc         1    
+ 12 FALSE     Parametric: GLM gaussian gaussian U[50, 1…    40 cwc.FE      1    
+ 13 FALSE     Parametric: RE  gaussian binomial U[50, 1…    40 cwc         1    
+ 14 FALSE     Parametric: RE  gaussian gaussian U[5, 20]   100 cwc         1    
+ 15 FALSE     Parametric: RE  gaussian gaussian U[50, 1…    40 cwc         1    
+ 16 FALSE     Nonparametric   gaussian gaussian U[50, 1…    40 cwc.FE      0.999
+ 17 FALSE     Parametric: RE  binomial gaussian U[50, 1…    40 cwc         0.999
+ 18 FALSE     Nonparametric   binomial gaussian U[50, 1…    40 cwc.FE      0.998
+ 19 FALSE     Nonparametric   gaussian binomial U[50, 1…    40 cwc.FE      0.997
+ 20 FALSE     Parametric: GLM binomial binomial U[50, 1…    40 cwc         0.992
+ 21 FALSE     Parametric: GLM gaussian binomial U[5, 20]   100 cwc         0.992
+ 22 FALSE     Parametric: GLM gaussian gaussian U[50, 1…    20 cwc.FE      0.992
+ 23 FALSE     Parametric: GLM gaussian gaussian U[5, 20]    70 cwc         0.991
+ 24 FALSE     Parametric: GLM gaussian gaussian U[50, 1…    20 cwc         0.991
+ 25 FALSE     Parametric: RE  gaussian gaussian U[50, 1…    20 cwc         0.991
+ 26 FALSE     Parametric: GLM gaussian gaussian U[5, 20]    70 cwc.FE      0.991
+ 27 FALSE     Nonparametric   gaussian gaussian U[50, 1…    20 cwc         0.99 
+ 28 FALSE     Nonparametric   gaussian gaussian U[5, 20]    70 cwc         0.989
+ 29 FALSE     Parametric: RE  gaussian gaussian U[5, 20]    70 cwc         0.989
+ 30 FALSE     Nonparametric   gaussian binomial U[5, 20]   100 cwc         0.986
+ 31 FALSE     Nonparametric   gaussian gaussian U[50, 1…    20 cwc.FE      0.985
+ 32 FALSE     Parametric: GLM binomial binomial U[50, 1…    40 cwc.FE      0.983
+ 33 FALSE     Parametric: RE  binomial binomial U[50, 1…    40 cwc         0.983
+ 34 FALSE     Nonparametric   binomial binomial U[50, 1…    40 cwc         0.978
+ 35 FALSE     Parametric: GLM gaussian binomial U[50, 1…    20 cwc         0.978
+ 36 FALSE     Parametric: GLM gaussian binomial U[5, 20]   100 cwc.FE      0.975
+ 37 FALSE     Nonparametric   gaussian gaussian U[5, 20]   100 cwc.FE      0.969
+ 38 FALSE     Nonparametric   binomial binomial U[50, 1…    40 cwc.FE      0.967
+ 39 FALSE     Parametric: GLM gaussian binomial U[50, 1…    20 cwc.FE      0.967
+ 40 FALSE     Parametric: RE  gaussian binomial U[5, 20]   100 cwc         0.966
+ 41 FALSE     Nonparametric   gaussian binomial U[50, 1…    20 cwc         0.965
+ 42 FALSE     Parametric: RE  gaussian binomial U[50, 1…    20 cwc         0.957
+ 43 FALSE     Nonparametric   gaussian binomial U[50, 1…    20 cwc.FE      0.945
+ 44 FALSE     Parametric: GLM gaussian binomial U[5, 20]    70 cwc         0.942
+ 45 FALSE     Parametric: GLM binomial gaussian U[5, 20]   100 cwc         0.936
+ 46 FALSE     Parametric: GLM binomial gaussian U[5, 20]   100 cwc.FE      0.934
+ 47 FALSE     Nonparametric   binomial gaussian U[5, 20]   100 cwc         0.93 
+ 48 FALSE     Parametric: GLM binomial gaussian U[50, 1…    20 cwc         0.921
+ 49 FALSE     Parametric: GLM binomial gaussian U[50, 1…    20 cwc.FE      0.92 
+ 50 FALSE     Parametric: RE  binomial gaussian U[5, 20]   100 cwc         0.915
+ 51 FALSE     Parametric: RE  binomial gaussian U[50, 1…    20 cwc         0.915
+ 52 FALSE     Nonparametric   gaussian binomial U[5, 20]    70 cwc         0.914
+ 53 FALSE     Nonparametric   gaussian gaussian U[5, 20]    70 cwc.FE      0.913
+ 54 FALSE     Parametric: GLM gaussian binomial U[5, 20]    70 cwc.FE      0.902
+ 55 FALSE     Nonparametric   binomial gaussian U[50, 1…    20 cwc         0.9  
+ 56 FALSE     Nonparametric   binomial gaussian U[50, 1…    20 cwc.FE      0.885
+ 57 FALSE     Parametric: GLM gaussian gaussian U[5, 20]    40 cwc         0.881
+ 58 FALSE     Parametric: GLM gaussian gaussian U[5, 20]    40 cwc.FE      0.879
+ 59 FALSE     Parametric: RE  gaussian binomial U[5, 20]    70 cwc         0.877
+ 60 FALSE     Parametric: RE  gaussian gaussian U[5, 20]    40 cwc         0.866
+ 61 FALSE     Nonparametric   gaussian gaussian U[5, 20]    40 cwc         0.856
+ 62 FALSE     Parametric: GLM gaussian gaussian U[50, 1…    10 cwc         0.852
+ 63 FALSE     Parametric: GLM gaussian gaussian U[50, 1…    10 cwc.FE      0.849
+ 64 FALSE     Parametric: RE  gaussian gaussian U[50, 1…    10 cwc         0.848
+ 65 FALSE     Parametric: GLM binomial binomial U[5, 20]   100 cwc         0.836
+ 66 FALSE     Parametric: GLM binomial gaussian U[5, 20]    70 cwc         0.834
+ 67 FALSE     Parametric: GLM binomial gaussian U[5, 20]    70 cwc.FE      0.830
+ 68 FALSE     Nonparametric   gaussian gaussian U[50, 1…    10 cwc         0.819
+ 69 FALSE     Nonparametric   gaussian binomial U[5, 20]   100 cwc.FE      0.809
+ 70 FALSE     Nonparametric   gaussian gaussian U[50, 1…    10 cwc.FE      0.804
+ 71 FALSE     Nonparametric   binomial gaussian U[5, 20]    70 cwc         0.798
+ 72 FALSE     Parametric: RE  binomial gaussian U[5, 20]    70 cwc         0.79 
+ 73 FALSE     Nonparametric   binomial binomial U[5, 20]   100 cwc         0.781
+ 74 FALSE     Parametric: GLM binomial binomial U[50, 1…    20 cwc         0.773
+ 75 FALSE     Parametric: GLM binomial binomial U[5, 20]   100 cwc.FE      0.770
+ 76 FALSE     Nonparametric   binomial gaussian U[5, 20]   100 cwc.FE      0.764
+ 77 FALSE     Parametric: GLM binomial binomial U[50, 1…    20 cwc.FE      0.731
+ 78 FALSE     Parametric: GLM gaussian binomial U[5, 20]    40 cwc         0.719
+ 79 FALSE     Nonparametric   binomial binomial U[50, 1…    20 cwc         0.716
+ 80 FALSE     Parametric: RE  binomial binomial U[5, 20]   100 cwc         0.703
+ 81 FALSE     Nonparametric   gaussian gaussian U[5, 20]    40 cwc.FE      0.702
+ 82 FALSE     Parametric: RE  binomial binomial U[50, 1…    20 cwc         0.688
+ 83 FALSE     Nonparametric   binomial binomial U[50, 1…    20 cwc.FE      0.648
+ 84 FALSE     Nonparametric   gaussian binomial U[5, 20]    40 cwc         0.641
+ 85 FALSE     Parametric: GLM gaussian binomial U[5, 20]    40 cwc.FE      0.638
+ 86 FALSE     Nonparametric   gaussian binomial U[5, 20]    70 cwc.FE      0.638
+ 87 FALSE     Parametric: GLM binomial binomial U[5, 20]    70 cwc         0.628
+ 88 FALSE     Parametric: RE  gaussian binomial U[5, 20]    40 cwc         0.611
+ 89 FALSE     Parametric: GLM gaussian binomial U[50, 1…    10 cwc         0.591
+ 90 FALSE     Parametric: GLM binomial binomial U[5, 20]    70 cwc.FE      0.570
+ 91 FALSE     Nonparametric   binomial gaussian U[5, 20]    70 cwc.FE      0.561
+ 92 FALSE     Parametric: GLM binomial gaussian U[5, 20]    40 cwc.FE      0.556
+ 93 FALSE     Parametric: GLM binomial gaussian U[5, 20]    40 cwc         0.556
+ 94 FALSE     Parametric: GLM gaussian binomial U[50, 1…    10 cwc.FE      0.556
+ 95 FALSE     Nonparametric   binomial binomial U[5, 20]    70 cwc         0.55 
+ 96 FALSE     Parametric: RE  gaussian binomial U[50, 1…    10 cwc         0.545
+ 97 FALSE     Nonparametric   gaussian binomial U[50, 1…    10 cwc         0.538
+ 98 FALSE     Parametric: RE  binomial binomial U[5, 20]    70 cwc         0.517
+ 99 FALSE     Parametric: RE  binomial gaussian U[5, 20]    40 cwc         0.488
+100 FALSE     Nonparametric   binomial gaussian U[5, 20]    40 cwc         0.482
+101 FALSE     Parametric: GLM binomial gaussian U[50, 1…    10 cwc         0.463
+102 FALSE     Nonparametric   gaussian binomial U[50, 1…    10 cwc.FE      0.46 
+103 FALSE     Parametric: GLM binomial gaussian U[50, 1…    10 cwc.FE      0.46 
+104 FALSE     Parametric: RE  binomial gaussian U[50, 1…    10 cwc         0.454
+105 FALSE     Nonparametric   binomial gaussian U[50, 1…    10 cwc         0.409
+106 FALSE     Nonparametric   binomial gaussian U[50, 1…    10 cwc.FE      0.402
+107 FALSE     Nonparametric   binomial binomial U[5, 20]   100 cwc.FE      0.394
+108 FALSE     Parametric: GLM binomial binomial U[5, 20]    40 cwc         0.344
+109 FALSE     Nonparametric   binomial gaussian U[5, 20]    40 cwc.FE      0.337
+110 FALSE     Nonparametric   gaussian binomial U[5, 20]    40 cwc.FE      0.331
+111 FALSE     Parametric: GLM binomial binomial U[5, 20]    40 cwc.FE      0.284
+112 FALSE     Parametric: RE  binomial binomial U[5, 20]    40 cwc         0.278
+113 FALSE     Nonparametric   binomial binomial U[5, 20]    40 cwc         0.26 
+114 FALSE     Parametric: GLM binomial binomial U[50, 1…    10 cwc         0.258
+115 FALSE     Nonparametric   binomial binomial U[5, 20]    70 cwc.FE      0.255
+116 FALSE     Parametric: GLM binomial binomial U[50, 1…    10 cwc.FE      0.241
+117 FALSE     Nonparametric   binomial binomial U[50, 1…    10 cwc         0.209
+118 FALSE     Nonparametric   binomial binomial U[50, 1…    10 cwc.FE      0.173
+119 FALSE     Nonparametric   binomial binomial U[5, 20]    40 cwc.FE      0.109
+
+
+==============================================================================
+Bias - Individual - NIE - Linear - Null
+==============================================================================
+# A tibble: 120 × 8
+    quadratic Fit             Mfamily  Yfamily  Nj        J cluster_opt      avg
+    <lgl>     <chr>           <chr>    <chr>    <chr> <dbl> <chr>          <dbl>
+  1 FALSE     Parametric: RE  gaussian gaussian U[5,…    70 cwc          4.08e-3
+  2 FALSE     Parametric: RE  gaussian gaussian U[5,…    40 cwc          3.61e-3
+  3 FALSE     Parametric: RE  gaussian gaussian U[5,…   100 cwc          3.48e-3
+  4 FALSE     Nonparametric   binomial gaussian U[5,…    40 cwc.FE       2.24e-3
+  5 FALSE     Parametric: RE  binomial gaussian U[5,…    70 cwc          1.82e-3
+  6 FALSE     Nonparametric   binomial gaussian U[5,…   100 cwc.FE       1.51e-3
+  7 FALSE     Parametric: RE  binomial gaussian U[5,…   100 cwc          1.47e-3
+  8 FALSE     Parametric: RE  binomial gaussian U[5,…    40 cwc          1.31e-3
+  9 FALSE     Nonparametric   gaussian gaussian U[5,…    70 cwc.FE       1.03e-3
+ 10 FALSE     Nonparametric   binomial gaussian U[5,…    70 cwc.FE       9.67e-4
+ 11 FALSE     Parametric: GLM binomial gaussian U[5,…    70 cwc.FE       6.70e-4
+ 12 FALSE     Parametric: GLM binomial gaussian U[5,…    70 cwc          6.68e-4
+ 13 FALSE     Nonparametric   gaussian binomial U[50…    10 cwc.FE       6.59e-4
+ 14 FALSE     Nonparametric   gaussian binomial U[50…    10 cwc          5.63e-4
+ 15 FALSE     Parametric: RE  gaussian binomial U[5,…    40 cwc          4.75e-4
+ 16 FALSE     Nonparametric   binomial gaussian U[5,…    40 cwc          4.53e-4
+ 17 FALSE     Parametric: RE  gaussian gaussian U[50…    40 cwc          4.50e-4
+ 18 FALSE     Parametric: GLM gaussian binomial U[5,…    40 cwc.FE       4.47e-4
+ 19 FALSE     Parametric: GLM gaussian binomial U[5,…    40 cwc          3.94e-4
+ 20 FALSE     Nonparametric   binomial gaussian U[5,…    70 cwc          3.58e-4
+ 21 FALSE     Parametric: GLM gaussian binomial U[50…    10 cwc.FE       3.26e-4
+ 22 FALSE     Parametric: GLM gaussian binomial U[50…    10 cwc          3.13e-4
+ 23 FALSE     Nonparametric   binomial gaussian U[50…    20 cwc.FE       2.64e-4
+ 24 FALSE     Parametric: RE  gaussian binomial U[50…    10 cwc          2.45e-4
+ 25 FALSE     Nonparametric   binomial gaussian U[5,…   100 cwc          2.18e-4
+ 26 FALSE     Parametric: GLM gaussian binomial U[5,…    70 cwc.FE       2.16e-4
+ 27 FALSE     Parametric: RE  binomial gaussian U[50…    40 cwc          2.13e-4
+ 28 FALSE     Parametric: GLM binomial gaussian U[5,…    40 cwc.FE       2.13e-4
+ 29 FALSE     Parametric: GLM binomial gaussian U[5,…    40 cwc          2.08e-4
+ 30 FALSE     Nonparametric   binomial binomial U[50…    20 cwc          2.03e-4
+ 31 FALSE     Parametric: GLM gaussian gaussian U[5,…    70 cwc.FE       1.99e-4
+ 32 FALSE     Parametric: GLM binomial gaussian U[5,…   100 cwc.FE       1.90e-4
+ 33 FALSE     Parametric: GLM binomial gaussian U[5,…   100 cwc          1.87e-4
+ 34 FALSE     Parametric: GLM gaussian gaussian U[5,…    70 cwc          1.80e-4
+ 35 FALSE     Nonparametric   gaussian binomial U[5,…    70 cwc          1.79e-4
+ 36 FALSE     Parametric: RE  binomial gaussian U[50…    10 cwc          1.55e-4
+ 37 FALSE     Parametric: RE  binomial gaussian U[50…    20 cwc          1.52e-4
+ 38 FALSE     Nonparametric   gaussian gaussian U[50…    40 cwc.FE       1.39e-4
+ 39 FALSE     Nonparametric   gaussian gaussian U[5,…    70 cwc          1.33e-4
+ 40 FALSE     Parametric: RE  gaussian binomial U[5,…    70 cwc          1.23e-4
+ 41 FALSE     Parametric: GLM binomial gaussian U[50…    40 cwc          1.11e-4
+ 42 FALSE     Parametric: GLM binomial gaussian U[50…    40 cwc.FE       1.10e-4
+ 43 FALSE     Nonparametric   gaussian binomial U[5,…    40 cwc          1.10e-4
+ 44 FALSE     Parametric: GLM binomial binomial U[50…    20 cwc          1.10e-4
+ 45 FALSE     Nonparametric   gaussian binomial U[50…    40 cwc.FE       1.04e-4
+ 46 FALSE     Parametric: GLM gaussian binomial U[5,…    70 cwc          9.02e-5
+ 47 FALSE     Parametric: GLM binomial gaussian U[50…    10 cwc.FE       8.64e-5
+ 48 FALSE     Parametric: GLM binomial gaussian U[50…    10 cwc          8.55e-5
+ 49 FALSE     Parametric: GLM binomial binomial U[50…    40 cwc          8.06e-5
+ 50 FALSE     Parametric: GLM gaussian gaussian U[50…    40 cwc.FE       7.17e-5
+ 51 FALSE     Parametric: GLM gaussian gaussian U[50…    40 cwc          6.96e-5
+ 52 FALSE     Nonparametric   gaussian binomial U[50…    40 cwc          6.58e-5
+ 53 FALSE     Parametric: GLM binomial gaussian U[50…    20 cwc          5.61e-5
+ 54 FALSE     Parametric: GLM binomial gaussian U[50…    20 cwc.FE       5.61e-5
+ 55 FALSE     Parametric: GLM gaussian binomial U[50…    40 cwc.FE       4.70e-5
+ 56 FALSE     Parametric: GLM binomial binomial U[50…    20 cwc.FE       4.47e-5
+ 57 FALSE     Nonparametric   binomial binomial U[50…    40 cwc          3.54e-5
+ 58 FALSE     Parametric: GLM binomial binomial U[5,…    40 cwc.FE       3.40e-5
+ 59 FALSE     Parametric: GLM binomial binomial U[50…    40 cwc.FE       3.07e-5
+ 60 FALSE     Nonparametric   binomial gaussian U[50…    40 cwc          3.06e-5
+ 61 FALSE     Parametric: GLM gaussian binomial U[50…    40 cwc          2.15e-5
+ 62 FALSE     Nonparametric   binomial binomial U[5,…    70 cwc          1.40e-5
+ 63 FALSE     Parametric: GLM binomial binomial U[5,…    70 cwc          1.51e-6
+ 64 FALSE     Nonparametric   binomial binomial U[50…    20 cwc.FE      -8.88e-6
+ 65 FALSE     Nonparametric   binomial gaussian U[50…    20 cwc         -2.22e-5
+ 66 FALSE     Parametric: RE  binomial binomial U[50…    20 cwc         -3.00e-5
+ 67 FALSE     Parametric: GLM binomial binomial U[5,…    40 cwc         -3.95e-5
+ 68 FALSE     Parametric: GLM binomial binomial U[5,…    70 cwc.FE      -6.22e-5
+ 69 FALSE     Nonparametric   gaussian binomial U[50…    20 cwc.FE      -7.27e-5
+ 70 FALSE     Nonparametric   binomial binomial U[50…    40 cwc.FE      -8.26e-5
+ 71 FALSE     Nonparametric   binomial gaussian U[50…    40 cwc.FE      -1.01e-4
+ 72 FALSE     Parametric: RE  gaussian binomial U[50…    40 cwc         -1.05e-4
+ 73 FALSE     Parametric: RE  binomial binomial U[50…    40 cwc         -1.11e-4
+ 74 FALSE     Parametric: GLM gaussian binomial U[50…    20 cwc.FE      -1.12e-4
+ 75 FALSE     Nonparametric   gaussian gaussian U[5,…    40 cwc.FE      -1.26e-4
+ 76 FALSE     Parametric: GLM gaussian binomial U[50…    20 cwc         -1.35e-4
+ 77 FALSE     Nonparametric   gaussian gaussian U[50…    40 cwc         -1.40e-4
+ 78 FALSE     Nonparametric   binomial gaussian U[50…    10 cwc.FE      -1.42e-4
+ 79 FALSE     Parametric: GLM binomial binomial U[50…    10 cwc         -1.56e-4
+ 80 FALSE     Nonparametric   gaussian binomial U[50…    20 cwc         -1.56e-4
+ 81 FALSE     Parametric: RE  gaussian binomial U[50…    20 cwc         -1.58e-4
+ 82 FALSE     Parametric: RE  gaussian gaussian U[50…    20 cwc         -1.71e-4
+ 83 FALSE     Parametric: GLM binomial binomial U[50…    10 cwc.FE      -1.81e-4
+ 84 FALSE     Parametric: RE  binomial binomial U[50…    10 cwc         -1.88e-4
+ 85 FALSE     Nonparametric   gaussian gaussian U[5,…   100 cwc.FE      -2.16e-4
+ 86 FALSE     Parametric: GLM binomial binomial U[5,…   100 cwc.FE      -2.33e-4
+ 87 FALSE     Parametric: GLM binomial binomial U[5,…   100 cwc         -2.34e-4
+ 88 FALSE     Nonparametric   binomial gaussian U[50…    10 cwc         -2.44e-4
+ 89 FALSE     Nonparametric   binomial binomial U[5,…   100 cwc         -2.45e-4
+ 90 FALSE     Nonparametric   gaussian binomial U[5,…    70 cwc.FE      -2.69e-4
+ 91 FALSE     Parametric: GLM gaussian binomial U[5,…   100 cwc.FE      -2.98e-4
+ 92 FALSE     Parametric: GLM gaussian binomial U[5,…   100 cwc         -3.30e-4
+ 93 FALSE     Nonparametric   binomial binomial U[50…    10 cwc         -3.64e-4
+ 94 FALSE     Nonparametric   gaussian binomial U[5,…   100 cwc         -3.87e-4
+ 95 FALSE     Nonparametric   binomial binomial U[50…    10 cwc.FE      -3.91e-4
+ 96 FALSE     Parametric: GLM gaussian gaussian U[5,…   100 cwc.FE      -4.64e-4
+ 97 FALSE     Nonparametric   gaussian binomial U[5,…    40 cwc.FE      -4.66e-4
+ 98 FALSE     Parametric: GLM gaussian gaussian U[5,…   100 cwc         -4.73e-4
+ 99 FALSE     Parametric: RE  gaussian binomial U[5,…   100 cwc         -4.82e-4
+100 FALSE     Parametric: GLM gaussian gaussian U[5,…    40 cwc.FE      -4.93e-4
+101 FALSE     Parametric: GLM gaussian gaussian U[5,…    40 cwc         -5.21e-4
+102 FALSE     Nonparametric   binomial binomial U[5,…    40 cwc         -5.23e-4
+103 FALSE     Nonparametric   gaussian gaussian U[5,…   100 cwc         -5.35e-4
+104 FALSE     Parametric: GLM gaussian gaussian U[50…    20 cwc.FE      -5.71e-4
+105 FALSE     Nonparametric   gaussian gaussian U[50…    20 cwc.FE      -5.74e-4
+106 FALSE     Parametric: GLM gaussian gaussian U[50…    20 cwc         -5.75e-4
+107 FALSE     Nonparametric   gaussian gaussian U[50…    20 cwc         -6.21e-4
+108 FALSE     Parametric: RE  gaussian gaussian U[50…    10 cwc         -8.28e-4
+109 FALSE     Nonparametric   gaussian gaussian U[5,…    40 cwc         -9.06e-4
+110 FALSE     Nonparametric   binomial binomial U[5,…    70 cwc.FE      -1.03e-3
+111 FALSE     Nonparametric   binomial binomial U[5,…   100 cwc.FE      -1.06e-3
+112 FALSE     Parametric: GLM gaussian gaussian U[50…    10 cwc.FE      -1.13e-3
+113 FALSE     Parametric: GLM gaussian gaussian U[50…    10 cwc         -1.14e-3
+114 FALSE     Nonparametric   gaussian gaussian U[50…    10 cwc         -1.25e-3
+115 FALSE     Nonparametric   binomial binomial U[5,…    40 cwc.FE      -1.34e-3
+116 FALSE     Parametric: RE  binomial binomial U[5,…    40 cwc         -1.62e-3
+117 FALSE     Nonparametric   gaussian gaussian U[50…    10 cwc.FE      -1.70e-3
+118 FALSE     Parametric: RE  binomial binomial U[5,…    70 cwc         -1.70e-3
+119 FALSE     Nonparametric   gaussian binomial U[5,…   100 cwc.FE      -1.75e-3
+120 FALSE     Parametric: RE  binomial binomial U[5,…   100 cwc         -1.95e-3
+
+
+==============================================================================
+Coverage - Individual - NIE - Linear - Null
+==============================================================================
+# A tibble: 120 × 8
+    quadratic Fit             Mfamily  Yfamily  Nj           J cluster_opt   avg
+    <lgl>     <chr>           <chr>    <chr>    <chr>    <dbl> <chr>       <dbl>
+  1 FALSE     Parametric: GLM binomial binomial U[50, 1…    10 cwc.FE      0.996
+  2 FALSE     Parametric: GLM binomial binomial U[50, 1…    10 cwc         0.995
+  3 FALSE     Parametric: RE  binomial binomial U[50, 1…    10 cwc         0.991
+  4 FALSE     Parametric: GLM binomial gaussian U[50, 1…    10 cwc.FE      0.986
+  5 FALSE     Parametric: RE  gaussian binomial U[50, 1…    10 cwc         0.986
+  6 FALSE     Nonparametric   binomial binomial U[50, 1…    10 cwc         0.985
+  7 FALSE     Parametric: GLM binomial gaussian U[50, 1…    10 cwc         0.985
+  8 FALSE     Parametric: RE  binomial gaussian U[50, 1…    10 cwc         0.984
+  9 FALSE     Parametric: RE  binomial binomial U[50, 1…    20 cwc         0.983
+ 10 FALSE     Nonparametric   binomial binomial U[50, 1…    10 cwc.FE      0.981
+ 11 FALSE     Nonparametric   binomial gaussian U[50, 1…    10 cwc.FE      0.981
+ 12 FALSE     Nonparametric   binomial gaussian U[50, 1…    10 cwc         0.98 
+ 13 FALSE     Parametric: RE  binomial binomial U[50, 1…    40 cwc         0.979
+ 14 FALSE     Nonparametric   binomial gaussian U[50, 1…    20 cwc         0.978
+ 15 FALSE     Nonparametric   gaussian binomial U[50, 1…    10 cwc.FE      0.978
+ 16 FALSE     Nonparametric   gaussian gaussian U[50, 1…    10 cwc.FE      0.978
+ 17 FALSE     Parametric: GLM binomial gaussian U[50, 1…    20 cwc         0.978
+ 18 FALSE     Parametric: GLM binomial gaussian U[50, 1…    20 cwc.FE      0.978
+ 19 FALSE     Parametric: RE  gaussian binomial U[50, 1…    20 cwc         0.977
+ 20 FALSE     Parametric: RE  binomial binomial U[5, 20]    40 cwc         0.976
+ 21 FALSE     Parametric: RE  gaussian gaussian U[50, 1…    10 cwc         0.976
+ 22 FALSE     Parametric: GLM binomial binomial U[50, 1…    20 cwc         0.976
+ 23 FALSE     Parametric: GLM gaussian binomial U[50, 1…    10 cwc.FE      0.976
+ 24 FALSE     Parametric: RE  binomial gaussian U[50, 1…    20 cwc         0.976
+ 25 FALSE     Parametric: GLM binomial gaussian U[5, 20]    40 cwc         0.974
+ 26 FALSE     Parametric: GLM gaussian binomial U[50, 1…    10 cwc         0.974
+ 27 FALSE     Parametric: GLM gaussian gaussian U[50, 1…    10 cwc         0.974
+ 28 FALSE     Parametric: GLM gaussian gaussian U[50, 1…    10 cwc.FE      0.974
+ 29 FALSE     Parametric: GLM binomial gaussian U[5, 20]    40 cwc.FE      0.974
+ 30 FALSE     Nonparametric   binomial gaussian U[50, 1…    20 cwc.FE      0.973
+ 31 FALSE     Nonparametric   gaussian binomial U[50, 1…    10 cwc         0.973
+ 32 FALSE     Nonparametric   gaussian gaussian U[50, 1…    10 cwc         0.973
+ 33 FALSE     Parametric: GLM binomial binomial U[50, 1…    20 cwc.FE      0.973
+ 34 FALSE     Parametric: GLM binomial binomial U[5, 20]    40 cwc.FE      0.973
+ 35 FALSE     Nonparametric   binomial binomial U[50, 1…    20 cwc         0.97 
+ 36 FALSE     Nonparametric   gaussian gaussian U[50, 1…    20 cwc.FE      0.97 
+ 37 FALSE     Parametric: RE  binomial gaussian U[5, 20]    40 cwc         0.968
+ 38 FALSE     Nonparametric   gaussian gaussian U[50, 1…    40 cwc.FE      0.968
+ 39 FALSE     Parametric: GLM binomial binomial U[5, 20]    40 cwc         0.968
+ 40 FALSE     Parametric: GLM gaussian binomial U[50, 1…    20 cwc         0.968
+ 41 FALSE     Parametric: RE  gaussian binomial U[50, 1…    40 cwc         0.968
+ 42 FALSE     Nonparametric   binomial binomial U[50, 1…    20 cwc.FE      0.967
+ 43 FALSE     Parametric: RE  binomial binomial U[5, 20]    70 cwc         0.967
+ 44 FALSE     Nonparametric   binomial gaussian U[50, 1…    40 cwc.FE      0.965
+ 45 FALSE     Parametric: GLM binomial binomial U[5, 20]    70 cwc.FE      0.964
+ 46 FALSE     Nonparametric   binomial binomial U[5, 20]    70 cwc.FE      0.964
+ 47 FALSE     Nonparametric   binomial gaussian U[5, 20]    40 cwc.FE      0.964
+ 48 FALSE     Nonparametric   binomial gaussian U[50, 1…    40 cwc         0.964
+ 49 FALSE     Parametric: GLM gaussian gaussian U[50, 1…    40 cwc         0.964
+ 50 FALSE     Parametric: GLM gaussian gaussian U[50, 1…    40 cwc.FE      0.964
+ 51 FALSE     Nonparametric   gaussian binomial U[50, 1…    20 cwc         0.963
+ 52 FALSE     Nonparametric   gaussian gaussian U[50, 1…    40 cwc         0.963
+ 53 FALSE     Parametric: GLM binomial binomial U[5, 20]    70 cwc         0.963
+ 54 FALSE     Parametric: RE  binomial gaussian U[5, 20]    70 cwc         0.961
+ 55 FALSE     Nonparametric   binomial gaussian U[5, 20]    70 cwc.FE      0.961
+ 56 FALSE     Parametric: GLM binomial binomial U[50, 1…    40 cwc.FE      0.961
+ 57 FALSE     Parametric: GLM gaussian binomial U[50, 1…    20 cwc.FE      0.961
+ 58 FALSE     Parametric: RE  gaussian gaussian U[50, 1…    20 cwc         0.961
+ 59 FALSE     Nonparametric   binomial binomial U[5, 20]    40 cwc.FE      0.96 
+ 60 FALSE     Nonparametric   binomial gaussian U[5, 20]    40 cwc         0.96 
+ 61 FALSE     Parametric: GLM binomial binomial U[50, 1…    40 cwc         0.96 
+ 62 FALSE     Parametric: GLM gaussian gaussian U[50, 1…    20 cwc         0.96 
+ 63 FALSE     Parametric: GLM gaussian gaussian U[50, 1…    20 cwc.FE      0.96 
+ 64 FALSE     Parametric: GLM binomial gaussian U[5, 20]    70 cwc.FE      0.960
+ 65 FALSE     Parametric: RE  binomial binomial U[5, 20]   100 cwc         0.960
+ 66 FALSE     Nonparametric   gaussian gaussian U[50, 1…    20 cwc         0.959
+ 67 FALSE     Parametric: GLM binomial gaussian U[5, 20]    70 cwc         0.959
+ 68 FALSE     Parametric: RE  gaussian gaussian U[50, 1…    40 cwc         0.959
+ 69 FALSE     Nonparametric   binomial binomial U[5, 20]    40 cwc         0.958
+ 70 FALSE     Nonparametric   binomial binomial U[5, 20]   100 cwc.FE      0.958
+ 71 FALSE     Nonparametric   gaussian binomial U[5, 20]    40 cwc.FE      0.958
+ 72 FALSE     Nonparametric   gaussian binomial U[50, 1…    20 cwc.FE      0.958
+ 73 FALSE     Parametric: RE  gaussian binomial U[5, 20]   100 cwc         0.958
+ 74 FALSE     Nonparametric   gaussian binomial U[50, 1…    40 cwc.FE      0.957
+ 75 FALSE     Nonparametric   binomial binomial U[50, 1…    40 cwc         0.956
+ 76 FALSE     Nonparametric   gaussian gaussian U[5, 20]    40 cwc.FE      0.956
+ 77 FALSE     Nonparametric   gaussian gaussian U[5, 20]    70 cwc.FE      0.956
+ 78 FALSE     Parametric: RE  gaussian binomial U[5, 20]    40 cwc         0.956
+ 79 FALSE     Parametric: RE  binomial gaussian U[50, 1…    40 cwc         0.954
+ 80 FALSE     Nonparametric   binomial binomial U[50, 1…    40 cwc.FE      0.954
+ 81 FALSE     Nonparametric   binomial gaussian U[5, 20]    70 cwc         0.954
+ 82 FALSE     Parametric: GLM binomial gaussian U[50, 1…    40 cwc.FE      0.953
+ 83 FALSE     Nonparametric   binomial binomial U[5, 20]    70 cwc         0.952
+ 84 FALSE     Parametric: GLM binomial binomial U[5, 20]   100 cwc         0.952
+ 85 FALSE     Parametric: GLM binomial gaussian U[50, 1…    40 cwc         0.952
+ 86 FALSE     Parametric: GLM gaussian binomial U[50, 1…    40 cwc         0.952
+ 87 FALSE     Parametric: RE  gaussian binomial U[5, 20]    70 cwc         0.952
+ 88 FALSE     Nonparametric   binomial binomial U[5, 20]   100 cwc         0.951
+ 89 FALSE     Parametric: GLM gaussian binomial U[50, 1…    40 cwc.FE      0.95 
+ 90 FALSE     Parametric: GLM binomial binomial U[5, 20]   100 cwc.FE      0.949
+ 91 FALSE     Nonparametric   gaussian binomial U[50, 1…    40 cwc         0.947
+ 92 FALSE     Nonparametric   gaussian binomial U[5, 20]   100 cwc.FE      0.946
+ 93 FALSE     Nonparametric   gaussian gaussian U[5, 20]   100 cwc.FE      0.946
+ 94 FALSE     Nonparametric   binomial gaussian U[5, 20]   100 cwc.FE      0.945
+ 95 FALSE     Nonparametric   binomial gaussian U[5, 20]   100 cwc         0.944
+ 96 FALSE     Parametric: GLM gaussian binomial U[5, 20]    40 cwc.FE      0.942
+ 97 FALSE     Nonparametric   gaussian binomial U[5, 20]    70 cwc.FE      0.942
+ 98 FALSE     Parametric: GLM gaussian binomial U[5, 20]    40 cwc         0.942
+ 99 FALSE     Parametric: GLM gaussian gaussian U[5, 20]    40 cwc         0.939
+100 FALSE     Parametric: GLM gaussian gaussian U[5, 20]    40 cwc.FE      0.939
+101 FALSE     Parametric: RE  binomial gaussian U[5, 20]   100 cwc         0.936
+102 FALSE     Nonparametric   gaussian binomial U[5, 20]    40 cwc         0.933
+103 FALSE     Nonparametric   gaussian gaussian U[5, 20]    70 cwc         0.929
+104 FALSE     Parametric: GLM gaussian gaussian U[5, 20]   100 cwc.FE      0.929
+105 FALSE     Parametric: GLM binomial gaussian U[5, 20]   100 cwc         0.928
+106 FALSE     Parametric: GLM binomial gaussian U[5, 20]   100 cwc.FE      0.928
+107 FALSE     Parametric: GLM gaussian gaussian U[5, 20]   100 cwc         0.928
+108 FALSE     Nonparametric   gaussian gaussian U[5, 20]    40 cwc         0.924
+109 FALSE     Nonparametric   gaussian binomial U[5, 20]    70 cwc         0.923
+110 FALSE     Nonparametric   gaussian gaussian U[5, 20]   100 cwc         0.923
+111 FALSE     Parametric: GLM gaussian gaussian U[5, 20]    70 cwc         0.923
+112 FALSE     Parametric: GLM gaussian gaussian U[5, 20]    70 cwc.FE      0.923
+113 FALSE     Parametric: RE  gaussian gaussian U[5, 20]    40 cwc         0.919
+114 FALSE     Parametric: GLM gaussian binomial U[5, 20]    70 cwc         0.919
+115 FALSE     Parametric: GLM gaussian binomial U[5, 20]    70 cwc.FE      0.919
+116 FALSE     Parametric: RE  gaussian gaussian U[5, 20]    70 cwc         0.918
+117 FALSE     Nonparametric   gaussian binomial U[5, 20]   100 cwc         0.917
+118 FALSE     Parametric: RE  gaussian gaussian U[5, 20]   100 cwc         0.914
+119 FALSE     Parametric: GLM gaussian binomial U[5, 20]   100 cwc         0.913
+120 FALSE     Parametric: GLM gaussian binomial U[5, 20]   100 cwc.FE      0.912
+
+
+==============================================================================
+MSE - Individual - NIE - Linear - Null
+==============================================================================
+# A tibble: 120 × 8
+    quadratic Fit             Mfamily  Yfamily  Nj         J cluster_opt     avg
+    <lgl>     <chr>           <chr>    <chr>    <chr>  <dbl> <chr>         <dbl>
+  1 FALSE     Nonparametric   gaussian gaussian U[5, …    40 cwc.FE      2.03e-3
+  2 FALSE     Nonparametric   binomial gaussian U[5, …    40 cwc.FE      1.65e-3
+  3 FALSE     Nonparametric   gaussian gaussian U[5, …    40 cwc         9.48e-4
+  4 FALSE     Nonparametric   gaussian gaussian U[5, …    70 cwc.FE      8.47e-4
+  5 FALSE     Nonparametric   binomial gaussian U[5, …    70 cwc.FE      6.84e-4
+  6 FALSE     Nonparametric   gaussian gaussian U[5, …   100 cwc.FE      6.23e-4
+  7 FALSE     Parametric: GLM gaussian gaussian U[5, …    40 cwc.FE      6.12e-4
+  8 FALSE     Parametric: RE  gaussian gaussian U[5, …    40 cwc         6.11e-4
+  9 FALSE     Parametric: GLM gaussian gaussian U[5, …    40 cwc         6.11e-4
+ 10 FALSE     Nonparametric   gaussian gaussian U[50,…    10 cwc.FE      5.74e-4
+ 11 FALSE     Nonparametric   binomial gaussian U[5, …    40 cwc         5.63e-4
+ 12 FALSE     Nonparametric   gaussian gaussian U[50,…    10 cwc         5.49e-4
+ 13 FALSE     Nonparametric   binomial gaussian U[5, …   100 cwc.FE      4.35e-4
+ 14 FALSE     Nonparametric   gaussian gaussian U[5, …    70 cwc         4.26e-4
+ 15 FALSE     Parametric: RE  gaussian gaussian U[50,…    10 cwc         3.79e-4
+ 16 FALSE     Nonparametric   binomial gaussian U[50,…    10 cwc.FE      3.78e-4
+ 17 FALSE     Parametric: GLM gaussian gaussian U[50,…    10 cwc.FE      3.71e-4
+ 18 FALSE     Parametric: GLM gaussian gaussian U[50,…    10 cwc         3.71e-4
+ 19 FALSE     Nonparametric   gaussian binomial U[5, …    40 cwc.FE      3.68e-4
+ 20 FALSE     Nonparametric   binomial gaussian U[50,…    10 cwc         3.45e-4
+ 21 FALSE     Parametric: RE  gaussian gaussian U[5, …    70 cwc         3.40e-4
+ 22 FALSE     Parametric: GLM gaussian gaussian U[5, …    70 cwc.FE      3.39e-4
+ 23 FALSE     Parametric: GLM gaussian gaussian U[5, …    70 cwc         3.37e-4
+ 24 FALSE     Parametric: RE  binomial gaussian U[5, …    40 cwc         3.26e-4
+ 25 FALSE     Parametric: GLM binomial gaussian U[5, …    40 cwc.FE      3.12e-4
+ 26 FALSE     Parametric: GLM binomial gaussian U[5, …    40 cwc         3.10e-4
+ 27 FALSE     Nonparametric   binomial binomial U[5, …    40 cwc.FE      2.87e-4
+ 28 FALSE     Nonparametric   gaussian gaussian U[5, …   100 cwc         2.75e-4
+ 29 FALSE     Nonparametric   gaussian gaussian U[50,…    20 cwc.FE      2.47e-4
+ 30 FALSE     Nonparametric   gaussian gaussian U[50,…    20 cwc         2.44e-4
+ 31 FALSE     Nonparametric   binomial gaussian U[5, …    70 cwc         2.34e-4
+ 32 FALSE     Parametric: RE  gaussian gaussian U[5, …   100 cwc         2.32e-4
+ 33 FALSE     Parametric: GLM gaussian gaussian U[5, …   100 cwc.FE      2.31e-4
+ 34 FALSE     Parametric: GLM gaussian gaussian U[5, …   100 cwc         2.30e-4
+ 35 FALSE     Parametric: RE  binomial gaussian U[50,…    10 cwc         2.11e-4
+ 36 FALSE     Parametric: GLM binomial gaussian U[50,…    10 cwc.FE      2.05e-4
+ 37 FALSE     Parametric: GLM binomial gaussian U[50,…    10 cwc         2.05e-4
+ 38 FALSE     Nonparametric   gaussian binomial U[5, …    70 cwc.FE      2.04e-4
+ 39 FALSE     Parametric: RE  gaussian gaussian U[50,…    20 cwc         1.96e-4
+ 40 FALSE     Nonparametric   gaussian binomial U[5, …    40 cwc         1.94e-4
+ 41 FALSE     Parametric: GLM gaussian gaussian U[50,…    20 cwc         1.86e-4
+ 42 FALSE     Parametric: GLM gaussian gaussian U[50,…    20 cwc.FE      1.86e-4
+ 43 FALSE     Parametric: RE  binomial gaussian U[5, …    70 cwc         1.80e-4
+ 44 FALSE     Parametric: GLM binomial gaussian U[5, …    70 cwc.FE      1.70e-4
+ 45 FALSE     Parametric: GLM binomial gaussian U[5, …    70 cwc         1.70e-4
+ 46 FALSE     Parametric: RE  gaussian binomial U[5, …    40 cwc         1.67e-4
+ 47 FALSE     Nonparametric   binomial gaussian U[5, …   100 cwc         1.66e-4
+ 48 FALSE     Parametric: GLM gaussian binomial U[5, …    40 cwc.FE      1.39e-4
+ 49 FALSE     Parametric: RE  binomial gaussian U[5, …   100 cwc         1.37e-4
+ 50 FALSE     Nonparametric   gaussian binomial U[5, …   100 cwc.FE      1.36e-4
+ 51 FALSE     Parametric: GLM gaussian binomial U[5, …    40 cwc         1.36e-4
+ 52 FALSE     Parametric: GLM binomial gaussian U[5, …   100 cwc.FE      1.32e-4
+ 53 FALSE     Parametric: GLM binomial gaussian U[5, …   100 cwc         1.32e-4
+ 54 FALSE     Nonparametric   gaussian binomial U[50,…    10 cwc.FE      1.31e-4
+ 55 FALSE     Nonparametric   binomial gaussian U[50,…    20 cwc.FE      1.30e-4
+ 56 FALSE     Nonparametric   binomial binomial U[5, …    70 cwc.FE      1.27e-4
+ 57 FALSE     Nonparametric   binomial gaussian U[50,…    20 cwc         1.26e-4
+ 58 FALSE     Nonparametric   gaussian binomial U[50,…    10 cwc         1.24e-4
+ 59 FALSE     Nonparametric   binomial binomial U[5, …    40 cwc         1.18e-4
+ 60 FALSE     Parametric: RE  binomial binomial U[5, …    40 cwc         1.12e-4
+ 61 FALSE     Nonparametric   gaussian gaussian U[50,…    40 cwc.FE      1.06e-4
+ 62 FALSE     Parametric: RE  gaussian binomial U[50,…    10 cwc         1.02e-4
+ 63 FALSE     Nonparametric   gaussian gaussian U[50,…    40 cwc         1.00e-4
+ 64 FALSE     Nonparametric   gaussian binomial U[5, …    70 cwc         9.79e-5
+ 65 FALSE     Parametric: RE  binomial gaussian U[50,…    20 cwc         9.66e-5
+ 66 FALSE     Nonparametric   binomial binomial U[5, …   100 cwc.FE      9.33e-5
+ 67 FALSE     Parametric: RE  gaussian gaussian U[50,…    40 cwc         9.33e-5
+ 68 FALSE     Parametric: GLM binomial gaussian U[50,…    20 cwc         8.99e-5
+ 69 FALSE     Parametric: GLM binomial gaussian U[50,…    20 cwc.FE      8.98e-5
+ 70 FALSE     Parametric: GLM gaussian gaussian U[50,…    40 cwc.FE      8.92e-5
+ 71 FALSE     Parametric: GLM gaussian gaussian U[50,…    40 cwc         8.90e-5
+ 72 FALSE     Parametric: RE  gaussian binomial U[5, …    70 cwc         8.90e-5
+ 73 FALSE     Parametric: GLM gaussian binomial U[50,…    10 cwc         8.23e-5
+ 74 FALSE     Parametric: GLM gaussian binomial U[50,…    10 cwc.FE      8.22e-5
+ 75 FALSE     Nonparametric   binomial binomial U[50,…    10 cwc.FE      8.07e-5
+ 76 FALSE     Parametric: GLM binomial binomial U[5, …    40 cwc.FE      7.93e-5
+ 77 FALSE     Parametric: GLM binomial binomial U[5, …    40 cwc         7.86e-5
+ 78 FALSE     Parametric: GLM gaussian binomial U[5, …    70 cwc.FE      7.84e-5
+ 79 FALSE     Parametric: GLM gaussian binomial U[5, …    70 cwc         7.67e-5
+ 80 FALSE     Nonparametric   binomial binomial U[50,…    10 cwc         7.02e-5
+ 81 FALSE     Parametric: RE  binomial binomial U[50,…    10 cwc         6.59e-5
+ 82 FALSE     Parametric: RE  binomial binomial U[5, …    70 cwc         6.33e-5
+ 83 FALSE     Nonparametric   gaussian binomial U[5, …   100 cwc         6.30e-5
+ 84 FALSE     Parametric: RE  gaussian binomial U[5, …   100 cwc         6.05e-5
+ 85 FALSE     Nonparametric   binomial gaussian U[50,…    40 cwc.FE      5.86e-5
+ 86 FALSE     Nonparametric   binomial gaussian U[50,…    40 cwc         5.63e-5
+ 87 FALSE     Parametric: RE  gaussian binomial U[50,…    20 cwc         5.43e-5
+ 88 FALSE     Nonparametric   gaussian binomial U[50,…    20 cwc.FE      5.31e-5
+ 89 FALSE     Parametric: RE  binomial gaussian U[50,…    40 cwc         5.22e-5
+ 90 FALSE     Nonparametric   binomial binomial U[5, …    70 cwc         5.12e-5
+ 91 FALSE     Parametric: GLM gaussian binomial U[5, …   100 cwc.FE      5.12e-5
+ 92 FALSE     Nonparametric   gaussian binomial U[50,…    20 cwc         5.09e-5
+ 93 FALSE     Parametric: GLM gaussian binomial U[5, …   100 cwc         5.03e-5
+ 94 FALSE     Parametric: GLM binomial gaussian U[50,…    40 cwc         4.77e-5
+ 95 FALSE     Parametric: GLM binomial gaussian U[50,…    40 cwc.FE      4.77e-5
+ 96 FALSE     Parametric: RE  binomial binomial U[5, …   100 cwc         4.69e-5
+ 97 FALSE     Parametric: GLM binomial binomial U[50,…    10 cwc.FE      4.53e-5
+ 98 FALSE     Parametric: GLM binomial binomial U[50,…    10 cwc         4.48e-5
+ 99 FALSE     Parametric: GLM gaussian binomial U[50,…    20 cwc.FE      4.18e-5
+100 FALSE     Parametric: GLM gaussian binomial U[50,…    20 cwc         4.17e-5
+101 FALSE     Parametric: GLM binomial binomial U[5, …    70 cwc.FE      3.80e-5
+102 FALSE     Parametric: GLM binomial binomial U[5, …    70 cwc         3.77e-5
+103 FALSE     Nonparametric   binomial binomial U[5, …   100 cwc         3.42e-5
+104 FALSE     Parametric: RE  binomial binomial U[50,…    20 cwc         3.23e-5
+105 FALSE     Nonparametric   binomial binomial U[50,…    20 cwc.FE      2.87e-5
+106 FALSE     Nonparametric   binomial binomial U[50,…    20 cwc         2.78e-5
+107 FALSE     Parametric: GLM binomial binomial U[5, …   100 cwc.FE      2.69e-5
+108 FALSE     Parametric: RE  gaussian binomial U[50,…    40 cwc         2.59e-5
+109 FALSE     Parametric: GLM binomial binomial U[5, …   100 cwc         2.56e-5
+110 FALSE     Nonparametric   gaussian binomial U[50,…    40 cwc.FE      2.54e-5
+111 FALSE     Nonparametric   gaussian binomial U[50,…    40 cwc         2.24e-5
+112 FALSE     Parametric: GLM binomial binomial U[50,…    20 cwc         2.00e-5
+113 FALSE     Parametric: GLM binomial binomial U[50,…    20 cwc.FE      2.00e-5
+114 FALSE     Parametric: GLM gaussian binomial U[50,…    40 cwc         2.00e-5
+115 FALSE     Parametric: GLM gaussian binomial U[50,…    40 cwc.FE      1.99e-5
+116 FALSE     Parametric: RE  binomial binomial U[50,…    40 cwc         1.60e-5
+117 FALSE     Nonparametric   binomial binomial U[50,…    40 cwc.FE      1.39e-5
+118 FALSE     Nonparametric   binomial binomial U[50,…    40 cwc         1.24e-5
+119 FALSE     Parametric: GLM binomial binomial U[50,…    40 cwc         1.08e-5
+120 FALSE     Parametric: GLM binomial binomial U[50,…    40 cwc.FE      1.07e-5
+
+
+==============================================================================
+Type1 - Individual - NIE - Linear - Null
+==============================================================================
+# A tibble: 120 × 8
+    quadratic Fit             Mfamily  Yfamily  Nj         J cluster_opt     avg
+    <lgl>     <chr>           <chr>    <chr>    <chr>  <dbl> <chr>         <dbl>
+  1 FALSE     Parametric: GLM gaussian binomial U[5, …   100 cwc.FE      0.0877 
+  2 FALSE     Parametric: GLM gaussian binomial U[5, …   100 cwc         0.087  
+  3 FALSE     Parametric: RE  gaussian gaussian U[5, …   100 cwc         0.0860 
+  4 FALSE     Nonparametric   gaussian binomial U[5, …   100 cwc         0.083  
+  5 FALSE     Parametric: RE  gaussian gaussian U[5, …    70 cwc         0.0824 
+  6 FALSE     Parametric: GLM gaussian binomial U[5, …    70 cwc.FE      0.0811 
+  7 FALSE     Parametric: GLM gaussian binomial U[5, …    70 cwc         0.081  
+  8 FALSE     Parametric: RE  gaussian gaussian U[5, …    40 cwc         0.0807 
+  9 FALSE     Parametric: GLM gaussian gaussian U[5, …    70 cwc.FE      0.0773 
+ 10 FALSE     Nonparametric   gaussian binomial U[5, …    70 cwc         0.077  
+ 11 FALSE     Nonparametric   gaussian gaussian U[5, …   100 cwc         0.077  
+ 12 FALSE     Parametric: GLM gaussian gaussian U[5, …    70 cwc         0.077  
+ 13 FALSE     Nonparametric   gaussian gaussian U[5, …    40 cwc         0.076  
+ 14 FALSE     Parametric: GLM binomial gaussian U[5, …   100 cwc         0.072  
+ 15 FALSE     Parametric: GLM binomial gaussian U[5, …   100 cwc.FE      0.072  
+ 16 FALSE     Parametric: GLM gaussian gaussian U[5, …   100 cwc         0.072  
+ 17 FALSE     Parametric: GLM gaussian gaussian U[5, …   100 cwc.FE      0.0711 
+ 18 FALSE     Nonparametric   gaussian gaussian U[5, …    70 cwc         0.071  
+ 19 FALSE     Nonparametric   gaussian binomial U[5, …    40 cwc         0.067  
+ 20 FALSE     Parametric: RE  binomial gaussian U[5, …   100 cwc         0.0645 
+ 21 FALSE     Parametric: GLM gaussian gaussian U[5, …    40 cwc.FE      0.0611 
+ 22 FALSE     Parametric: GLM gaussian gaussian U[5, …    40 cwc         0.061  
+ 23 FALSE     Nonparametric   gaussian binomial U[5, …    70 cwc.FE      0.058  
+ 24 FALSE     Parametric: GLM gaussian binomial U[5, …    40 cwc         0.058  
+ 25 FALSE     Parametric: GLM gaussian binomial U[5, …    40 cwc.FE      0.0577 
+ 26 FALSE     Nonparametric   binomial gaussian U[5, …   100 cwc         0.056  
+ 27 FALSE     Nonparametric   binomial gaussian U[5, …   100 cwc.FE      0.055  
+ 28 FALSE     Nonparametric   gaussian binomial U[5, …   100 cwc.FE      0.054  
+ 29 FALSE     Nonparametric   gaussian gaussian U[5, …   100 cwc.FE      0.054  
+ 30 FALSE     Nonparametric   gaussian binomial U[50,…    40 cwc         0.053  
+ 31 FALSE     Parametric: GLM binomial binomial U[5, …   100 cwc.FE      0.0513 
+ 32 FALSE     Parametric: GLM gaussian binomial U[50,…    40 cwc.FE      0.05   
+ 33 FALSE     Nonparametric   binomial binomial U[5, …   100 cwc         0.049  
+ 34 FALSE     Parametric: RE  gaussian binomial U[5, …    70 cwc         0.0484 
+ 35 FALSE     Nonparametric   binomial binomial U[5, …    70 cwc         0.048  
+ 36 FALSE     Parametric: GLM binomial binomial U[5, …   100 cwc         0.048  
+ 37 FALSE     Parametric: GLM binomial gaussian U[50,…    40 cwc         0.048  
+ 38 FALSE     Parametric: GLM gaussian binomial U[50,…    40 cwc         0.048  
+ 39 FALSE     Parametric: GLM binomial gaussian U[50,…    40 cwc.FE      0.047  
+ 40 FALSE     Nonparametric   binomial binomial U[50,…    40 cwc.FE      0.046  
+ 41 FALSE     Nonparametric   binomial gaussian U[5, …    70 cwc         0.046  
+ 42 FALSE     Parametric: RE  binomial gaussian U[50,…    40 cwc         0.0459 
+ 43 FALSE     Parametric: RE  gaussian binomial U[5, …    40 cwc         0.0445 
+ 44 FALSE     Nonparametric   binomial binomial U[50,…    40 cwc         0.044  
+ 45 FALSE     Nonparametric   gaussian gaussian U[5, …    40 cwc.FE      0.044  
+ 46 FALSE     Nonparametric   gaussian gaussian U[5, …    70 cwc.FE      0.044  
+ 47 FALSE     Nonparametric   gaussian binomial U[50,…    40 cwc.FE      0.043  
+ 48 FALSE     Parametric: RE  gaussian binomial U[5, …   100 cwc         0.0420 
+ 49 FALSE     Nonparametric   binomial binomial U[5, …    40 cwc         0.042  
+ 50 FALSE     Nonparametric   binomial binomial U[5, …   100 cwc.FE      0.042  
+ 51 FALSE     Nonparametric   gaussian binomial U[5, …    40 cwc.FE      0.042  
+ 52 FALSE     Nonparametric   gaussian binomial U[50,…    20 cwc.FE      0.042  
+ 53 FALSE     Parametric: RE  gaussian gaussian U[50,…    40 cwc         0.0414 
+ 54 FALSE     Nonparametric   gaussian gaussian U[50,…    20 cwc         0.041  
+ 55 FALSE     Parametric: GLM binomial gaussian U[5, …    70 cwc         0.041  
+ 56 FALSE     Parametric: RE  binomial binomial U[5, …   100 cwc         0.0402 
+ 57 FALSE     Parametric: GLM binomial gaussian U[5, …    70 cwc.FE      0.0401 
+ 58 FALSE     Nonparametric   binomial binomial U[5, …    40 cwc.FE      0.04   
+ 59 FALSE     Nonparametric   binomial gaussian U[5, …    40 cwc         0.04   
+ 60 FALSE     Parametric: GLM binomial binomial U[50,…    40 cwc         0.04   
+ 61 FALSE     Parametric: GLM gaussian gaussian U[50,…    20 cwc         0.04   
+ 62 FALSE     Parametric: GLM gaussian gaussian U[50,…    20 cwc.FE      0.04   
+ 63 FALSE     Parametric: RE  gaussian gaussian U[50,…    20 cwc         0.0393 
+ 64 FALSE     Parametric: GLM gaussian binomial U[50,…    20 cwc.FE      0.0391 
+ 65 FALSE     Nonparametric   binomial gaussian U[5, …    70 cwc.FE      0.039  
+ 66 FALSE     Parametric: GLM binomial binomial U[50,…    40 cwc.FE      0.039  
+ 67 FALSE     Parametric: RE  binomial gaussian U[5, …    70 cwc         0.0389 
+ 68 FALSE     Nonparametric   gaussian binomial U[50,…    20 cwc         0.037  
+ 69 FALSE     Nonparametric   gaussian gaussian U[50,…    40 cwc         0.037  
+ 70 FALSE     Parametric: GLM binomial binomial U[5, …    70 cwc         0.037  
+ 71 FALSE     Nonparametric   binomial binomial U[5, …    70 cwc.FE      0.036  
+ 72 FALSE     Nonparametric   binomial gaussian U[5, …    40 cwc.FE      0.036  
+ 73 FALSE     Nonparametric   binomial gaussian U[50,…    40 cwc         0.036  
+ 74 FALSE     Parametric: GLM gaussian gaussian U[50,…    40 cwc         0.036  
+ 75 FALSE     Parametric: GLM gaussian gaussian U[50,…    40 cwc.FE      0.036  
+ 76 FALSE     Parametric: GLM binomial binomial U[5, …    70 cwc.FE      0.0355 
+ 77 FALSE     Nonparametric   binomial gaussian U[50,…    40 cwc.FE      0.035  
+ 78 FALSE     Parametric: RE  binomial binomial U[5, …    70 cwc         0.0332 
+ 79 FALSE     Nonparametric   binomial binomial U[50,…    20 cwc.FE      0.033  
+ 80 FALSE     Parametric: RE  gaussian binomial U[50,…    40 cwc         0.0321 
+ 81 FALSE     Nonparametric   gaussian gaussian U[50,…    40 cwc.FE      0.032  
+ 82 FALSE     Parametric: GLM binomial binomial U[5, …    40 cwc         0.032  
+ 83 FALSE     Parametric: GLM gaussian binomial U[50,…    20 cwc         0.032  
+ 84 FALSE     Parametric: RE  binomial gaussian U[5, …    40 cwc         0.0315 
+ 85 FALSE     Nonparametric   binomial binomial U[50,…    20 cwc         0.03   
+ 86 FALSE     Nonparametric   gaussian gaussian U[50,…    20 cwc.FE      0.03   
+ 87 FALSE     Parametric: GLM binomial binomial U[5, …    40 cwc.FE      0.0271 
+ 88 FALSE     Nonparametric   binomial gaussian U[50,…    20 cwc.FE      0.027  
+ 89 FALSE     Nonparametric   gaussian binomial U[50,…    10 cwc         0.027  
+ 90 FALSE     Nonparametric   gaussian gaussian U[50,…    10 cwc         0.027  
+ 91 FALSE     Parametric: GLM binomial binomial U[50,…    20 cwc.FE      0.027  
+ 92 FALSE     Parametric: GLM binomial gaussian U[5, …    40 cwc.FE      0.0261 
+ 93 FALSE     Parametric: GLM binomial gaussian U[5, …    40 cwc         0.026  
+ 94 FALSE     Parametric: GLM gaussian binomial U[50,…    10 cwc         0.026  
+ 95 FALSE     Parametric: GLM gaussian gaussian U[50,…    10 cwc         0.026  
+ 96 FALSE     Parametric: GLM gaussian gaussian U[50,…    10 cwc.FE      0.026  
+ 97 FALSE     Parametric: RE  binomial gaussian U[50,…    20 cwc         0.0243 
+ 98 FALSE     Parametric: GLM binomial binomial U[50,…    20 cwc         0.024  
+ 99 FALSE     Parametric: GLM gaussian binomial U[50,…    10 cwc.FE      0.024  
+100 FALSE     Parametric: RE  gaussian gaussian U[50,…    10 cwc         0.0238 
+101 FALSE     Parametric: RE  binomial binomial U[5, …    40 cwc         0.0237 
+102 FALSE     Parametric: RE  gaussian binomial U[50,…    20 cwc         0.0231 
+103 FALSE     Nonparametric   binomial gaussian U[50,…    20 cwc         0.022  
+104 FALSE     Nonparametric   gaussian binomial U[50,…    10 cwc.FE      0.022  
+105 FALSE     Nonparametric   gaussian gaussian U[50,…    10 cwc.FE      0.022  
+106 FALSE     Parametric: GLM binomial gaussian U[50,…    20 cwc         0.022  
+107 FALSE     Parametric: GLM binomial gaussian U[50,…    20 cwc.FE      0.022  
+108 FALSE     Parametric: RE  binomial binomial U[50,…    40 cwc         0.0210 
+109 FALSE     Nonparametric   binomial gaussian U[50,…    10 cwc         0.02   
+110 FALSE     Nonparametric   binomial binomial U[50,…    10 cwc.FE      0.019  
+111 FALSE     Nonparametric   binomial gaussian U[50,…    10 cwc.FE      0.019  
+112 FALSE     Parametric: RE  binomial binomial U[50,…    20 cwc         0.0171 
+113 FALSE     Parametric: RE  binomial gaussian U[50,…    10 cwc         0.0160 
+114 FALSE     Nonparametric   binomial binomial U[50,…    10 cwc         0.015  
+115 FALSE     Parametric: GLM binomial gaussian U[50,…    10 cwc         0.015  
+116 FALSE     Parametric: RE  gaussian binomial U[50,…    10 cwc         0.0141 
+117 FALSE     Parametric: GLM binomial gaussian U[50,…    10 cwc.FE      0.014  
+118 FALSE     Parametric: RE  binomial binomial U[50,…    10 cwc         0.00908
+119 FALSE     Parametric: GLM binomial binomial U[50,…    10 cwc         0.005  
+120 FALSE     Parametric: GLM binomial binomial U[50,…    10 cwc.FE      0.004  
+

@@ -1,0 +1,56 @@
+
+==============================================================================
+True values - Nonnull
+==============================================================================
+# A tibble: 48 × 7
+# Groups:   quad, Mfamily, Yfamily, J, Nj [48]
+   quad      Mfamily  Yfamily     J Nj    true_individual_TNIE true_cluster_TNIE
+   <chr>     <chr>    <chr>   <dbl> <chr>                <dbl>             <dbl>
+ 1 linear    binomial binomi…    10 U[50…               0.0228            0.0222
+ 2 linear    binomial binomi…    20 U[50…               0.0229            0.0222
+ 3 linear    binomial binomi…    40 U[5,…               0.0237            0.0225
+ 4 linear    binomial binomi…    40 U[50…               0.0229            0.0223
+ 5 linear    binomial binomi…    70 U[5,…               0.0237            0.0225
+ 6 linear    binomial binomi…   100 U[5,…               0.0237            0.0225
+ 7 linear    binomial gaussi…    10 U[50…               0.0987            0.0956
+ 8 linear    binomial gaussi…    20 U[50…               0.0985            0.0951
+ 9 linear    binomial gaussi…    40 U[5,…               0.102             0.0963
+10 linear    binomial gaussi…    40 U[50…               0.0984            0.0950
+11 linear    binomial gaussi…    70 U[5,…               0.102             0.0960
+12 linear    binomial gaussi…   100 U[5,…               0.102             0.0961
+13 linear    gaussian binomi…    10 U[50…               0.0569            0.0552
+14 linear    gaussian binomi…    20 U[50…               0.0565            0.0547
+15 linear    gaussian binomi…    40 U[5,…               0.0587            0.0555
+16 linear    gaussian binomi…    40 U[50…               0.0566            0.0547
+17 linear    gaussian binomi…    70 U[5,…               0.0587            0.0554
+18 linear    gaussian binomi…   100 U[5,…               0.0588            0.0555
+19 linear    gaussian gaussi…    10 U[50…               0.310             0.300 
+20 linear    gaussian gaussi…    20 U[50…               0.310             0.300 
+21 linear    gaussian gaussi…    40 U[5,…               0.322             0.303 
+22 linear    gaussian gaussi…    40 U[50…               0.311             0.300 
+23 linear    gaussian gaussi…    70 U[5,…               0.321             0.302 
+24 linear    gaussian gaussi…   100 U[5,…               0.322             0.302 
+25 nonlinear binomial binomi…    10 U[50…               0.0236            0.0230
+26 nonlinear binomial binomi…    20 U[50…               0.0236            0.0230
+27 nonlinear binomial binomi…    40 U[5,…               0.0244            0.0232
+28 nonlinear binomial binomi…    40 U[50…               0.0237            0.0230
+29 nonlinear binomial binomi…    70 U[5,…               0.0243            0.0231
+30 nonlinear binomial binomi…   100 U[5,…               0.0244            0.0232
+31 nonlinear binomial gaussi…    10 U[50…               0.101             0.0981
+32 nonlinear binomial gaussi…    20 U[50…               0.101             0.0976
+33 nonlinear binomial gaussi…    40 U[5,…               0.105             0.0990
+34 nonlinear binomial gaussi…    40 U[50…               0.101             0.0976
+35 nonlinear binomial gaussi…    70 U[5,…               0.105             0.0985
+36 nonlinear binomial gaussi…   100 U[5,…               0.105             0.0986
+37 nonlinear gaussian binomi…    10 U[50…               0.0592            0.0574
+38 nonlinear gaussian binomi…    20 U[50…               0.0588            0.0569
+39 nonlinear gaussian binomi…    40 U[5,…               0.0612            0.0579
+40 nonlinear gaussian binomi…    40 U[50…               0.0589            0.0570
+41 nonlinear gaussian binomi…    70 U[5,…               0.0610            0.0576
+42 nonlinear gaussian binomi…   100 U[5,…               0.0610            0.0577
+43 nonlinear gaussian gaussi…    10 U[50…               0.310             0.300 
+44 nonlinear gaussian gaussi…    20 U[50…               0.310             0.300 
+45 nonlinear gaussian gaussi…    40 U[5,…               0.322             0.303 
+46 nonlinear gaussian gaussi…    40 U[50…               0.311             0.300 
+47 nonlinear gaussian gaussi…    70 U[5,…               0.321             0.302 
+48 nonlinear gaussian gaussi…   100 U[5,…               0.321             0.302 
