@@ -1,0 +1,12 @@
+
+~~~ Dropping nonconverging cases ~~~
+
+Dropping 6259 out of 480000 rows due to convergence issues
+Keeping 473741 rows in converged dataset
+
+ Breakdown of convergence issues by method
+# A tibble: 2 × 3
+  Fit   cluster_opt n_dropped
+  <chr> <chr>           <int>
+1 glm   RE.glm           2825
+2 glm   cwc.FE           3434

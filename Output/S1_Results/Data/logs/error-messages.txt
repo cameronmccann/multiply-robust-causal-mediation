@@ -1,0 +1,484 @@
+# A tibble: 480 × 5
+# Groups:   condition_num, Fit [192]
+    condition_num Fit   cluster_opt     n n_error
+    <chr>         <chr> <chr>       <int>   <int>
+  1 01            glm   RE.glm       1000      11
+  2 01            glm   cwc          1000       0
+  3 01            glm   cwc.FE       1000       0
+  4 01            mlr   cwc          1000       0
+  5 01            mlr   cwc.FE       1000       0
+  6 02            glm   RE.glm       1000       0
+  7 02            glm   cwc          1000       0
+  8 02            glm   cwc.FE       1000       0
+  9 02            mlr   cwc          1000       0
+ 10 02            mlr   cwc.FE       1000       0
+ 11 03            glm   RE.glm       1000       0
+ 12 03            glm   cwc          1000       0
+ 13 03            glm   cwc.FE       1000       0
+ 14 03            mlr   cwc          1000       0
+ 15 03            mlr   cwc.FE       1000       0
+ 16 04            glm   RE.glm       1000       1
+ 17 04            glm   cwc          1000       0
+ 18 04            glm   cwc.FE       1000       0
+ 19 04            mlr   cwc          1000       0
+ 20 04            mlr   cwc.FE       1000       0
+ 21 05            glm   RE.glm       1000       0
+ 22 05            glm   cwc          1000       0
+ 23 05            glm   cwc.FE       1000       0
+ 24 05            mlr   cwc          1000       0
+ 25 05            mlr   cwc.FE       1000       0
+ 26 06            glm   RE.glm       1000       0
+ 27 06            glm   cwc          1000       0
+ 28 06            glm   cwc.FE       1000       0
+ 29 06            mlr   cwc          1000       0
+ 30 06            mlr   cwc.FE       1000       0
+ 31 07            glm   RE.glm       1000       0
+ 32 07            glm   cwc          1000       0
+ 33 07            glm   cwc.FE       1000       0
+ 34 07            mlr   cwc          1000       0
+ 35 07            mlr   cwc.FE       1000       0
+ 36 08            glm   RE.glm       1000       0
+ 37 08            glm   cwc          1000       0
+ 38 08            glm   cwc.FE       1000       0
+ 39 08            mlr   cwc          1000       0
+ 40 08            mlr   cwc.FE       1000       0
+ 41 09            glm   RE.glm       1000       0
+ 42 09            glm   cwc          1000       0
+ 43 09            glm   cwc.FE       1000       0
+ 44 09            mlr   cwc          1000       0
+ 45 09            mlr   cwc.FE       1000       0
+ 46 10            glm   RE.glm       1000       0
+ 47 10            glm   cwc          1000       0
+ 48 10            glm   cwc.FE       1000       0
+ 49 10            mlr   cwc          1000       0
+ 50 10            mlr   cwc.FE       1000       0
+ 51 11            glm   RE.glm       1000       0
+ 52 11            glm   cwc          1000       0
+ 53 11            glm   cwc.FE       1000       0
+ 54 11            mlr   cwc          1000       0
+ 55 11            mlr   cwc.FE       1000       0
+ 56 12            glm   RE.glm       1000       0
+ 57 12            glm   cwc          1000       0
+ 58 12            glm   cwc.FE       1000       0
+ 59 12            mlr   cwc          1000       0
+ 60 12            mlr   cwc.FE       1000       0
+ 61 13            glm   RE.glm       1000       0
+ 62 13            glm   cwc          1000       0
+ 63 13            glm   cwc.FE       1000       0
+ 64 13            mlr   cwc          1000       0
+ 65 13            mlr   cwc.FE       1000       0
+ 66 14            glm   RE.glm       1000       0
+ 67 14            glm   cwc          1000       0
+ 68 14            glm   cwc.FE       1000       0
+ 69 14            mlr   cwc          1000       0
+ 70 14            mlr   cwc.FE       1000       0
+ 71 15            glm   RE.glm       1000       0
+ 72 15            glm   cwc          1000       0
+ 73 15            glm   cwc.FE       1000       0
+ 74 15            mlr   cwc          1000       0
+ 75 15            mlr   cwc.FE       1000       0
+ 76 16            glm   RE.glm       1000       0
+ 77 16            glm   cwc          1000       0
+ 78 16            glm   cwc.FE       1000       0
+ 79 16            mlr   cwc          1000       0
+ 80 16            mlr   cwc.FE       1000       0
+ 81 17            glm   RE.glm       1000       0
+ 82 17            glm   cwc          1000       0
+ 83 17            glm   cwc.FE       1000       0
+ 84 17            mlr   cwc          1000       0
+ 85 17            mlr   cwc.FE       1000       0
+ 86 18            glm   RE.glm       1000       0
+ 87 18            glm   cwc          1000       0
+ 88 18            glm   cwc.FE       1000       0
+ 89 18            mlr   cwc          1000       0
+ 90 18            mlr   cwc.FE       1000       0
+ 91 19            glm   RE.glm       1000       0
+ 92 19            glm   cwc          1000       0
+ 93 19            glm   cwc.FE       1000       0
+ 94 19            mlr   cwc          1000       0
+ 95 19            mlr   cwc.FE       1000       0
+ 96 20            glm   RE.glm       1000       0
+ 97 20            glm   cwc          1000       0
+ 98 20            glm   cwc.FE       1000       0
+ 99 20            mlr   cwc          1000       0
+100 20            mlr   cwc.FE       1000       0
+101 21            glm   RE.glm       1000       0
+102 21            glm   cwc          1000       0
+103 21            glm   cwc.FE       1000       0
+104 21            mlr   cwc          1000       0
+105 21            mlr   cwc.FE       1000       0
+106 22            glm   RE.glm       1000       0
+107 22            glm   cwc          1000       0
+108 22            glm   cwc.FE       1000       0
+109 22            mlr   cwc          1000       0
+110 22            mlr   cwc.FE       1000       0
+111 23            glm   RE.glm       1000       0
+112 23            glm   cwc          1000       0
+113 23            glm   cwc.FE       1000       0
+114 23            mlr   cwc          1000       0
+115 23            mlr   cwc.FE       1000       0
+116 24            glm   RE.glm       1000       0
+117 24            glm   cwc          1000       0
+118 24            glm   cwc.FE       1000       0
+119 24            mlr   cwc          1000       0
+120 24            mlr   cwc.FE       1000       0
+121 25            glm   RE.glm       1000       0
+122 25            glm   cwc          1000       0
+123 25            glm   cwc.FE       1000       0
+124 25            mlr   cwc          1000       0
+125 25            mlr   cwc.FE       1000       0
+126 26            glm   RE.glm       1000       0
+127 26            glm   cwc          1000       0
+128 26            glm   cwc.FE       1000       0
+129 26            mlr   cwc          1000       0
+130 26            mlr   cwc.FE       1000       0
+131 27            glm   RE.glm       1000       0
+132 27            glm   cwc          1000       0
+133 27            glm   cwc.FE       1000       0
+134 27            mlr   cwc          1000       0
+135 27            mlr   cwc.FE       1000       0
+136 28            glm   RE.glm       1000       0
+137 28            glm   cwc          1000       0
+138 28            glm   cwc.FE       1000       0
+139 28            mlr   cwc          1000       0
+140 28            mlr   cwc.FE       1000       0
+141 29            glm   RE.glm       1000       0
+142 29            glm   cwc          1000       0
+143 29            glm   cwc.FE       1000       0
+144 29            mlr   cwc          1000       0
+145 29            mlr   cwc.FE       1000       0
+146 30            glm   RE.glm       1000       0
+147 30            glm   cwc          1000       0
+148 30            glm   cwc.FE       1000       0
+149 30            mlr   cwc          1000       0
+150 30            mlr   cwc.FE       1000       0
+151 31            glm   RE.glm       1000       0
+152 31            glm   cwc          1000       0
+153 31            glm   cwc.FE       1000       0
+154 31            mlr   cwc          1000       0
+155 31            mlr   cwc.FE       1000       0
+156 32            glm   RE.glm       1000       0
+157 32            glm   cwc          1000       0
+158 32            glm   cwc.FE       1000       0
+159 32            mlr   cwc          1000       0
+160 32            mlr   cwc.FE       1000       0
+161 33            glm   RE.glm       1000       0
+162 33            glm   cwc          1000       0
+163 33            glm   cwc.FE       1000       0
+164 33            mlr   cwc          1000       0
+165 33            mlr   cwc.FE       1000       0
+166 34            glm   RE.glm       1000       0
+167 34            glm   cwc          1000       0
+168 34            glm   cwc.FE       1000       0
+169 34            mlr   cwc          1000       0
+170 34            mlr   cwc.FE       1000       0
+171 35            glm   RE.glm       1000       0
+172 35            glm   cwc          1000       0
+173 35            glm   cwc.FE       1000       0
+174 35            mlr   cwc          1000       0
+175 35            mlr   cwc.FE       1000       0
+176 36            glm   RE.glm       1000       0
+177 36            glm   cwc          1000       0
+178 36            glm   cwc.FE       1000       0
+179 36            mlr   cwc          1000       0
+180 36            mlr   cwc.FE       1000       0
+181 37            glm   RE.glm       1000       0
+182 37            glm   cwc          1000       0
+183 37            glm   cwc.FE       1000       0
+184 37            mlr   cwc          1000       0
+185 37            mlr   cwc.FE       1000       0
+186 38            glm   RE.glm       1000       0
+187 38            glm   cwc          1000       0
+188 38            glm   cwc.FE       1000       0
+189 38            mlr   cwc          1000       0
+190 38            mlr   cwc.FE       1000       0
+191 39            glm   RE.glm       1000       0
+192 39            glm   cwc          1000       0
+193 39            glm   cwc.FE       1000       0
+194 39            mlr   cwc          1000       0
+195 39            mlr   cwc.FE       1000       0
+196 40            glm   RE.glm       1000       0
+197 40            glm   cwc          1000       0
+198 40            glm   cwc.FE       1000       0
+199 40            mlr   cwc          1000       0
+200 40            mlr   cwc.FE       1000       0
+201 41            glm   RE.glm       1000       0
+202 41            glm   cwc          1000       0
+203 41            glm   cwc.FE       1000       0
+204 41            mlr   cwc          1000       0
+205 41            mlr   cwc.FE       1000       0
+206 42            glm   RE.glm       1000       0
+207 42            glm   cwc          1000       0
+208 42            glm   cwc.FE       1000       0
+209 42            mlr   cwc          1000       0
+210 42            mlr   cwc.FE       1000       0
+211 43            glm   RE.glm       1000       0
+212 43            glm   cwc          1000       0
+213 43            glm   cwc.FE       1000       0
+214 43            mlr   cwc          1000       0
+215 43            mlr   cwc.FE       1000       0
+216 44            glm   RE.glm       1000       0
+217 44            glm   cwc          1000       0
+218 44            glm   cwc.FE       1000       0
+219 44            mlr   cwc          1000       0
+220 44            mlr   cwc.FE       1000       0
+221 45            glm   RE.glm       1000       0
+222 45            glm   cwc          1000       0
+223 45            glm   cwc.FE       1000       0
+224 45            mlr   cwc          1000       0
+225 45            mlr   cwc.FE       1000       0
+226 46            glm   RE.glm       1000       0
+227 46            glm   cwc          1000       0
+228 46            glm   cwc.FE       1000       0
+229 46            mlr   cwc          1000       0
+230 46            mlr   cwc.FE       1000       0
+231 47            glm   RE.glm       1000       0
+232 47            glm   cwc          1000       0
+233 47            glm   cwc.FE       1000       0
+234 47            mlr   cwc          1000       0
+235 47            mlr   cwc.FE       1000       0
+236 48            glm   RE.glm       1000       0
+237 48            glm   cwc          1000       0
+238 48            glm   cwc.FE       1000       0
+239 48            mlr   cwc          1000       0
+240 48            mlr   cwc.FE       1000       0
+241 49            glm   RE.glm       1000       1
+242 49            glm   cwc          1000       0
+243 49            glm   cwc.FE       1000       0
+244 49            mlr   cwc          1000       0
+245 49            mlr   cwc.FE       1000       0
+246 50            glm   RE.glm       1000       0
+247 50            glm   cwc          1000       0
+248 50            glm   cwc.FE       1000       0
+249 50            mlr   cwc          1000       0
+250 50            mlr   cwc.FE       1000       0
+251 51            glm   RE.glm       1000       0
+252 51            glm   cwc          1000       0
+253 51            glm   cwc.FE       1000       0
+254 51            mlr   cwc          1000       0
+255 51            mlr   cwc.FE       1000       0
+256 52            glm   RE.glm       1000       0
+257 52            glm   cwc          1000       0
+258 52            glm   cwc.FE       1000       0
+259 52            mlr   cwc          1000       0
+260 52            mlr   cwc.FE       1000       0
+261 53            glm   RE.glm       1000       0
+262 53            glm   cwc          1000       0
+263 53            glm   cwc.FE       1000       0
+264 53            mlr   cwc          1000       0
+265 53            mlr   cwc.FE       1000       0
+266 54            glm   RE.glm       1000       0
+267 54            glm   cwc          1000       0
+268 54            glm   cwc.FE       1000       0
+269 54            mlr   cwc          1000       0
+270 54            mlr   cwc.FE       1000       0
+271 55            glm   RE.glm       1000       0
+272 55            glm   cwc          1000       0
+273 55            glm   cwc.FE       1000       0
+274 55            mlr   cwc          1000       0
+275 55            mlr   cwc.FE       1000       0
+276 56            glm   RE.glm       1000       0
+277 56            glm   cwc          1000       0
+278 56            glm   cwc.FE       1000       0
+279 56            mlr   cwc          1000       0
+280 56            mlr   cwc.FE       1000       0
+281 57            glm   RE.glm       1000       0
+282 57            glm   cwc          1000       0
+283 57            glm   cwc.FE       1000       0
+284 57            mlr   cwc          1000       0
+285 57            mlr   cwc.FE       1000       0
+286 58            glm   RE.glm       1000       0
+287 58            glm   cwc          1000       0
+288 58            glm   cwc.FE       1000       0
+289 58            mlr   cwc          1000       0
+290 58            mlr   cwc.FE       1000       0
+291 59            glm   RE.glm       1000       0
+292 59            glm   cwc          1000       0
+293 59            glm   cwc.FE       1000       0
+294 59            mlr   cwc          1000       0
+295 59            mlr   cwc.FE       1000       0
+296 60            glm   RE.glm       1000       0
+297 60            glm   cwc          1000       0
+298 60            glm   cwc.FE       1000       0
+299 60            mlr   cwc          1000       0
+300 60            mlr   cwc.FE       1000       0
+301 61            glm   RE.glm       1000       0
+302 61            glm   cwc          1000       0
+303 61            glm   cwc.FE       1000       0
+304 61            mlr   cwc          1000       0
+305 61            mlr   cwc.FE       1000       0
+306 62            glm   RE.glm       1000       0
+307 62            glm   cwc          1000       0
+308 62            glm   cwc.FE       1000       0
+309 62            mlr   cwc          1000       0
+310 62            mlr   cwc.FE       1000       0
+311 63            glm   RE.glm       1000       0
+312 63            glm   cwc          1000       0
+313 63            glm   cwc.FE       1000       0
+314 63            mlr   cwc          1000       0
+315 63            mlr   cwc.FE       1000       0
+316 64            glm   RE.glm       1000       0
+317 64            glm   cwc          1000       0
+318 64            glm   cwc.FE       1000       0
+319 64            mlr   cwc          1000       0
+320 64            mlr   cwc.FE       1000       0
+321 65            glm   RE.glm       1000       0
+322 65            glm   cwc          1000       0
+323 65            glm   cwc.FE       1000       0
+324 65            mlr   cwc          1000       0
+325 65            mlr   cwc.FE       1000       0
+326 66            glm   RE.glm       1000       0
+327 66            glm   cwc          1000       0
+328 66            glm   cwc.FE       1000       0
+329 66            mlr   cwc          1000       0
+330 66            mlr   cwc.FE       1000       0
+331 67            glm   RE.glm       1000       0
+332 67            glm   cwc          1000       0
+333 67            glm   cwc.FE       1000       0
+334 67            mlr   cwc          1000       0
+335 67            mlr   cwc.FE       1000       0
+336 68            glm   RE.glm       1000       0
+337 68            glm   cwc          1000       0
+338 68            glm   cwc.FE       1000       0
+339 68            mlr   cwc          1000       0
+340 68            mlr   cwc.FE       1000       0
+341 69            glm   RE.glm       1000       0
+342 69            glm   cwc          1000       0
+343 69            glm   cwc.FE       1000       0
+344 69            mlr   cwc          1000       0
+345 69            mlr   cwc.FE       1000       0
+346 70            glm   RE.glm       1000       0
+347 70            glm   cwc          1000       0
+348 70            glm   cwc.FE       1000       0
+349 70            mlr   cwc          1000       0
+350 70            mlr   cwc.FE       1000       0
+351 71            glm   RE.glm       1000       0
+352 71            glm   cwc          1000       0
+353 71            glm   cwc.FE       1000       0
+354 71            mlr   cwc          1000       0
+355 71            mlr   cwc.FE       1000       0
+356 72            glm   RE.glm       1000       0
+357 72            glm   cwc          1000       0
+358 72            glm   cwc.FE       1000       0
+359 72            mlr   cwc          1000       0
+360 72            mlr   cwc.FE       1000       0
+361 73            glm   RE.glm       1000       0
+362 73            glm   cwc          1000       0
+363 73            glm   cwc.FE       1000       0
+364 73            mlr   cwc          1000       0
+365 73            mlr   cwc.FE       1000       0
+366 74            glm   RE.glm       1000       0
+367 74            glm   cwc          1000       0
+368 74            glm   cwc.FE       1000       0
+369 74            mlr   cwc          1000       0
+370 74            mlr   cwc.FE       1000       0
+371 75            glm   RE.glm       1000       0
+372 75            glm   cwc          1000       0
+373 75            glm   cwc.FE       1000       0
+374 75            mlr   cwc          1000       0
+375 75            mlr   cwc.FE       1000       0
+376 76            glm   RE.glm       1000       0
+377 76            glm   cwc          1000       0
+378 76            glm   cwc.FE       1000       0
+379 76            mlr   cwc          1000       0
+380 76            mlr   cwc.FE       1000       0
+381 77            glm   RE.glm       1000       0
+382 77            glm   cwc          1000       0
+383 77            glm   cwc.FE       1000       0
+384 77            mlr   cwc          1000       0
+385 77            mlr   cwc.FE       1000       0
+386 78            glm   RE.glm       1000       0
+387 78            glm   cwc          1000       0
+388 78            glm   cwc.FE       1000       0
+389 78            mlr   cwc          1000       0
+390 78            mlr   cwc.FE       1000       0
+391 79            glm   RE.glm       1000       0
+392 79            glm   cwc          1000       0
+393 79            glm   cwc.FE       1000       0
+394 79            mlr   cwc          1000       0
+395 79            mlr   cwc.FE       1000       0
+396 80            glm   RE.glm       1000       0
+397 80            glm   cwc          1000       0
+398 80            glm   cwc.FE       1000       0
+399 80            mlr   cwc          1000       0
+400 80            mlr   cwc.FE       1000       0
+401 81            glm   RE.glm       1000       0
+402 81            glm   cwc          1000       0
+403 81            glm   cwc.FE       1000       0
+404 81            mlr   cwc          1000       0
+405 81            mlr   cwc.FE       1000       0
+406 82            glm   RE.glm       1000       0
+407 82            glm   cwc          1000       0
+408 82            glm   cwc.FE       1000       0
+409 82            mlr   cwc          1000       0
+410 82            mlr   cwc.FE       1000       0
+411 83            glm   RE.glm       1000       0
+412 83            glm   cwc          1000       0
+413 83            glm   cwc.FE       1000       0
+414 83            mlr   cwc          1000       0
+415 83            mlr   cwc.FE       1000       0
+416 84            glm   RE.glm       1000       0
+417 84            glm   cwc          1000       0
+418 84            glm   cwc.FE       1000       0
+419 84            mlr   cwc          1000       0
+420 84            mlr   cwc.FE       1000       0
+421 85            glm   RE.glm       1000       0
+422 85            glm   cwc          1000       0
+423 85            glm   cwc.FE       1000       0
+424 85            mlr   cwc          1000       0
+425 85            mlr   cwc.FE       1000       0
+426 86            glm   RE.glm       1000       0
+427 86            glm   cwc          1000       0
+428 86            glm   cwc.FE       1000       0
+429 86            mlr   cwc          1000       0
+430 86            mlr   cwc.FE       1000       0
+431 87            glm   RE.glm       1000       0
+432 87            glm   cwc          1000       0
+433 87            glm   cwc.FE       1000       0
+434 87            mlr   cwc          1000       0
+435 87            mlr   cwc.FE       1000       0
+436 88            glm   RE.glm       1000       0
+437 88            glm   cwc          1000       0
+438 88            glm   cwc.FE       1000       0
+439 88            mlr   cwc          1000       0
+440 88            mlr   cwc.FE       1000       0
+441 89            glm   RE.glm       1000       0
+442 89            glm   cwc          1000       0
+443 89            glm   cwc.FE       1000       0
+444 89            mlr   cwc          1000       0
+445 89            mlr   cwc.FE       1000       0
+446 90            glm   RE.glm       1000       0
+447 90            glm   cwc          1000       0
+448 90            glm   cwc.FE       1000       0
+449 90            mlr   cwc          1000       0
+450 90            mlr   cwc.FE       1000       0
+451 91            glm   RE.glm       1000       0
+452 91            glm   cwc          1000       0
+453 91            glm   cwc.FE       1000       0
+454 91            mlr   cwc          1000       0
+455 91            mlr   cwc.FE       1000       0
+456 92            glm   RE.glm       1000       0
+457 92            glm   cwc          1000       0
+458 92            glm   cwc.FE       1000       0
+459 92            mlr   cwc          1000       0
+460 92            mlr   cwc.FE       1000       0
+461 93            glm   RE.glm       1000       0
+462 93            glm   cwc          1000       0
+463 93            glm   cwc.FE       1000       0
+464 93            mlr   cwc          1000       0
+465 93            mlr   cwc.FE       1000       0
+466 94            glm   RE.glm       1000       0
+467 94            glm   cwc          1000       0
+468 94            glm   cwc.FE       1000       0
+469 94            mlr   cwc          1000       0
+470 94            mlr   cwc.FE       1000       0
+471 95            glm   RE.glm       1000       0
+472 95            glm   cwc          1000       0
+473 95            glm   cwc.FE       1000       0
+474 95            mlr   cwc          1000       0
+475 95            mlr   cwc.FE       1000       0
+476 96            glm   RE.glm       1000       0
+477 96            glm   cwc          1000       0
+478 96            glm   cwc.FE       1000       0
+479 96            mlr   cwc          1000       0
+480 96            mlr   cwc.FE       1000       0
