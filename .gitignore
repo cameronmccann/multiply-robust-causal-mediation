@@ -15,6 +15,9 @@ README.html
 ## Exclude shell script showing how to obtain simulation output from TACC
 Code/01_S1-obtain-sim-output.sh
 
+## Exclude script uploading project to OSF
+Code/07_000_upload-files-to-OSF.R
+
 ## Exclude Archive & Sandbox
 Code/Archive/
 Code/Sandbox/
