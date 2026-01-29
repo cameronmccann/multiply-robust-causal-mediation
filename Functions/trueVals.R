@@ -8,7 +8,7 @@
 #'
 #' @param data_list A list containing the generated dataset (\code{data}), cluster sizes, 
 #'                  and all generation parameters. This should be the output from one 
-#'                  of the data generation functions (e.g., \code{generate_data2.0c()}).
+#'                  of the data generation functions (e.g., \code{generate_data()}).
 #'
 #' @return A list with two elements:
 #' \describe{
@@ -37,7 +37,7 @@
 #' For **continuous outcomes**, the linear predictor \code{latentY} is used directly.
 #'
 #' Additional logic is included for the special case of a **continuous mediator** combined with a 
-#' **binary outcome**, where a large population dataset is generated (by calling \code{generate_data2.0c()} 
+#' **binary outcome**, where a large population dataset is generated (by calling \code{generate_data()} 
 #' internally) to approximate the integral. This provides a Monte Carlo estimate of the expected 
 #' outcome \(\mathbb{E}[Y]\).
 #'
@@ -48,14 +48,10 @@
 #' @examples
 #' \dontrun{
 #' # Typically called internally. Example call:
-#' data_list <- generate_data2.0c(J = 50, Mfamily = "binomial", Yfamily = "binomial")
+#' data_list <- generate_data(J = 50, Mfamily = "binomial", Yfamily = "binomial")
 #' result <- trueVals(data_list)
 #' result$truevals_individual
 #' }
-#'
-#' @seealso 
-#' \code{\link{trueVals2.0b}}, 
-#' \code{\link{generate_data2.0c}}
 #'
 #' @export
 trueVals <- function(data_list, 
@@ -347,7 +343,7 @@ trueVals <- function(data_list,
         
         # ══════════════════════════════
         # Continuous M, Binary Y => Monte Carlo approximation
-        # done by generating a large population with generate_data2.0c(...).
+        # done by generating a large population with generate_data(...).
         # ══════════════════════════════
         # if (!is.null(data_list$Mfamily) && !is.null(data_list$Yfamily)) {#
         # if (Mfamily == "gaussian" & Yfamily == "binomial") {
@@ -356,7 +352,7 @@ trueVals <- function(data_list,
         #     large_J <- 10000
         #     big_njrange <- c(data_list$njrange[1], data_list$njrange[2]) 
         #     
-        #     pop_result <- generate_data2.0c( 
+        #     pop_result <- generate_data( 
         #         include_truevals = FALSE, # 
         #         include_overlapMsg = FALSE, 
         #         J = large_J,

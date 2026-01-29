@@ -1,9 +1,3 @@
-# CURRENTLY UPDATING: 2025-07-10
-# # Might need to update:
-#   # documentation
-#   # output of a_x & a_z to a_on_x & a_on_z
-
-
 #' @title generate_data
 #'
 #' @description
