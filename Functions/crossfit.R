@@ -149,7 +149,9 @@ crossfit <- function(train, valid.list, yname, xnames, varnames,
     # --------------------------------------------------------------------------
     # 3. RANDOM EFFECTS GLM (RE.glm)
     # --------------------------------------------------------------------------
-    # random effects ----
+    
+    # random effects ----------------------------------------------------------
+
     # Using lmer/glmer from the lme4 package for random effects
     if (cluster_opt == "RE.glm") {
         
@@ -196,6 +198,8 @@ crossfit <- function(train, valid.list, yname, xnames, varnames,
     # --------------------------------------------------------------------------
     # 3b. RANDOM EFFECTS GLM (RE.glm.rs) — random intercepts + random slopes
     # --------------------------------------------------------------------------
+    
+    # random effects & random slopes ------------------------------------------
     if (cluster_opt == "RE.glm.rs") {
         
         # Build random effects formula

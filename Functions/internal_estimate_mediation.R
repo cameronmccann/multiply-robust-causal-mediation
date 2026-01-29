@@ -42,6 +42,9 @@
 #' @param learners_m Character vector specifying the learner library for mediator models. Defaults to `c("SL.glm")`.
 #' @param learners_y Character vector specifying the learner library for outcome models. Defaults to `c("SL.glm")`.
 #' @param contrast_a Named numeric vector providing treatment contrasts, typically `c(a=1, astar=0)`.
+#' @param random_slope_vars_a Optional character vector; names of variables for which to include random slopes in the propensity score (treatment) model. Defaults to `NULL`.
+#' @param random_slope_vars_m Optional character vector; names of variables for which to include random slopes in the mediator model. Defaults to `NULL`.
+#' @param random_slope_vars_y Optional character vector; names of variables for which to include random slopes in the outcome model. Defaults to `NULL`.
 #'
 #' @return
 #' A named list containing:

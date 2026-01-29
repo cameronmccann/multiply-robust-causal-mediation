@@ -23,6 +23,13 @@ Code/Archive/
 Code/Sandbox/
 
 
+# Functions/
+
+## Exclude Archive 
+Functions/Archive/
+Functions/Archive.zip
+
+
 # Output/
 
 ## Exclude entire Output_mediator_ClusterData folder 
