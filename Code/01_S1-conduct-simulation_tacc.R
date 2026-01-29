@@ -85,10 +85,10 @@ function_names <- c(
     # "trueVals", 
     
     # As of 01/01/2025 the two funcs below are the updated versions 
-    "generate_data2.0c", 
+    "generate_data", #"generate_data2.0c", 
     # "trueVals2.0c",
-    "trueVals2.0d",
-    "trueVals2.0f",
+    #"trueVals2.0d",
+    "trueVals", #"trueVals2.0f",
     
     # Estimation functions 
     "crossfit", 
@@ -438,7 +438,7 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
                 # cat("Starting rep = ~", rep_counter, "... @", format(Sys.time(), "%H:%M:%S"), "\n") #cat("Starting rep_idx =", rep_idx, "...\n")
                 
                 # Generate data
-                sim_data <- generate_data2.0c(
+                sim_data <- generate_data(
                     J = Jval, 
                     njrange = c(Nj_low, Nj_high), 
                     Mfamily = Mfamily,

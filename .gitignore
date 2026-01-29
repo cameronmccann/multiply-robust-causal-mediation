@@ -12,6 +12,9 @@ README.html
 
 # Code/
 
+## Exclude R script for conducting simulation on personal computer
+Code/01_S1-conduct-simulation.R
+
 ## Exclude shell script showing how to obtain simulation output from TACC
 Code/01_S1-obtain-sim-output.sh
 
