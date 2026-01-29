@@ -48,3 +48,10 @@ Output/S1_Simulation-Output/2025-10-22_1000-reps/pop-data/
 ## Exclude Archive folder in S1_Results/
 Output/S1_Results/Archive/
 
+
+# Application/
+
+## Exclude Archive folders 
+Application/Code/Archive/
+Application/Functions/Archive/
+
