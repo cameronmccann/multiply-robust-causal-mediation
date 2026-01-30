@@ -12,7 +12,7 @@
 # Script Description:   
 #   This R script performs the mediation analysis for the empirical application. 
 # 
-# Last Updated: 2026-01-29
+# Last Updated: 2026-01-30
 #
 #
 # Notes:
@@ -70,14 +70,6 @@ for (func in function_names) {
 # Import Data -----------------------------------------------------
 # Load clean dataset 
 data <- read_rds(file = "Application/Data/Cleaned/Empirical-Application-Data.rds")
-
-# # Drop clusters < 8
-# data <- data |> 
-#     filter(CLUSTER2 != 274)
-
-# Need
-## ICC
-## Descriptives on cluster size & number of clusters
 
 # ══════════════════════════════
 #    Treatment Proportion 
@@ -297,12 +289,6 @@ for (i in seq_along(param_list)) {
 
 }
 
-# Save each output as separate objects:
-# result1 <- results_list[[1]]
-# result2 <- results_list[[2]]
-# result3 <- results_list[[3]]
-# result4 <- results_list[[4]]
-
 # Add setup name 
 names(results_list) <- names(param_list)
 
@@ -415,3 +401,4 @@ combined_results |>
     ylab("Effect Type and Version") +
     ggtitle("Forest Plot of Estimates and 95% Confidence Intervals")
 
+################################## END #########################################
