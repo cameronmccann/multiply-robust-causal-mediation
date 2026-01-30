@@ -1,53 +1,29 @@
 ################################################################################
 ############################## Simulation(s) ###################################
 ################################################################################
+
 ############################ Script Description ################################
 #
-# Author: Cameron McCann
+# Author: 
 # 
 # Date Created: 2025-01-01
 #
 #
 # Script Description: 
-# 
-#       Note: data generation creates pop data (when Mfamily & Yfamily meet "gaussian" &. "binomial") for every iteration but only saves first iteration into pop data folder. 
+#       This script runs the simulation study for all (or a select number of) 
+#       conditions. Outputs are saved in Output/S1_Simulation-Output/. 
 #
 #
-# Last Updated: 2025-10-22
+# Last Updated: 2026-01-30
 #
 #
 # Notes:
 #   To-Do: 
-#               + MAYBE SEE IF YOU CAN GET ITERATION NUMBER STORED PROPERLY INSTEAD OF SEED NUMBER 
-# 
-#       - {Still need to Finish updating anlaysis functions (helper and overall)} 
-#       - test run parametric analysis, then generate nonlinear data & test parameteric analysis 
-# 
-#       - update functions to handle: 
-#           + varing cluster size, using uniform distribution? 
-#           + nonlinear relations between z & xs with t, m, & y
-#       - first test parametric model before using machine learning models 
-#           + we will test 2 (dich./contin. mediator) x 2 (dich./contin. outcome) scenario 
-#           + performance criteria: power, coverage, bias, RMSE, etc
-#           + test 100 reps, 200, 500, and then 1,000 reps for final 
 #
 #   Done: 
-
-# Note:
-#   code used for seeds in Dr Liu's code: 
-        # set.seed(12)
-        # datseeds <- c(sample(1:1e6, 3000), sample(1:1e6+1e6, 200))
-
 #
 ################################################################################
 
-
-# # This can potentially speed up code
-# library(compiler)
-# enableJIT(3)
-
-# set directory 
-# setwd("/home1/10384/cameronmccann/multiply-robust-causal-mediation copy") # temp-2025-01-23-test_multiply-robust-causal-mediation")
 
 # Load packages & functions ----------------------------------------------------
 
@@ -74,7 +50,7 @@ pacman::p_load(
 #     Source Updated Functions
 # ══════════════════════════════
 function_names <- c(
-    # "generate_data", 
+    # Data Generation functions
     "generate_clusters", 
     "generate_confounders", 
     "generate_treatment", 
@@ -82,13 +58,8 @@ function_names <- c(
     "generate_outcome", 
     "pm1", 
     "my", 
-    # "trueVals", 
-    
-    # As of 01/01/2025 the two funcs below are the updated versions 
-    "generate_data", #"generate_data2.0c", 
-    # "trueVals2.0c",
-    #"trueVals2.0d",
-    "trueVals", #"trueVals2.0f",
+    "trueVals",
+    "generate_data", 
     
     # Estimation functions 
     "crossfit", 
@@ -137,29 +108,12 @@ conditions_all <- data.frame(rbind(
 ), 
 icc = c(0.2))
 
-# Select all of the simulation conditions you'd like to run (condition # will correspond to row #)
+# Limit conditions: Select all of the simulation conditions you'd like to run
 conditions <- conditions_all |> 
-    # filter(quadratic == F) |> 
-    # filter(if.null == T) |> 
-    filter((J %in% c(10) & Nj_low %in% c(50)) | 
-               J %in% c(40) & Nj_low %in% c(5)) |>  
-    filter(!(J == 10 & Mfamily == "binomial" & Yfamily == "binomial" & if.null == TRUE)) # drop 2 rows we already ran
-    # filter(J %in% c(10, 40)) #|> #c(100, 70)) |> # c(20)) |> # c(70)) |>
-    # filter(Nj_low %in% c(50)) #|>
-    # filter(!c(Mfamily == "gaussian" & Yfamily == "gaussian"))
-    # filter(Mfamily %in% c("gaussian") & Yfamily %in% c("gaussian"))
-    # filter(Mfamily %in% c("binomial", "gaussian"), Yfamily %in% c("binomial", "gaussian")) #, "gaussian")) # c("binomial")) #, Yfamily %in% c("gaussian"))
-
-    # test run conditions: 
-    # conditions_all |> tibble::rownames_to_column("condition_number") |> filter(if.null == F & J %in% c(40, 100)) |> filter((Mfamily == "binomial" & Yfamily == "binomial") | (Mfamily == "gaussian" & Yfamily == "gaussian"))
-
-# limit conditions 
-# conditions <- conditions[c(1, 18), ] #conditions[c(1:2, 17:18), ] #
-conditions <- conditions_all |> #[c(58, 61, 64, 67, 70,  55, 56, 57, 60), , drop = FALSE] |> #c(1:2, 49:72) #1, 3, 6, 7, 9, 12, 13, 18, 19, 21, 24, 49, 51, 52, 54, 55, 56, 57, 58, 60, 67, 69, 70, 72, 61:66 #1, 7, 13, 19, 4, 10, 16, 22, 3, 9, 15, 21, 6, 12, 18, 24
     tibble::rownames_to_column("condition_number") |>
     # filter(Nj_low == 50) |> 
     # arrange(if.null) |>
-    slice(c(12:48, 50:67, 69:96)) #slice(c(1, 49, 68, 2:48, 50:67, 69:96))                           # <------------------------- SELECT CONDITIONS TO RUN HERE
+    slice(c(1:96)) #slice(c(1, 49, 68, 2:48, 50:67, 69:96))                   # <------------------------- SELECT CONDITIONS TO RUN HERE
     
 conditions
 
@@ -167,17 +121,11 @@ conditions
 #    Methods  
 # ══════════════════════════════
 methds_all <- data.frame(expand.grid(
-    cluster_a = "FE", #c("FE", "RE", "noncluster"), # "RE", # "noncluster", #
-    cluster_m = "FE", # c("FE", "RE", "noncluster"), # "RE", #  "noncluster.mlr", #
-    cluster_y =  "FE", #c("FE", "RE", "noncluster"), # "noncluster.mlr", ## "FE.mlr", #
-    # interact_fitm2 =  c(T), # NULL, #
-    # interact_fity = c(T), # NULL, #
-    # Morder = c("21", "12"),
-    Fit = c("mlr","glm"), #Fit = c("mlr3", "mlr2", "mlr","glm"), #
-    # cluster_opt_a = c("sufficient_stats",  "cwc.FE"), # "FE.glm", #  
-    # cluster_opt_m = c("sufficient_stats",  "cwc.FE"),  #"FE.glm", # 
-    # cluster_opt_y = c("sufficient_stats",  "cwc.FE") # "cwc.FE"#c("sufficient_stats") #, 
-    cluster_opt = c("cwc.FE", "cwc") #,  "noncluster.glm"
+    cluster_a = "FE", 
+    cluster_m = "FE", 
+    cluster_y =  "FE", 
+    Fit = c("mlr","glm"), 
+    cluster_opt = c("cwc.FE", "cwc") 
 )) |>  
     mutate(
         cluster_opt_a = cluster_opt, 
@@ -185,8 +133,6 @@ methds_all <- data.frame(expand.grid(
         cluster_opt_y = cluster_opt
     )
 
-# (methds <- methds_all %>%
-#     filter(cluster_opt %in% c("cwc"), Fit %in% c("mlr") ))
 methds <- methds_all |> 
     filter(cluster_opt %in% c("cwc", "cwc.FE"), Fit %in% c("glm", "mlr")) #, "mlr2", "mlr3")) #, "glm")) 
     
@@ -217,25 +163,19 @@ methds <- methds |>
 
 # Set desired reps, & folders ----------------------------------------------
 
-# # Set seed & condition 
-# set.seed(12)
-# datseeds <- c(sample(1:1e6, 3000), sample(1:1e6+1e6, 200))
-
-backup_every <- 10#5#20#50          # Save after every 50 successful reps
+# Set backup frequency
+backup_every <- 10          # Save after every 10 successful reps
 # start_raw_iter <- 1         # Raw iteration to resume from (index in seed_pool)
 
 # select starting & ending condition numbers (correspond to rows in conditions dataframe) 
-strting_cond <- 1#6#1 #18                           # <------------------------- SELECT ROW AS STARTING CONDITION HERE
+strting_cond <- 1                           # <------------------------- SELECT ROW AS STARTING CONDITION HERE
 total_conditions <- nrow(conditions) 
-# if (!exists(strting_cond) || is.null(strting_cond)) {
-#     strting_cond <- 1
-# }
 
 # Number of desired replications (i.e., successful reps)
-reps <- 610 #205 # 1000
+reps <- 1050 
 
 # Set max number of iterations attempted (avoid infinite loop)
-max_attempts <- 500000#500#100#3000
+max_attempts <- 500000
 
 # ══════════════════════════════
 #    Set up folders 
@@ -243,7 +183,7 @@ max_attempts <- 500000#500#100#3000
 # Create parent output directory
 path <- "Output/S1_Simulation-Output"
 ## Add subdirectory, if desired (e.g., for test runs)
-additional_folder <- "2025-10-22_600-reps" #"2025-09-03_200-reps" 
+additional_folder <- "2025-10-22_1000-reps" 
 ## Check if additional_folder is not NULL to add to path
 if (!exists("additional_folder") || !is.null(additional_folder)) {
     path <- file.path(path, additional_folder)
@@ -269,19 +209,12 @@ if (!dir.exists(backup_folder)) dir.create(backup_folder)
 Sys.setenv(OPENBLAS_NUM_THREADS = 1, OMP_NUM_THREADS = 1, MKL_NUM_THREADS = 1)  # Avoid nested threads
 
 # Detect available cores and dynamically allocate
-min_cores <- 2#10  # Minimum cores to use
-preferred_cores <- backup_every#3#6#25#0#50 #15 #20  #150 # Preferred minimum if available
+min_cores <- 2  # Minimum cores to use
+preferred_cores <- backup_every # Preferred minimum if available
 available_cores <- parallel::detectCores(logical = TRUE)  # Detect all logical cores
 
 n_cores <- max(min_cores, min(preferred_cores, available_cores))  # Use a reasonable number of cores
 message(glue("Detected {available_cores} cores. Using {n_cores} cores for parallel computing."))
-
-# n_cores <- 4#0 # parallel::detectCores(logical = TRUE) - 1
-# cl <- parallel::makeCluster(n_cores)
-# doParallel::registerDoParallel(cl)
-# 
-# message(glue(#"Detected {available_cores} cores. 
-#              "Using {n_cores} cores for parallel computing."))
 
 # ══════════════════════════════
 #     Initialize Timing Table
@@ -302,7 +235,7 @@ OverallPar_time <- data.frame(
 #     Main Loop Over Conditions
 # ══════════════════════════════
 
-for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
+for (cond_idx in strting_cond:total_conditions) { 
     
     cond <- conditions[cond_idx, ]
     isQuad <- cond[["quadratic"]]
@@ -315,7 +248,6 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
     
     true_cond_number <- as.integer(conditions$condition_number[cond_idx]) # obtain cond number. 
     cond_idx_padded <- sprintf("%02d", true_cond_number)                  # change cond number: 1 => 01
-    # cond_idx_padded <- sprintf("%02d", cond_idx) # change condition number: 1 => 01
     
     # Create condition-specific backup folder
     cond_backup_folder <- file.path(backup_folder, glue("cond-{cond_idx_padded}_null-{isNull}_quad-{isQuad}_M-{Mfamily}_Y-{Yfamily}_nj-[{Nj_low}-{Nj_high}]_J-{Jval}"))
@@ -333,9 +265,6 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
         successful_results <- readRDS(latest_backup_file)
         cat(glue("🔁 Resuming from {basename(latest_backup_file)} with {length(successful_results)} reps. \n\n"))
         
-        # Determine the last used raw_iteration (i.e., seed index)
-        # used_raw_iters <- sapply(successful_results, function(x) x$raw_iteration)
-        # start_raw_iter <- max(used_raw_iters, na.rm = TRUE) + 1
         # Using robust version:
         used_raw_iters <- sapply(successful_results, function(x) {
             if (is.null(x$raw_iteration)) {
@@ -371,11 +300,6 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
             ),
             resume_log_file
         )
-        # # Optional: Write log
-        # writeLines(
-        #     glue("Resumed from backup: {basename(latest_backup_file)}\nStarting at raw_iter = {start_raw_iter}"),
-        #     file.path(cond_backup_folder, "resume-log.txt")
-        # )
     } else {
         successful_results <- list()
         rep_counter <- 1
@@ -388,7 +312,7 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
     )
     
     ### Start timing for condition ----------------------------------------------
-    # start_time_cond <- Sys.time()
+    
     # Set or reuse start time for duration calculation
     start_time_file <- file.path(cond_backup_folder, "start-time.txt")
     if (length(backup_files) == 0) {
@@ -405,17 +329,12 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
     }
     
     set.seed(12)
-    seeds <- c(sample(1:1e6, 300000), sample(1:1e6+1e6, 200000)) #datseeds <- c(sample(1:1e6, 3000), sample(1:1e6+1e6, 200))
-    # seeds <- sample.int(1e7, reps)
-    # seeds <- seeds[131:133] #[259:261]
-    # seeds <- c(721442, 814237, 814286) #problematic seed nums
-    
+    seeds <- c(sample(1:1e6, 300000), sample(1:1e6+1e6, 200000)) 
+
     # Define pool of seeds
     seed_pool <- seeds[1:max_attempts]
     
     # Prep before loop
-    # successful_results <- list()
-    # rep_counter <- 1
     seed_counter <- start_raw_iter  # Start at a specific raw iteration    #seed_counter <- 1
     batch_size <- n_cores
     
@@ -431,7 +350,6 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
                 
                 # Sys.setenv(OPENBLAS_NUM_THREADS = 1, OMP_NUM_THREADS = 1)  # Ensure settings per worker
                 start_time_iter <- Sys.time()
-                # set.seed(seeds[rep_idx])
                 set.seed(seed)
                 
                 # message 
@@ -564,43 +482,6 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
                         error = !is.null(err_msg), 
                         error_message = err_msg
                     )
-                    
-                    # old 
-                    # warnings_list <- character(0)  # Reset warnings for each iteration
-                    # 
-                    # estimates <- withCallingHandlers(
-                    #     {
-                    #         estimate_mediation(
-                    #             data = sim_data$data,
-                    #             Sname = "school",
-                    #             Wnames = NULL,
-                    #             Xnames = names(sim_data$data)[grep("^X", names(sim_data$data))],
-                    #             Aname = "A",
-                    #             Mnames = "M",
-                    #             Yname = "Y",
-                    #             learners_a = learners_a,
-                    #             learners_m = learners_m,
-                    #             learners_y = learners_y,
-                    #             cluster_opt = cluster_opt,  
-                    #             num_folds = num_folds, 
-                    #             random_slope_vars_y = random_slope_vars_y
-                    #         )
-                    #     },
-                    #     warning = function(w) {
-                    #         warnings_list <<- c(warnings_list, conditionMessage(w))  # Append warning message
-                    #         invokeRestart("muffleWarning")  # Muffle warning to continue
-                    #     }
-                    # )
-                    # 
-                    # # Store results and warnings in the list for this iteration
-                    # results[[glue::glue("{methds$Fit[meth]}-{methds$cluster_opt[meth]}")]] <- list(
-                    #     Fit = methds$Fit[[meth]], 
-                    #     cluster_opt = methds$cluster_opt[[meth]], 
-                    #     # methds[1, ], 
-                    #     num_folds = num_folds, 
-                    #     estimates = estimates,
-                    #     warnings = warnings_list
-                    # )
                 }
                 
                 # ═══════════════════
@@ -629,9 +510,7 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
                 end_time_iter <- Sys.time()
                 iter_duration <- as.numeric(difftime(end_time_iter, start_time_iter, units = "mins"))
                 
-                
-                ########################################################################
-                # Prep data for export (update code that follows this)
+                # Prep data for export 
                 iteration_data <- list(
                     raw_iteration = match(seed, seed_pool), # Add raw iteration number (not successful iteration number) 
                     iteration = seed_counter, #rep_idx,
@@ -664,15 +543,6 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
                     error_all_methods = FALSE
                 )
                 # 
-                # ########################################################################
-                # 
-                # # clear up space
-                # rm(sim_data, results, estimates, warnings_list)
-                # 
-                # message 
-                # cat("Finished rep_idx =", rep_idx, "... @", format(Sys.time(), "%H:%M:%S"), "\n") #cat("Finished rep_idx =", rep_idx, "...\n")
-                # cat("Finished rep = ~", rep_counter, "... @", format(Sys.time(), "%H:%M:%S"), "\n") 
-                # Return the iteration data
                 return(iteration_data)
                 
             }, error = function(e) {
@@ -684,23 +554,19 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
         }, mc.cores = n_cores)
         
         # Filter and store valid results
-        # successful_batch <- Filter(Negate(is.null), results_batch)
         successful_batch <- Filter(function(x) {
             !is.null(x) && !isTRUE(x$error_all_methods) # drops iterations where all methods failed
         }, results_batch)
         
         if (length(successful_batch) > 0) {
             for (res in seq_along(successful_batch)) {
-                # successful_results[[rep_counter]] <- res
                 if (exists("successful_results") == TRUE) {
                     successful_batch[[res]]$rep <- length(successful_results) + res
-                    # successful_batch[[res]]$iteration <- successful_batch[[res]]$raw_iteration
                     successful_results[[length(successful_results) + 1]] <- successful_batch[[res]]
                 } else {
                     successful_results <- list(successful_batch[[res]])
                 }
                 rep_counter <- rep_counter + 1
-                # if (length(successful_results) >= reps) break
                 if (length(successful_results) %% backup_every == 0 || length(successful_results) >= reps) {
                     saveRDS(successful_results,
                             file.path(
@@ -781,16 +647,10 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
         )
     ))
     
-    #Glue used in prior code or Dr Liu's
-    # cond_label <- glue("quad={isQuad}, M={Mfamily}, Y={Yfamily}, nj=[{Nj_low},{Nj_high}], J={Jval}")
-    # rname <- glue("RData/qA{qA}qM{qM}qY{qY}_null{null}_cluster_opt{cluster_opt}_intXZ{intXZ}_xz{xz}_{Yfamily}_Fit_{learner}_icc{icc}_J{J}_n{nj}_rep{jobseeds[1]}_{tail(jobseeds, 1)}.RData")
-    
     # clear space
-    rm(successful_batch) #rm(result_list)
-    # gc()
+    rm(successful_batch) 
     
-    
-    # ----- New Logging Info -----
+    # New Logging Info 
     resume_logs <- list.files(cond_backup_folder, pattern = "^resume-log.*\\.txt$", full.names = TRUE)
     n_resumes <- length(resume_logs)
     resume_times <- if (n_resumes > 0) {
@@ -839,8 +699,5 @@ for (cond_idx in strting_cond:total_conditions) { #seq_len(total_conditions)) {
         "Time: {cond_time_formatted}"
     ))
 }
-
-
-
 
 ################################## END #########################################

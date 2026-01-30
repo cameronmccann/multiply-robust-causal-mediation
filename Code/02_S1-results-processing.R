@@ -20,12 +20,11 @@
 #   - 
 # 
 #
-# Last Updated: 2026-01-13
+# Last Updated: 2026-01-30
 #
 #
 # Notes:
 #   To-Do
-#       # Check & run error & warning sections 
 #       
 #   Done: 
 # 
@@ -54,10 +53,10 @@ pacman::p_load(
 sim_date <- "2025-10-22" 
 
 # Number of replications
-reps <- 1000 #600#200 
+reps <- 1000 
 
 # Add subdirectory for results, if desired (e.g., for test runs): where do you want results stored
-additional_folder_results <- NULL #"2025-10-22_1000-reps" # set to NULL on final run
+additional_folder_results <- NULL #"2025-10-22_1000-reps" # set to NULL on final run (i.e., to set S1_Results/ as results parent folder)
 
 # Where to pull simulaiton output from 
 additional_folder_output <- "2025-10-22_1000-reps" 
@@ -380,21 +379,6 @@ sim1_data <- purrr::map_dfr(all_data_list, function(file_data) {
         "Dropping %d iterations with error msg at indices %s: %s\n", 
         length(error_iter), paste(error_iter, collapse = ", "), basename(fname)
     ))
-    # # Identify and drop error iterations
-    # error_iter <- which(vapply(iter_data, function(iter) {
-    #     msg <- iter$results$`mlr-cwc.FE`$error_message
-    #     !is.null(msg) && grepl(
-    #         "Error in internal function `v.ac()`: no applicable method for 'predict' applied to an object of class \"NULL\"",
-    #         msg, fixed = TRUE
-    #     )
-    # }, logical(1)))
-    # 
-    # if (length(error_iter)) {
-    #     iter_data <- iter_data[-error_iter]
-    # }
-    # 
-    # cat(sprintf("Dropping %d iterations with error msg at indices %s: %s\n", 
-    #             length(error_iter), paste(error_iter, collapse = ", "), basename(fname)))
     
     # Extract condition number from filename
     condition_number <- str_extract(basename(fname), "(?<=condition-)[0-9]{2}")

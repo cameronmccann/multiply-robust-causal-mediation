@@ -14,7 +14,7 @@
 #       02_S1-results-processing.R script) and summarizes & reports the results 
 #       for the first simulation study (i.e., obtains performance measures & convergence rates). 
 #
-# Last Updated: 2026-01-09
+# Last Updated: 2026-01-30
 #
 #
 # Notes:
@@ -50,7 +50,7 @@ reps <- 1000
 results_root <- "Output/S1_Results" 
 
 # Add subdirectory for results, if desired (e.g., for test runs): where do you want results stored
-additional_folder_results <- NULL #"2025-10-22_1000-reps" # set to NULL on final run
+additional_folder_results <- NULL #"2025-10-22_1000-reps" # set to NULL on final run (i.e., to set S1_Results/ as results parent folder)
 
 # ══════════════════════════════
 #    Check Results folder structure  
